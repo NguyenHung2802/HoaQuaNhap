@@ -1,0 +1,105 @@
+<div class="row g-4 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="card-subtitle text-muted fw-bold">Sản phẩm</h6>
+                    <div class="p-2 bg-success bg-opacity-10 rounded text-success">
+                        <i class="fas fa-box fa-lg"></i>
+                    </div>
+                </div>
+                <h3 class="card-title mb-0"><%= stats.products %></h3>
+                <p class="text-muted small mt-2 mb-0">Tổng số mặt hàng hiện có</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="card-subtitle text-muted fw-bold">Danh mục</h6>
+                    <div class="p-2 bg-primary bg-opacity-10 rounded text-primary">
+                        <i class="fas fa-tags fa-lg"></i>
+                    </div>
+                </div>
+                <h3 class="card-title mb-0"><%= stats.categories %></h3>
+                <p class="text-muted small mt-2 mb-0">Tổng số nhóm hàng</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="card-subtitle text-muted fw-bold">Đơn hàng</h6>
+                    <div class="p-2 bg-warning bg-opacity-10 rounded text-warning">
+                        <i class="fas fa-shopping-cart fa-lg"></i>
+                    </div>
+                </div>
+                <h3 class="card-title mb-0"><%= stats.orders %></h3>
+                <p class="text-muted small mt-2 mb-0">Hôm nay: <span class="text-warning fw-bold">0</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="card-subtitle text-muted fw-bold">Khách hàng</h6>
+                    <div class="p-2 bg-info bg-opacity-10 rounded text-info">
+                        <i class="fas fa-users fa-lg"></i>
+                    </div>
+                </div>
+                <h3 class="card-title mb-0"><%= stats.customers %></h3>
+                <p class="text-muted small mt-2 mb-0">Hội viên đăng ký</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Đơn hàng mới nhất</h5>
+                    <a href="/admin/orders" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Mã đơn</th>
+                                <th>Khách hàng</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th class="text-end pe-4">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">Chưa có dữ liệu đơn hàng mới nào.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0">Sắp hết hàng</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Đang tải dữ liệu...</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

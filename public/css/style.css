@@ -1,0 +1,56 @@
+/* Common styles */
+:root {
+  --primary-color: #2e7d32;
+  --secondary-color: #fdd835;
+  --text-dark: #333;
+  --text-muted: #666;
+  --bg-light: #f8f9fa;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* Utils */
+.text-primary { color: var(--primary-color) !important; }
+.bg-primary { background-color: var(--primary-color) !important; }
+
+/* Navbar enhancements */
+.navbar {
+  padding: 0.8rem 0;
+  transition: all 0.3s ease;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.nav-link:hover {
+  color: var(--primary-color);
+}
+
+/* Hero Section */
+.hero-banner {
+  background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
+  border-bottom: 1px solid #eee;
+}
+
+/* Product Cards */
+.card {
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Footer Section */
+footer {
+  background-color: #333;
+  color: #fff;
+}

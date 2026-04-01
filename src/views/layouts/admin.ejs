@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Admin WebHoaQua</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Admin CSS -->
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --primary-color: #2e7d32;
+            --bg-light: #f8f9fa;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            overflow-x: hidden;
+        }
+        #wrapper {
+            display: flex;
+            width: 100%;
+        }
+        #sidebar-wrapper {
+            min-height: 100vh;
+            width: var(--sidebar-width);
+            background: #1a202c;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        #sidebar-wrapper .sidebar-heading {
+            padding: 1.5rem 1rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--primary-color);
+        }
+        #sidebar-wrapper .list-group-item {
+            background: transparent;
+            color: #cbd5e0;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            transition: 0.2s;
+        }
+        #sidebar-wrapper .list-group-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        #sidebar-wrapper .list-group-item.active {
+            background: rgba(46, 125, 50, 0.2);
+            color: #48bb78;
+            border-left: 4px solid #48bb78;
+        }
+        #page-content-wrapper {
+            width: 100%;
+        }
+        .admin-navbar {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <i class="fas fa-leaf me-2"></i>WebHoaQua Admin
+            </div>
+            <div class="list-group list-group-flush mt-3">
+                <a href="/admin" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+                <a href="/admin/products" class="list-group-item list-group-item-action">
+                    <i class="fas fa-box me-2"></i>Sản phẩm
+                </a>
+                <a href="/admin/categories" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tags me-2"></i>Danh mục
+                </a>
+                <a href="/admin/orders" class="list-group-item list-group-item-action">
+                    <i class="fas fa-shopping-cart me-2"></i>Đơn hàng
+                </a>
+                <a href="/admin/customers" class="list-group-item list-group-item-action">
+                    <i class="fas fa-users me-2"></i>Khách hàng
+                </a>
+                <a href="/admin/banners" class="list-group-item list-group-item-action">
+                    <i class="fas fa-image me-2"></i>Banners
+                </a>
+                <a href="/admin/blog" class="list-group-item list-group-item-action">
+                    <i class="fas fa-pen-nib me-2"></i>Bài viết
+                </a>
+                <hr class="bg-gray-700 my-2">
+                <a href="/" class="list-group-item list-group-item-action">
+                    <i class="fas fa-external-link-alt me-2"></i>Xem Website
+                </a>
+                <a href="/admin/logout" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                </a>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg admin-navbar py-3 px-4">
+                <div class="container-fluid">
+                    <h5 class="mb-0 text-dark fw-bold"><%= title %></h5>
+                    <div class="ms-auto d-flex align-items-center">
+                        <span class="me-3 text-muted">Xin chào, <strong>Admin</strong></span>
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=2e7d32&color=fff" class="rounded-circle" width="35" alt="Avatar">
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                <%- body %>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

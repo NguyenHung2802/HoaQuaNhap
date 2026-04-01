@@ -1,0 +1,47 @@
+<section class="hero-banner bg-light py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Chào mừng đến với WebHoaQua</h1>
+        <p class="lead">Hương vị tươi mới từ khắp thế giới, giao tận tay bạn.</p>
+        <a href="/products" class="btn btn-primary btn-lg px-4 gap-3">Xem Sản Phẩm</a>
+    </div>
+</section>
+
+<section class="featured-products py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Sản Phẩm Nổi Bật</h2>
+        <div class="row g-4">
+            <% if (featuredProducts.length > 0) { %>
+                <% featuredProducts.forEach(product => { %>
+                    <div class="col-md-3">
+                        <div class="card h-100 shadow-sm transition-hover">
+                            <div class="position-absolute top-0 end-0 p-2">
+                                <span class="badge bg-danger rounded-pill">Mới</span>
+                            </div>
+                            <div class="card-body text-center d-flex flex-column">
+                                <div class="product-icon mb-3">
+                                    <i class="fas fa-seedling fa-3x text-success"></i>
+                                </div>
+                                <h5 class="card-title fw-bold text-dark"><%= product.name %></h5>
+                                <p class="card-text text-muted small flex-grow-1"><%= product.short_description %></p>
+                                <div class="price-container mt-auto">
+                                    <% if (product.sale_price) { %>
+                                        <span class="text-decoration-line-through text-muted small"><%= product.price.toLocaleString() %>₫</span>
+                                        <span class="fw-bold text-primary fs-5"><%= product.sale_price.toLocaleString() %>₫</span>
+                                    <% } else { %>
+                                        <span class="fw-bold text-primary fs-5"><%= product.price.toLocaleString() %>₫</span>
+                                    <% } %>
+                                    <span class="text-muted small">/<%= product.unit %></span>
+                                </div>
+                                <a href="/products/<%= product.slug %>" class="btn btn-outline-primary btn-sm mt-3 stretched-link">Chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="col-12 text-center py-5 text-muted">
+                    <p>Đang cập nhật sản phẩm mới...</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</section>
