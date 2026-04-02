@@ -1,47 +1,463 @@
-<section class="hero-banner bg-light py-5">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold">Chào mừng đến với WebHoaQua</h1>
-        <p class="lead">Hương vị tươi mới từ khắp thế giới, giao tận tay bạn.</p>
-        <a href="/products" class="btn btn-primary btn-lg px-4 gap-3">Xem Sản Phẩm</a>
+<!-- ===== HERO SECTION ===== -->
+<section class="hero-section">
+    <div class="hero-bg"></div>
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-lg-6 hero-text-col">
+                <p class="hero-eyebrow">🍃 Nhập khẩu chính hãng • Tươi ngon mỗi ngày</p>
+                <h1 class="hero-title">Tinh Hoa <br>Trái Cây <span class="hero-title-accent">Nhập Khẩu</span><br>Toàn Cầu.</h1>
+                <p class="hero-subtitle">Hàng trăm loại trái cây thượng hạng từ Hàn Quốc, Mỹ, New Zealand... mang đến tận tay bạn mỗi ngày.</p>
+                <div class="d-flex gap-3 flex-wrap mt-4">
+                    <a href="/products" class="btn btn-primary btn-lg rounded-pill px-5">
+                        Mua sắm ngay <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#categories" class="btn btn-outline-light btn-lg rounded-pill px-5">
+                        Khám phá
+                    </a>
+                </div>
+                <!-- Trust badges -->
+                <div class="d-flex gap-4 mt-5 trust-badges">
+                    <div class="trust-badge">
+                        <span class="badge-number">500+</span>
+                        <span class="badge-label">Loại trái cây</span>
+                    </div>
+                    <div class="trust-badge">
+                        <span class="badge-number">10K+</span>
+                        <span class="badge-label">Khách hàng tin yêu</span>
+                    </div>
+                    <div class="trust-badge">
+                        <span class="badge-number">30+</span>
+                        <span class="badge-label">Quốc gia xuất xứ</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+                <div class="hero-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80" alt="Trái cây nhập khẩu tươi ngon" class="hero-main-img">
+                    <div class="hero-badge-float">
+                        <i class="fas fa-check-circle me-2"></i> Đảm bảo chất lượng
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
-<section class="featured-products py-5">
+<!-- ===== CATEGORIES CIRCLES ===== -->
+<section class="section-padding" id="categories">
     <div class="container">
-        <h2 class="text-center mb-4">Sản Phẩm Nổi Bật</h2>
-        <div class="row g-4">
-            <% if (featuredProducts.length > 0) { %>
-                <% featuredProducts.forEach(product => { %>
-                    <div class="col-md-3">
-                        <div class="card h-100 shadow-sm transition-hover">
-                            <div class="position-absolute top-0 end-0 p-2">
-                                <span class="badge bg-danger rounded-pill">Mới</span>
+        <div class="text-center mb-5">
+            <p class="section-eyebrow">Đa dạng lựa chọn</p>
+            <h2 class="section-title">Khám Phá Thiên Đường<br>Trái Cây</h2>
+        </div>
+        <div class="row justify-content-center g-4">
+            <% const catIcons = ['🍎','🍇','🍓','🍊','🍋','🍌','🥝','🍑']; %>
+            <% if (categories && categories.length > 0) { %>
+                <% categories.forEach((cat, i) => { %>
+                    <div class="col-4 col-sm-3 col-md-2">
+                        <a href="/products?category=<%= cat.slug %>" class="cat-circle-item">
+                            <div class="cat-circle-img">
+                                <% if (cat.image_url) { %>
+                                    <img src="<%= cat.image_url %>" alt="<%= cat.name %>" loading="lazy">
+                                <% } else { %>
+                                    <span class="cat-emoji"><%= catIcons[i % catIcons.length] %></span>
+                                <% } %>
                             </div>
-                            <div class="card-body text-center d-flex flex-column">
-                                <div class="product-icon mb-3">
-                                    <i class="fas fa-seedling fa-3x text-success"></i>
-                                </div>
-                                <h5 class="card-title fw-bold text-dark"><%= product.name %></h5>
-                                <p class="card-text text-muted small flex-grow-1"><%= product.short_description %></p>
-                                <div class="price-container mt-auto">
-                                    <% if (product.sale_price) { %>
-                                        <span class="text-decoration-line-through text-muted small"><%= product.price.toLocaleString() %>₫</span>
-                                        <span class="fw-bold text-primary fs-5"><%= product.sale_price.toLocaleString() %>₫</span>
-                                    <% } else { %>
-                                        <span class="fw-bold text-primary fs-5"><%= product.price.toLocaleString() %>₫</span>
-                                    <% } %>
-                                    <span class="text-muted small">/<%= product.unit %></span>
-                                </div>
-                                <a href="/products/<%= product.slug %>" class="btn btn-outline-primary btn-sm mt-3 stretched-link">Chi tiết</a>
-                            </div>
-                        </div>
+                            <span class="cat-circle-name"><%= cat.name %></span>
+                        </a>
                     </div>
                 <% }) %>
             <% } else { %>
-                <div class="col-12 text-center py-5 text-muted">
-                    <p>Đang cập nhật sản phẩm mới...</p>
-                </div>
+                <% ['Táo Nhập', 'Nho Tươi', 'Dâu Tây', 'Cam Vàng', 'Lê Nhập', 'Xoài'].forEach((name, i) => { %>
+                    <div class="col-4 col-sm-3 col-md-2">
+                        <a href="/products" class="cat-circle-item">
+                            <div class="cat-circle-img">
+                                <span class="cat-emoji"><%= catIcons[i] %></span>
+                            </div>
+                            <span class="cat-circle-name"><%= name %></span>
+                        </a>
+                    </div>
+                <% }) %>
             <% } %>
         </div>
     </div>
 </section>
+
+<!-- ===== FEATURED PRODUCTS ===== -->
+<section class="section-padding bg-light-grey">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <p class="section-eyebrow">Lựa chọn hôm nay</p>
+                <h2 class="section-title mb-0">Sản Phẩm Yêu Thích<br>Trong Mùa</h2>
+            </div>
+            <a href="/products" class="btn btn-outline-primary rounded-pill px-4 d-none d-md-block">
+                Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        <div class="row g-4">
+            <% const allProducts = [...(featuredProducts || []), ...(bestSellers || [])].slice(0, 4); %>
+            <% if (allProducts.length > 0) { %>
+                <% allProducts.forEach(p => { %>
+                    <div class="col-6 col-md-3">
+                        <a href="/product/<%= p.slug %>" class="fruit-card d-block text-decoration-none">
+                            <div class="fruit-card-img-wrap">
+                                <% if (p.images && p.images.length > 0) { %>
+                                    <img src="<%= p.images[0].image_url %>" alt="<%= p.name %>" loading="lazy">
+                                <% } else { %>
+                                    <div class="fruit-card-placeholder">
+                                        <i class="fas fa-apple-whole"></i>
+                                    </div>
+                                <% } %>
+                                <% if (p.is_best_seller) { %>
+                                    <span class="fruit-tag hot">Bán chạy 🔥</span>
+                                <% } else if (p.is_featured) { %>
+                                    <span class="fruit-tag new">Nổi bật ✨</span>
+                                <% } %>
+                            </div>
+                            <div class="fruit-card-body">
+                                <h5 class="fruit-card-name"><%= p.name %></h5>
+                                <div class="fruit-card-price-wrap">
+                                    <span class="price-main">
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.sale_price || p.price) %>
+                                    </span>
+                                    <% if (p.sale_price) { %>
+                                        <span class="price-old">
+                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price) %>
+                                        </span>
+                                    <% } %>
+                                </div>
+                                <p class="fruit-card-unit"><%= p.unit || 'kg' %> · <%= p.origin_country || '' %></p>
+                            </div>
+                        </a>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="col-12 text-center py-5 text-muted">
+                    <i class="fas fa-box-open fa-3x mb-3 opacity-25"></i>
+                    <p>Chưa có sản phẩm nào. Vui lòng quay lại sau!</p>
+                </div>
+            <% } %>
+        </div>
+        <div class="text-center mt-4 d-md-none">
+            <a href="/products" class="btn btn-outline-primary rounded-pill px-4">Xem tất cả sản phẩm</a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PROMO BANNER ===== -->
+<section class="promo-banner-section">
+    <div class="container">
+        <div class="promo-banner-card">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <p class="promo-eyebrow">Ưu đãi đặc biệt</p>
+                    <h2 class="promo-title">Combo Chào Buổi Sáng</h2>
+                    <p class="promo-desc">Bộ sưu tập trái cây tươi được tuyển chọn kỹ lưỡng — Táo Envy, Lê Hàn, Nho Shine Muscat. Tặng kèm túi quà cao cấp.</p>
+                    <div class="d-flex align-items-center gap-4 mt-4">
+                        <div>
+                            <span class="promo-price">390.000₫</span>
+                            <span class="promo-price-old ms-2">520.000₫</span>
+                        </div>
+                        <a href="/products" class="btn btn-light rounded-pill px-4 fw-bold">
+                            Săn ngay <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-flex justify-content-end">
+                    <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500&q=80" 
+                         alt="Combo trái cây" class="promo-img rounded-4" style="max-height:280px;object-fit:cover;width:100%">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== WHY CHOOSE US ===== -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <p class="section-eyebrow">Tại sao chọn chúng tôi?</p>
+                <h2 class="section-title">Lý Do Người Tiêu Dùng<br>Yêu Thích</h2>
+                <p class="text-muted mt-3 mb-4">Cam kết mang đến những trái cây thuần khiết nhất từ các vùng nguyên sản. Chất lượng là ưu tiên hàng đầu.</p>
+                <a href="/about" class="btn btn-primary rounded-pill px-4">Tìm hiểu thêm</a>
+            </div>
+            <div class="col-lg-7">
+                <div class="row g-4">
+                    <% [
+                        { icon: 'fas fa-seedling', title: 'Vùng Nguyên Sản', desc: 'Trực tiếp từ những vườn cây uy tín tại Hàn Quốc, Mỹ, New Zealand...', color: '#e8f5e9' },
+                        { icon: 'fas fa-snowflake', title: 'Bảo Quản Tươi Ngon', desc: 'Quy trình bảo quản lạnh chuẩn quốc tế từ khâu thu hoạch đến tay bạn.', color: '#e3f2fd' },
+                        { icon: 'fas fa-award', title: 'Chứng Nhận Chất Lượng', desc: 'Toàn bộ sản phẩm có giấy kiểm định nhập khẩu, đảm bảo an toàn thực phẩm.', color: '#fff8e1' },
+                        { icon: 'fas fa-truck', title: 'Giao Hàng Tận Nơi', desc: 'Hệ thống giao hàng nhanh, đảm bảo trái cây đến tay bạn trong tình trạng tốt nhất.', color: '#fce4ec' }
+                    ].forEach(item => { %>
+                        <div class="col-6">
+                            <div class="why-card" style="background: <%= item.color %>;">
+                                <div class="why-icon"><i class="<%= item.icon %>"></i></div>
+                                <h6 class="why-title"><%= item.title %></h6>
+                                <p class="why-desc"><%= item.desc %></p>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="section-padding testimonials-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="section-eyebrow">Khách hàng nói gì?</p>
+            <h2 class="section-title">"Trải nghiệm trái cây đến tận<br>ngưỡng chất lượng"</h2>
+        </div>
+        <div class="row justify-content-center g-4">
+            <% [
+                { name: 'Trần Thị Mai', role: 'Nội trợ, TP.HCM', text: 'Mình đã mua táo Envy và nho Shine Muscat nhiều lần. Trái cây luôn tươi, giòn ngọt hơn hẳn siêu thị!', stars: 5 },
+                { name: 'Nguyễn Văn Hùng', role: 'Doanh nhân, Hà Nội', text: 'Tôi thường tặng hộp quà trái cây nhập khẩu cho đối tác. Cách đóng gói rất sang trọng, đối tác luôn ấn tượng.', stars: 5 },
+                { name: 'Lê Thu Hà', role: 'Mẹ 2 con, Đà Nẵng', text: 'Con tôi rất thích dâu tây Seolhyang từ đây. Dâu to, ngọt, không chua như nơi khác.', stars: 5 }
+            ].forEach(r => { %>
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="d-flex gap-1 mb-3">
+                            <% for(let s=0; s<r.stars; s++) { %><i class="fas fa-star text-warning"></i><% } %>
+                        </div>
+                        <p class="testimonial-text">"<%= r.text %>"</p>
+                        <div class="testimonial-author mt-4">
+                            <div class="author-avatar"><%= r.name.charAt(0) %></div>
+                            <div>
+                                <div class="fw-bold"><%= r.name %></div>
+                                <small class="text-muted"><%= r.role %></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ===== BLOG FEED ===== -->
+<section class="section-padding bg-light-grey">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <p class="section-eyebrow">Góc kiến thức</p>
+                <h2 class="section-title mb-0">Kiến Thức Trái Cây</h2>
+            </div>
+            <a href="/blog" class="btn btn-outline-primary rounded-pill px-4 d-none d-md-block">Xem tất cả</a>
+        </div>
+        <div class="row g-4">
+            <% [
+                { title: 'Bí Quyết Bảo Quản Táo Nhập Khẩu Luôn Tươi Ngon', date: '28/03/2025', tag: 'Mẹo hay', img: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&q=80' },
+                { title: 'Trái Cây Vitamin C Cực Cần Thiết Cho Mùa Hè', date: '25/03/2025', tag: 'Sức khỏe', img: 'https://images.unsplash.com/photo-1543218024-57a70143c369?w=400&q=80' },
+                { title: 'Nghệ Thuật Trao Quà: Hộp Trái Cây Đẳng Cấp', date: '22/03/2025', tag: 'Phong cách', img: 'https://images.unsplash.com/photo-1471927272523-e75852d3a4b1?w=400&q=80' }
+            ].forEach(b => { %>
+                <div class="col-md-4">
+                    <a href="/blog" class="blog-card d-block">
+                        <div class="blog-img-wrap">
+                            <img src="<%= b.img %>" alt="<%= b.title %>" loading="lazy">
+                            <span class="blog-tag"><%= b.tag %></span>
+                        </div>
+                        <div class="blog-body">
+                            <p class="blog-date"><i class="far fa-calendar me-1"></i><%= b.date %></p>
+                            <h5 class="blog-title"><%= b.title %></h5>
+                            <span class="blog-link">Đọc thêm <i class="fas fa-arrow-right ms-1"></i></span>
+                        </div>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CSS for this page ===== -->
+<style>
+/* ---- Variables ---- */
+:root {
+    --hero-bg: #0f2d1f;
+    --bg-light-grey: #f4f7f3;
+}
+.bg-light-grey { background: var(--bg-light-grey); }
+.section-eyebrow {
+    color: var(--brand-accent);
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+.section-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    color: var(--brand-primary);
+    line-height: 1.2;
+}
+
+/* ---- HERO ---- */
+.hero-section {
+    position: relative;
+    background: var(--hero-bg);
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+.hero-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=60') center/cover no-repeat;
+    opacity: 0.15;
+}
+.hero-section > .container { position: relative; z-index: 2; }
+.hero-eyebrow {
+    color: #a3e9bc;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+.hero-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: #fff;
+    line-height: 1.1;
+}
+.hero-title-accent { color: #6fcf97; }
+.hero-subtitle { color: #cbd5e1; font-size: 1.1rem; max-width: 480px; margin-top: 1rem; }
+.trust-badges { gap: 2rem !important; }
+.trust-badge { text-align: center; }
+.badge-number { display: block; font-size: 1.8rem; font-weight: 800; color: #fff; line-height: 1; }
+.badge-label { font-size: 0.75rem; color: #94a3b8; }
+.hero-image-wrap { position: relative; }
+.hero-main-img { width: 100%; max-width: 500px; height: 520px; object-fit: cover; border-radius: 24px; }
+.hero-badge-float {
+    position: absolute; bottom: 30px; left: -30px;
+    background: #fff; padding: 12px 20px; border-radius: 50px;
+    font-weight: 600; font-size: 0.9rem; color: var(--brand-primary);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* ---- CATEGORIES ---- */
+.cat-circle-item {
+    display: flex; flex-direction: column; align-items: center;
+    text-decoration: none; gap: 10px;
+    transition: transform 0.3s ease;
+}
+.cat-circle-item:hover { transform: translateY(-6px); }
+.cat-circle-img {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: var(--bg-light-grey);
+    border: 3px solid #e8f5e9;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.cat-circle-item:hover .cat-circle-img {
+    border-color: var(--brand-accent);
+    box-shadow: 0 8px 20px rgba(46,125,50,0.2);
+}
+.cat-circle-img img { width: 100%; height: 100%; object-fit: cover; }
+.cat-emoji { font-size: 2.2rem; }
+.cat-circle-name {
+    font-size: 0.82rem; font-weight: 600; text-align: center;
+    color: var(--brand-primary);
+}
+
+/* ---- PRODUCT CARDS ---- */
+.fruit-card {
+    border: 1px solid #eee;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #fff;
+    transition: all 0.3s ease;
+    color: inherit;
+}
+.fruit-card:hover { transform: translateY(-6px); box-shadow: 0 16px 36px rgba(0,0,0,0.1); }
+.fruit-card-img-wrap { position: relative; overflow: hidden; padding-top: 75%; background: var(--bg-light-grey); }
+.fruit-card-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.fruit-card:hover .fruit-card-img-wrap img { transform: scale(1.06); }
+.fruit-card-placeholder {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; color: #ccc;
+}
+.fruit-tag {
+    position: absolute; top: 12px; left: 12px;
+    padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+}
+.fruit-tag.hot { background: #fee2e2; color: #dc2626; }
+.fruit-tag.new { background: #e0f2fe; color: #0369a1; }
+.fruit-card-body { padding: 16px; }
+.fruit-card-name {
+    font-family: var(--font-heading);
+    font-size: 1rem; line-height: 1.3;
+    color: var(--brand-primary); margin-bottom: 8px;
+}
+.price-main { font-size: 1.1rem; font-weight: 700; color: var(--brand-accent); }
+.price-old { font-size: 0.85rem; color: #9ca3af; text-decoration: line-through; margin-left: 6px; }
+.fruit-card-unit { font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0; }
+
+/* ---- PROMO BANNER ---- */
+.promo-banner-section { padding: 40px 0; }
+.promo-banner-card {
+    background: linear-gradient(135deg, #1b4d3e 0%, #2e7d32 100%);
+    border-radius: 28px;
+    padding: 56px 60px;
+    color: #fff;
+    overflow: hidden;
+}
+.promo-eyebrow { color: #a3e9bc; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+.promo-title { font-family: var(--font-heading); font-size: clamp(1.8rem, 3vw, 2.8rem); color: #fff; }
+.promo-desc { color: #cbd5e1; max-width: 520px; }
+.promo-price { font-size: 2rem; font-weight: 800; color: #6fcf97; }
+.promo-price-old { font-size: 1.1rem; text-decoration: line-through; color: rgba(255,255,255,0.4); }
+
+/* ---- WHY US ---- */
+.why-card {
+    border-radius: 18px; padding: 28px;
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+.why-card:hover { transform: translateY(-4px); }
+.why-icon { font-size: 1.8rem; color: var(--brand-primary); margin-bottom: 12px; }
+.why-title { font-weight: 700; color: var(--brand-primary); margin-bottom: 8px; }
+.why-desc { font-size: 0.875rem; color: var(--text-muted); margin: 0; }
+
+/* ---- TESTIMONIALS ---- */
+.testimonials-section { background: #fff; }
+.testimonial-card {
+    background: var(--bg-light-grey);
+    border-radius: 20px; padding: 32px;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+.testimonial-card:hover { background: var(--brand-light-green); }
+.testimonial-text { font-family: var(--font-heading); font-size: 1.05rem; font-style: italic; color: var(--brand-primary); line-height: 1.6; }
+.testimonial-author { display: flex; align-items: center; gap: 14px; }
+.author-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--brand-accent);
+    color: #fff; font-weight: 700; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* ---- BLOG ---- */
+.blog-card { text-decoration: none; color: inherit; border-radius: 18px; overflow: hidden; background: #fff; border: 1px solid #eee; transition: all 0.3s ease; }
+.blog-card:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(0,0,0,0.08); color: inherit; }
+.blog-img-wrap { position: relative; padding-top: 60%; overflow: hidden; }
+.blog-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.blog-card:hover .blog-img-wrap img { transform: scale(1.06); }
+.blog-tag { position: absolute; top: 14px; left: 14px; background: var(--brand-accent); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.blog-body { padding: 22px; }
+.blog-date { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+.blog-title { font-size: 1rem; font-weight: 700; color: var(--brand-primary); line-height: 1.4; margin-bottom: 12px; }
+.blog-link { font-size: 0.85rem; color: var(--brand-accent); font-weight: 600; }
+
+@media (max-width: 768px) {
+    .hero-section { min-height: 80vh; }
+    .promo-banner-card { padding: 36px 24px; }
+    .cat-circle-img { width: 70px; height: 70px; }
+}
+</style>

@@ -1,0 +1,53 @@
+<!-- Modal: Auth Intervention (Guest Buy Now) -->
+<div class="modal fade" id="authInterventionModal" tabindex="-1" aria-labelledby="authInterventionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="authInterventionModalLabel">Bạn muốn thực hiện mua hàng?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="card bg-primary bg-opacity-10 border-0 p-3 rounded-4 h-100 text-center">
+                            <i class="fas fa-user-check text-primary fs-3 mb-3"></i>
+                            <h6 class="fw-bold mb-2">Mua hàng là thành viên</h6>
+                            <p class="text-muted small mb-3">Tận hưởng ưu đãi, tích điểm và theo dõi đơn hàng dễ dàng.</p>
+                            <a href="/auth/login" class="btn btn-primary rounded-pill fw-bold">Đăng nhập ngay</a>
+                            <p class="mt-2 text-muted small">Chưa có tài khoản? <a href="/auth/register" class="text-decoration-none">Đăng ký</a></p>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4 text-center">
+                        <span class="text-muted fw-light">- HOẶC -</span>
+                    </div>
+                    <div class="col-12">
+                        <div class="card bg-light border-0 p-3 rounded-4 h-100 text-center shadow-sm">
+                            <i class="fas fa-bolt text-warning fs-3 mb-3"></i>
+                            <h6 class="fw-bold mb-2">Mua nhanh không cần tài khoản</h6>
+                            <p class="text-muted small mb-3">Chỉ cần cung cấp SĐT và Họ tên để chúng tôi liên hệ giao hàng.</p>
+                            
+                            <!-- Form nhập liệu nhanh (Quick Checkout) -->
+                            <form action="/api/public/orders/quick-checkout" method="POST" id="quickCheckoutForm">
+                                <input type="hidden" name="product_id" id="quickCheckoutProductId">
+                                <input type="hidden" name="quantity" id="quickCheckoutQuantity" value="1">
+                                
+                                <div class="mb-2">
+                                    <input type="text" name="full_name" class="form-control rounded-pill border-0" placeholder="Họ và tên" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="tel" name="phone" class="form-control rounded-pill border-0" placeholder="Số điện thoại" required>
+                                </div>
+                                <button type="submit" class="btn btn-dark btn-lg rounded-pill fw-bold w-100 shadow">
+                                    Xác nhận mua ngay
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 text-center justify-content-center pb-4">
+                <p class="text-muted small">Cần hỗ trợ? <i class="fab fa-facebook-messenger text-primary mx-1"></i> Liên hệ <a href="https://m.me/yourpage" target="_blank" class="fw-bold">Messenger</a> hoặc Zalo</p>
+            </div>
+        </div>
+    </div>
+</div>

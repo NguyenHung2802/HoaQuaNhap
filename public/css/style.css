@@ -1,56 +1,180 @@
-/* Common styles */
+/* 
+    The Digital Orchard - Public Styles 
+    Phase 4: S14 Assets & Global Styles
+*/
+
 :root {
-  --primary-color: #2e7d32;
-  --secondary-color: #fdd835;
-  --text-dark: #333;
-  --text-muted: #666;
-  --bg-light: #f8f9fa;
+    /* Colors - Fresh & Premium */
+    --brand-primary: #1b4d3e;     /* Darker Green for text/buttons */
+    --brand-accent: #2e7d32;      /* Vibrant Green */
+    --brand-secondary: #f4b400;   /* Fruit Yellow */
+    --brand-light-green: #e8f5e9;
+    
+    --text-main: #1a1a1a;
+    --text-muted: #6b7280;
+    --bg-global: #ffffff;
+    --bg-alt: #f9fafb;
+    --border-color: #efefef;
+
+    /* Fonts */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Outfit', sans-serif;
 }
 
+/* Base Styles */
 body {
-  font-family: 'Outfit', sans-serif;
-  color: var(--text-dark);
-  line-height: 1.6;
+    font-family: var(--font-body);
+    color: var(--text-main);
+    background-color: var(--bg-global);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Utils */
-.text-primary { color: var(--primary-color) !important; }
-.bg-primary { background-color: var(--primary-color) !important; }
+h1, h2, h3, h4, .serif-font {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--brand-primary);
+}
 
-/* Navbar enhancements */
+a {
+    color: var(--brand-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--brand-accent);
+}
+
+/* Typography Helpers */
+.text-brand { color: var(--brand-primary) !important; }
+.text-accent { color: var(--brand-accent) !important; }
+.font-serif { font-family: var(--font-heading) !important; }
+.lh-1 { line-height: 1.1; }
+.letter-spacing-1 { letter-spacing: -0.02em; }
+
+/* Buttons Enhancement */
+.btn-primary {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 100px; /* Pillow shape from design */
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--brand-accent);
+    border-color: var(--brand-accent);
+}
+
+.btn-outline-primary {
+    color: var(--brand-primary);
+    border-color: var(--brand-primary);
+    border-radius: 100px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+
+/* Layout Elements */
+.section-padding {
+    padding: 80px 0;
+}
+
+@media (max-width: 768px) {
+    .section-padding {
+        padding: 50px 0;
+    }
+}
+
+/* Navbar Customization */
 .navbar {
-  padding: 0.8rem 0;
-  transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-brand {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--brand-primary) !important;
+    font-size: 1.8rem;
 }
 
 .nav-link {
-  font-weight: 500;
-  color: var(--text-dark);
+    color: var(--text-main);
+    font-weight: 500;
+    margin: 0 10px;
+    position: relative;
 }
 
-.nav-link:hover {
-  color: var(--primary-color);
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    right: 10px;
+    height: 2px;
+    background: var(--brand-accent);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
 }
 
-/* Hero Section */
-.hero-banner {
-  background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
-  border-bottom: 1px solid #eee;
+.nav-link:hover::after, .nav-link.active::after {
+    transform: scaleX(1);
 }
 
-/* Product Cards */
-.card {
-  border: none;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Card Improvements */
+.fruit-card {
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #fff;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+.fruit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
-/* Footer Section */
-footer {
-  background-color: #333;
-  color: #fff;
+.fruit-card img {
+    transition: transform 0.5s ease;
+}
+
+.fruit-card:hover img {
+    transform: scale(1.05);
+}
+
+/* Badges */
+.badge-brand {
+    background-color: var(--brand-accent);
+    color: #fff;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+/* Footer Dark */
+.footer-dark {
+    background-color: #0f172a; /* Near black green/slate */
+    color: #cbd5e1;
+    padding: 80px 0 30px;
+}
+
+.footer-dark h5 {
+    color: #fff;
+    margin-bottom: 25px;
+}
+
+.footer-dark a {
+    color: #94a3b8;
+}
+
+.footer-dark a:hover {
+    color: #fff;
 }

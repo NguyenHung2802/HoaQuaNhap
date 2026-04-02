@@ -1,35 +1,53 @@
 const db = require('../../../config/db');
 
 /**
- * Hiển thị trang chủ với dữ liệu mẫu từ DB để test kết nối
+ * Hiển thị trang chủ - Phase 4 Version
  */
 exports.renderHome = async (req, res, next) => {
   try {
-    // 1. Fetch Featured Products
+    // 1. Sản phẩm nổi bật (4 featured)
     const featuredProducts = await db.product.findMany({
       where: { is_featured: true, status: 'published' },
-      include: { category: true },
-      take: 8,
+      include: {
+        images: { where: { is_thumbnail: true }, take: 1 }
+      },
+      take: 4,
+      orderBy: { created_at: 'desc' }
     });
 
-    // 2. Fetch Active Categories
+    // 2. Sản phẩm bán chạy (4 best_seller)
+    const bestSellers = await db.product.findMany({
+      where: { is_best_seller: true, status: 'published' },
+      include: {
+        images: { where: { is_thumbnail: true }, take: 1 }
+      },
+      take: 4,
+      orderBy: { created_at: 'desc' }
+    });
+
+    // 3. Categories (đã có trong globalCategories, lấy thêm với count)
     const categories = await db.category.findMany({
       where: { is_active: true },
-      take: 6,
+      take: 6
     });
 
     res.render('public/home/index', {
-      title: 'Trang chủ - Thế giới Hoa Quả Nhập Khẩu',
+      title: 'Trang chủ',
+      metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại WebHoaQua — Tươi ngon, đảm bảo chất lượng, giao hàng tận nơi.',
       featuredProducts,
+      bestSellers,
       categories,
+      layout: 'layouts/main'
     });
   } catch (error) {
-    // Nếu chưa có DB hoặc chưa migrate, vẫn render trang nhưng báo log
-    console.error('Home controller error (Possibly DB not ready):', error.message);
+    console.error('Home controller error:', error.message);
     res.render('public/home/index', {
-      title: 'Chào mừng đến với WebHoaQua',
+      title: 'Trang chủ',
+      metaDesc: '',
       featuredProducts: [],
+      bestSellers: [],
       categories: [],
+      layout: 'layouts/main'
     });
   }
 };

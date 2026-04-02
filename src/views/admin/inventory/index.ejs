@@ -1,0 +1,98 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Lịch sử biến động kho</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Kho hàng</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="card-title mb-0">Lịch sử nhập/xuất/điều chỉnh</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4">Thời gian</th>
+                        <th>Sản phẩm</th>
+                        <th>Loại</th>
+                        <th>Số lượng</th>
+                        <th>Trước / Sau</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (logs && logs.length > 0) { %>
+                        <% logs.forEach(log => { %>
+                            <tr>
+                                <td class="ps-4 text-muted small">
+                                    <%= new Date(log.created_at).toLocaleString('vi-VN') %>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark"><%= log.product.name %></div>
+                                    <div class="small text-muted">SKU: <%= log.product.sku %></div>
+                                </td>
+                                <td>
+                                    <% if (log.type === 'import') { %>
+                                        <span class="badge bg-success bg-opacity-10 text-success border-0 px-2 py-1">Nhập kho</span>
+                                    <% } else if (log.type === 'export') { %>
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border-0 px-2 py-1">Xuất kho</span>
+                                    <% } else if (log.type === 'adjust') { %>
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border-0 px-2 py-1">Điều chỉnh</span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary opacity-10 text-secondary border-0 px-2 py-1"><%= log.type %></span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <span class="fw-bold <%= log.quantity >= 0 ? 'text-success' : 'text-danger' %>">
+                                        <%= log.quantity >= 0 ? '+' : '' %><%= log.quantity %>
+                                    </span>
+                                </td>
+                                <td class="small text-muted">
+                                    <%= log.before_quantity %> <i class="fas fa-arrow-right mx-1 opacity-50"></i> <%= log.after_quantity %>
+                                </td>
+                                <td>
+                                    <span class="text-muted"><%= log.note || '---' %></span>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-history fa-3x mb-3 opacity-25"></i>
+                                <p class="mb-0">Chưa có lích sử biến động kho nào.</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <div class="card-footer bg-white py-3 border-top-0">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>">Trước</a>
+                        </li>
+                        <% for(let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link shadow-none" href="?page=<%= i %>"><%= i %></a>
+                            </li>
+                        <% } %>
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage + 1 %>">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        <% } %>
+    </div>
+</div>

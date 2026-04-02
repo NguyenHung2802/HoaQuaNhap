@@ -1,0 +1,68 @@
+<div class="container-fluid px-4">
+    <h1 class="mt-4"><%= title %></h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+        <li class="breadcrumb-item active">Đơn hàng</li>
+    </ol>
+
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <i class="fas fa-table me-1"></i>
+            Danh sách đơn hàng mới nhất
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Loại khách</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày đặt</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                        <tr>
+                            <td><strong>#<%= order.order_code %></strong></td>
+                            <td>
+                                <div><%= order.customer_name %></div>
+                                <small class="text-muted"><%= order.customer_phone %></small>
+                            </td>
+                            <td>
+                                <% if (order.customer && order.customer.user_id) { %>
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">
+                                        <i class="fas fa-user-check me-1"></i> Thành viên
+                                    </span>
+                                <% } else { %>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">
+                                        <i class="fas fa-user-secret me-1"></i> Khách vãng lai
+                                    </span>
+                                <% } %>
+                            </td>
+                            <td><span class="text-danger fw-bold"><%= order.total_amount.toLocaleString('vi-VN') %>₫</span></td>
+                            <td>
+                                <span class="badge bg-warning text-dark"><%= order.order_status %></span>
+                            </td>
+                            <td><small><%= order.created_at.toLocaleString('vi-VN') %></small></td>
+                            <td>
+                                <a href="/admin/orders/<%= order.id %>" class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <i class="fas fa-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                        <% if (orders.length === 0) { %>
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">Chưa có đơn hàng nào.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

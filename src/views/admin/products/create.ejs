@@ -1,0 +1,272 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Thêm sản phẩm mới</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/admin/products">Sản phẩm</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Thêm mới</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="/admin/products" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Quay lại
+    </a>
+</div>
+
+<form action="/admin/products/create" method="POST" enctype="multipart/form-data">
+    <div class="row">
+        <!-- Main Column -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Thông tin cơ bản</h5>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-bold">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-lg" id="name" name="name" 
+                               placeholder="Ví dụ: Nho mẫu đơn Hàn Quốc" required onkeyup="generateSlug()">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="slug" class="form-label fw-bold">Slug (Đường dẫn thân thiện) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted small">/products/</span>
+                            <input type="text" class="form-control" id="slug" name="slug" placeholder="nho-mau-don-han-quoc" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="generateSlug()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="short_description" class="form-label fw-bold">Mô tả ngắn</label>
+                        <textarea class="form-control" id="short_description" name="short_description" rows="2" placeholder="Hiển thị nhanh ở trang danh sách..."></textarea>
+                    </div>
+
+                    <div class="mb-0">
+                        <label for="description" class="form-label fw-bold">Mô tả chi tiết</label>
+                        <textarea class="form-control" id="description" name="description" rows="6" placeholder="Thông tin chi tiết về sản phẩm..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing & Inventory -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Giá & Kho hàng</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="price" class="form-label fw-bold">Giá bán lẻ (VND) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="price" name="price" placeholder="500000" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="sale_price" class="form-label fw-bold">Giá khuyến mãi (VND)</label>
+                            <input type="number" class="form-control text-danger" id="sale_price" name="sale_price" placeholder="450000">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="cost_price" class="form-label fw-bold">Giá vốn (VND)</label>
+                            <input type="number" class="form-control text-muted" id="cost_price" name="cost_price" placeholder="300000">
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="stock_quantity" class="form-label fw-bold">Số lượng tồn kho <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" value="10" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="min_stock_alert" class="form-label fw-bold">Cảnh báo hết hàng tại</label>
+                            <input type="number" class="form-control" id="min_stock_alert" name="min_stock_alert" value="5">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="sku" class="form-label fw-bold">Mã SKU <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sku" name="sku" placeholder="NHO-HAN-001" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Hình ảnh sản phẩm</h5>
+                    <p class="text-muted small mb-3">Hỗ trợ tải lên tối đa 5 ảnh. Ảnh đầu tiên sẽ mặc định là ảnh đại diện.</p>
+                    
+                    <div id="image-previews" class="row g-2 mb-3">
+                        <!-- Preview dynamic images here -->
+                    </div>
+
+                    <div class="upload-zone bg-light border border-dashed rounded p-4 text-center">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-2"></i>
+                        <h6 class="mb-1">Tải ảnh lên</h6>
+                        <p class="small text-muted mb-3">Kéo thả hoặc nhấn để chọn tệp</p>
+                        <input type="file" id="file-picker" class="d-none" multiple accept="image/*" onchange="previewImages()">
+                        <input type="file" name="images" id="images-input" class="d-none" multiple accept="image/*">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('file-picker').click()">Chọn tệp</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Phân loại & Thuộc tính</h5>
+                    
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label fw-bold">Danh mục <span class="text-danger">*</span></label>
+                        <select class="form-select" id="category_id" name="category_id" required>
+                            <option value="">-- Chọn danh mục --</option>
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat.id %>"><%= cat.name %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="origin_country" class="form-label fw-bold">Xuất xứ</label>
+                        <input type="text" class="form-control" id="origin_country" name="origin_country" placeholder="Hàn Quốc, Mỹ, Việt Nam...">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label for="unit" class="form-label fw-bold">Đơn vị</label>
+                            <input type="text" class="form-control" id="unit" name="unit" value="kg">
+                        </div>
+                        <div class="col-6">
+                            <label for="weight_value" class="form-label fw-bold">Trọng lượng (kg)</label>
+                            <input type="number" step="0.01" class="form-control" id="weight_value" name="weight_value" placeholder="1.0">
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <label for="packing_type" class="form-label fw-bold">Quy cách đóng gói</label>
+                        <input type="text" class="form-control" id="packing_type" name="packing_type" placeholder="Hộp 1kg, Thùng 5kg...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Trạng thái & Hiển thị</h5>
+                    
+                    <div class="mb-3">
+                        <label for="status" class="form-label fw-bold">Trạng thái phát hành</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="published">Đang bán</option>
+                            <option value="draft">Bản nháp</option>
+                            <option value="out_of_stock">Tạm hết hàng</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="true">
+                            <label class="form-check-input-label fw-bold ms-2" for="is_featured">Sản phẩm nổi bật</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_best_seller" name="is_best_seller" value="true">
+                            <label class="form-check-input-label fw-bold ms-2" for="is_best_seller">Sản phẩm bán chạy</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary w-100 mb-2 py-2 fw-bold">Tạo sản phẩm</button>
+                    <button type="reset" class="btn btn-light w-100 border">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+    .border-dashed { border-style: dashed !important; }
+    .preview-box {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+    .preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .preview-box .remove-btn {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: red;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 18px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+</style>
+
+<script src="/js/slug-generator.js"></script>
+<script>
+    function generateSlug() {
+        const name = document.getElementById('name').value;
+        const slugInput = document.getElementById('slug');
+        if (typeof slugifyVietnamese === 'function') {
+            slugInput.value = slugifyVietnamese(name);
+        }
+    }
+
+    const dataTransfer = new DataTransfer();
+
+    function previewImages() {
+        const picker = document.getElementById('file-picker');
+        const hiddenInput = document.getElementById('images-input');
+        
+        if (picker.files) {
+            Array.from(picker.files).forEach(file => {
+                if (dataTransfer.items.length < 5) {
+                    dataTransfer.items.add(file);
+                } else if (dataTransfer.items.length >= 5) {
+                    alert('Chỉ được chọn tối đa 5 ảnh');
+                }
+            });
+            hiddenInput.files = dataTransfer.files;
+            picker.value = ''; // Reset picker so they can select the same file again if they deleted it
+        }
+        renderPreviews();
+    }
+
+    function renderPreviews() {
+        const previewContainer = document.getElementById('image-previews');
+        previewContainer.innerHTML = '';
+        Array.from(dataTransfer.files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const div = document.createElement('div');
+                div.className = 'col-auto';
+                div.innerHTML = `
+                    <div class="preview-box border rounded p-1 mb-2">
+                        <img src="${e.target.result}" class="rounded">
+                        <div class="remove-btn" onclick="removeImage(${index})"><i class="fas fa-times"></i></div>
+                        <div class="small mt-1 text-center text-muted" style="font-size: 10px">${index === 0 ? 'Thumbnail' : 'Ảnh ' + (index+1)}</div>
+                    </div>
+                `;
+                previewContainer.appendChild(div);
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removeImage(index) {
+        dataTransfer.items.remove(index);
+        document.getElementById('images-input').files = dataTransfer.files;
+        renderPreviews();
+    }
+</script>

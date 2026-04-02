@@ -49,23 +49,35 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/main'); // Default layout for public site
 
 // Global variables for views
-app.use((req, res, next) => {
+const { PrismaClient } = require('@prisma/client');
+const _prisma = new PrismaClient();
+app.use(async (req, res, next) => {
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
     res.locals.user = req.session.user || null;
+    res.locals.req = req;
+    try {
+        res.locals.globalCategories = await _prisma.category.findMany({
+            where: { is_active: true },
+            orderBy: { name: 'asc' },
+            take: 8
+        });
+    } catch (e) {
+        res.locals.globalCategories = [];
+    }
     next();
 });
 
 // Import routes
 const webRoutes = require('./routes/web.route');
 const adminRoutes = require('./routes/admin.route');
-// const apiRoutes = require('./routes/api.route');
+const apiRoutes = require('./routes/api.route');
 
 // Use routes
 app.use('/', webRoutes);
 app.use('/admin', adminRoutes);
-// app.use('/api', apiRoutes);
+app.use('/api', apiRoutes);
 
 // 404 Error handling
 app.use((req, res, next) => {

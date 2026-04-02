@@ -23,6 +23,7 @@ model User {
   updated_at    DateTime @updatedAt
 
   blog_posts    BlogPost[]
+  customer      Customer?
 }
 
 model Category {
@@ -107,6 +108,8 @@ model Customer {
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
+  user_id      Int?     @unique
+  user         User?    @relation(fields: [user_id], references: [id])
   addresses    CustomerAddress[]
   carts        Cart[]
   orders       Order[]

@@ -1,0 +1,73 @@
+<div class="row justify-content-center my-5">
+    <div class="col-md-6">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary">Tạo tài khoản mới</h3>
+                    <p class="text-muted">Đăng ký để nhận nhiều ưu đãi hơn</p>
+                </div>
+
+                <form action="/auth/register" method="POST">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label">Họ và tên</label>
+                            <input type="text" name="full_name" id="full_name" class="form-control bg-light border-0 py-2" placeholder="Nguyễn Văn A" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <input type="tel" name="phone" id="phone" class="form-control bg-light border-0 py-2" placeholder="09xxxxxxxx" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" id="email" class="form-control bg-light border-0 py-2" placeholder="abc@example.com" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mật khẩu</label>
+                        <input type="password" name="password" id="password" class="form-control bg-light border-0 py-2" placeholder="Tối thiểu 6 ký tự" required minlength="6">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label">Xác nhận mật khẩu</label>
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control bg-light border-0 py-2" placeholder="********" required>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <label class="form-check-label text-muted small" for="terms">
+                            Tôi đồng ý với <a href="#" class="text-primary text-decoration-none">Điều khoản và Chính sách</a> của WebHoaQua
+                        </label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm border-0">
+                            Đăng ký
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="my-4 text-muted">
+
+                <div class="text-center">
+                    <p class="text-muted">Đã có tài khoản? <a href="/auth/login" class="text-primary fw-bold text-decoration-none">Đăng nhập</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Validation đơn giản trên browser
+    const form = document.querySelector('form');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+
+    form.addEventListener('submit', function(e) {
+        if (password.value !== confirmPassword.value) {
+            e.preventDefault();
+            alert('Mật khẩu xác nhận không khớp!');
+        }
+    });
+</script>

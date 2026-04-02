@@ -1,0 +1,306 @@
+<!-- FancyBox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
+
+<!-- Breadcrumb -->
+<div class="bg-light-grey py-3 border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/products">Sản phẩm</a></li>
+                <% if (product.category) { %>
+                    <li class="breadcrumb-item"><a href="/products?category=<%= product.category.slug %>"><%= product.category.name %></a></li>
+                <% } %>
+                <li class="breadcrumb-item active"><%= product.name %></li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- ===== PRODUCT DETAIL ===== -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-5 align-items-start">
+
+            <!-- Gallery (Left) -->
+            <div class="col-lg-6">
+                <div class="product-gallery">
+                    <!-- Main Swiper -->
+                    <div class="swiper mainSwiper mb-3 rounded-4 overflow-hidden" style="background:#f4f7f3;">
+                        <div class="swiper-wrapper">
+                            <% if (product.images && product.images.length > 0) { %>
+                                <% product.images.forEach(img => { %>
+                                    <div class="swiper-slide">
+                                        <a href="<%= img.image_url %>" data-fancybox="gallery" data-caption="<%= product.name %>" class="d-block position-relative zoom-hover">
+                                            <img src="<%= img.image_url %>" alt="<%= product.name %>" 
+                                                 style="width:100%;height:460px;object-fit:cover;" loading="lazy">
+                                            <div class="zoom-icon"><i class="fas fa-search-plus"></i></div>
+                                        </a>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="swiper-slide d-flex align-items-center justify-content-center" style="height:460px;">
+                                    <span style="font-size:5rem;">🍎</span>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                    <!-- Thumb Swiper -->
+                    <% if (product.images && product.images.length > 1) { %>
+                        <div class="swiper thumbSwiper">
+                            <div class="swiper-wrapper">
+                                <% product.images.forEach(img => { %>
+                                    <div class="swiper-slide">
+                                        <img src="<%= img.image_url %>" alt="thumb" 
+                                             class="rounded-3" style="width:100%;height:80px;object-fit:cover;cursor:pointer;opacity:0.6;">
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Product Info (Right) -->
+            <div class="col-lg-6">
+                <% if (product.category) { %>
+                    <a href="/products?category=<%= product.category.slug %>" class="detail-cat-badge">
+                        <%= product.category.name %>
+                    </a>
+                <% } %>
+                <h1 class="detail-title mt-2"><%= product.name %></h1>
+
+                <!-- Price Block -->
+                <div class="detail-price-block">
+                    <% if (product.sale_price) { %>
+                        <span class="detail-price-sale">
+                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.sale_price) %>
+                        </span>
+                        <span class="detail-price-original">
+                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                        </span>
+                        <span class="detail-discount-badge">
+                            -<%= Math.round((1 - product.sale_price/product.price)*100) %>%
+                        </span>
+                    <% } else { %>
+                        <span class="detail-price-sale">
+                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                        </span>
+                    <% } %>
+                </div>
+
+                <!-- Short Desc -->
+                <% if (product.short_description) { %>
+                    <p class="detail-short-desc"><%= product.short_description %></p>
+                <% } %>
+
+                <!-- Specs Table -->
+                <div class="detail-specs">
+                    <% const specs = [
+                        { label: 'Mã SP', value: product.sku },
+                        { label: 'Xuất xứ', value: product.origin_country },
+                        { label: 'Đơn vị', value: product.unit },
+                        { label: 'Trọng lượng', value: product.weight_value ? product.weight_value + ' kg' : null },
+                        { label: 'Quy cách', value: product.packing_type },
+                        { label: 'Tình trạng', value: product.stock_quantity > 0 ? 'Còn hàng (' + product.stock_quantity + ' ' + product.unit + ')' : 'Hết hàng' }
+                    ].filter(s => s.value); %>
+                    <% specs.forEach(s => { %>
+                        <div class="spec-row">
+                            <span class="spec-label"><%= s.label %></span>
+                            <span class="spec-value <%= s.label==='Tình trạng' && product.stock_quantity > 0 ? 'text-success fw-bold' : '' %>">
+                                <%= s.value %>
+                            </span>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <!-- Add to Cart -->
+                <div class="d-flex gap-3 mt-4 align-items-center flex-wrap">
+                    <div class="qty-control">
+                        <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
+                        <input type="number" id="qty" class="qty-input" value="1" min="1" max="<%= product.stock_quantity %>">
+                        <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+                    </div>
+                    <button class="btn btn-primary rounded-pill px-5 flex-grow-1" onclick="addToCart(<%= product.id %>)" 
+                            <%= product.stock_quantity <= 0 ? 'disabled' : '' %>>
+                        <i class="fas fa-basket-shopping me-2"></i>Thêm vào giỏ
+                    </button>
+                </div>
+                <div class="mt-4 d-flex gap-3">
+                    <button class="btn btn-light border rounded-pill px-4 flex-grow-1">
+                        <i class="far fa-heart me-2 text-danger"></i>Yêu thích
+                    </button>
+                    <button class="btn btn-light border rounded-pill px-4 flex-grow-1" onclick="navigator.share({title:'<%= product.name %>',url:window.location.href})">
+                        <i class="fas fa-share-alt me-2 text-muted"></i>Chia sẻ
+                    </button>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="detail-trust-badges mt-4">
+                    <div><i class="fas fa-shield-alt text-success me-2"></i>Hàng nhập khẩu chính hãng</div>
+                    <div><i class="fas fa-truck text-primary me-2"></i>Giao hàng trong ngày</div>
+                    <div><i class="fas fa-undo-alt text-warning me-2"></i>Đổi trả miễn phí 24h</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DESCRIPTION TABS ===== -->
+        <div class="mt-5">
+            <ul class="nav nav-tabs detail-tabs" role="tablist">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#desc">Mô tả sản phẩm</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#specs">Thông tin dinh dưỡng</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews">Đánh giá</button></li>
+            </ul>
+            <div class="tab-content detail-tab-content p-4 border border-top-0 rounded-bottom-4">
+                <div class="tab-pane fade show active" id="desc">
+                    <% if (product.description) { %>
+                        <%- product.description %>
+                    <% } else { %>
+                        <p class="text-muted">Thông tin mô tả chi tiết đang được cập nhật.</p>
+                    <% } %>
+                </div>
+                <div class="tab-pane fade" id="specs">
+                    <p class="text-muted">Thông tin dinh dưỡng sẽ được cập nhật sớm.</p>
+                </div>
+                <div class="tab-pane fade" id="reviews">
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="text-center">
+                            <div style="font-size:3rem;font-weight:800;color:var(--brand-primary)">5.0</div>
+                            <div class="d-flex gap-1"><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i></div>
+                            <small class="text-muted">Dựa trên đánh giá</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RELATED PRODUCTS ===== -->
+        <% if (relatedProducts && relatedProducts.length > 0) { %>
+            <div class="mt-5 pt-4">
+                <h3 class="section-title mb-4">Sản phẩm liên quan</h3>
+                <div class="row row-cols-2 row-cols-md-4 g-4">
+                    <% relatedProducts.forEach(p => { %>
+                        <div class="col">
+                            <a href="/product/<%= p.slug %>" class="fruit-card d-block text-decoration-none">
+                                <div class="fruit-card-img-wrap">
+                                    <% if (p.images && p.images.length > 0) { %>
+                                        <img src="<%= p.images[0].image_url %>" alt="<%= p.name %>" loading="lazy">
+                                    <% } else { %>
+                                        <div class="fruit-card-placeholder">🍎</div>
+                                    <% } %>
+                                </div>
+                                <div class="fruit-card-body">
+                                    <h5 class="fruit-card-name"><%= p.name %></h5>
+                                    <span class="price-main"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.sale_price || p.price) %></span>
+                                </div>
+                            </a>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</section>
+
+<style>
+.bg-light-grey { background: #f4f7f3; }
+.section-padding { padding: 60px 0; }
+.section-title { font-family: var(--font-heading); font-size: clamp(1.5rem, 2.5vw, 2rem); color: var(--brand-primary); }
+
+/* Gallery */
+.zoom-hover .zoom-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); opacity: 0; transition: all 0.3s ease; background: var(--brand-primary); color: #fff; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; pointer-events: none; }
+.zoom-hover:hover .zoom-icon { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+.swiper-button-next, .swiper-button-prev { color: var(--brand-primary) !important; background: rgba(255,255,255,0.8); width: 36px !important; height: 36px !important; border-radius: 50%; }
+
+.swiper-button-next::after, .swiper-button-prev::after { font-size: 14px !important; font-weight: 800; }
+.thumbSwiper .swiper-slide-thumb-active img { opacity: 1 !important; border: 2px solid var(--brand-accent); border-radius: 8px; }
+
+/* Detail Info */
+.detail-cat-badge { display: inline-block; padding: 4px 14px; background: var(--brand-light-green); color: var(--brand-accent); border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-decoration: none; }
+.detail-title { font-family: var(--font-heading); font-size: clamp(1.6rem, 3vw, 2.2rem); color: var(--brand-primary); line-height: 1.2; }
+.detail-price-block { display: flex; align-items: baseline; gap: 12px; margin: 16px 0; }
+.detail-price-sale { font-size: 2rem; font-weight: 800; color: var(--brand-accent); }
+.detail-price-original { font-size: 1.1rem; text-decoration: line-through; color: #9ca3af; }
+.detail-discount-badge { background: #fee2e2; color: #dc2626; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; }
+.detail-short-desc { color: var(--text-muted); line-height: 1.7; border-left: 3px solid var(--brand-light-green); padding-left: 14px; }
+
+/* Specs */
+.detail-specs { background: #f9fafb; border-radius: 14px; padding: 20px; margin: 20px 0; }
+.spec-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+.spec-row:last-child { border: none; }
+.spec-label { color: var(--text-muted); font-weight: 500; }
+.spec-value { color: var(--brand-primary); font-weight: 600; }
+
+/* QTY Control */
+.qty-control { display: flex; align-items: center; border: 1px solid #e5e7eb; border-radius: 50px; overflow: hidden; }
+.qty-btn { background: none; border: none; width: 40px; height: 44px; font-size: 1.2rem; cursor: pointer; color: var(--brand-primary); }
+.qty-btn:hover { background: var(--brand-light-green); }
+.qty-input { width: 48px; text-align: center; border: none; font-weight: 700; font-size: 1rem; outline: none; }
+
+/* Trust Badges */
+.detail-trust-badges { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.85rem; color: var(--text-muted); }
+
+/* Tabs */
+.detail-tabs { border-color: #e5e7eb; }
+.detail-tabs .nav-link { color: var(--text-muted); font-weight: 500; padding: 12px 24px; border: none; border-bottom: 2px solid transparent; }
+.detail-tabs .nav-link.active { color: var(--brand-primary); border-bottom-color: var(--brand-primary); background: none; font-weight: 700; }
+
+/* Product Cards (shared) */
+.fruit-card { border: 1px solid #eee; border-radius: 18px; overflow: hidden; background: #fff; transition: all 0.3s ease; color: inherit; }
+.fruit-card:hover { transform: translateY(-6px); box-shadow: 0 16px 36px rgba(0,0,0,0.1); }
+.fruit-card-img-wrap { position: relative; overflow: hidden; padding-top: 75%; background: #f4f7f3; }
+.fruit-card-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.fruit-card:hover .fruit-card-img-wrap img { transform: scale(1.06); }
+.fruit-card-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+.fruit-card-body { padding: 16px; }
+.fruit-card-name { font-family: var(--font-heading); font-size: 0.95rem; color: var(--brand-primary); margin-bottom: 8px; line-height: 1.3; }
+.price-main { font-weight: 700; font-size: 1rem; color: var(--brand-accent); }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Fancybox.bind('[data-fancybox="gallery"]', {
+            Toolbar: {
+                display: {
+                    left: ["infobar"],
+                    middle: [
+                        "zoomIn",
+                        "zoomOut",
+                        "toggle1to1",
+                        "rotateCCW",
+                        "rotateCW"
+                    ],
+                    right: ["slideshow", "thumbs", "close"],
+                },
+            },
+        });
+
+        // Thumbnail Swiper
+        const thumbSwiper = new Swiper('.thumbSwiper', {
+            spaceBetween: 10,
+            slidesPerView: 4,
+            freeMode: true,
+            watchSlidesProgress: true,
+        });
+        
+        new Swiper('.mainSwiper', {
+            spaceBetween: 10,
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            thumbs: { swiper: thumbSwiper },
+        });
+    });
+
+    // Qty control
+    function changeQty(delta) {
+        const input = document.getElementById('qty');
+        const newVal = Math.max(1, parseInt(input.value) + delta);
+        input.value = newVal;
+    }
+
+    function addToCart(productId) {
+        alert('Chức năng giỏ hàng sẽ được kích hoạt ở giai đoạn tiếp theo!');
+    }
+</script>

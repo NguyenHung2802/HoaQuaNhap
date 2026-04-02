@@ -1,0 +1,131 @@
+<div class="container-fluid px-4 pb-5">
+    <h1 class="mt-4"><%= title %></h1>
+    <div class="mb-4">
+        <a href="/admin/orders" class="btn btn-outline-secondary rounded-pill btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Thông tin vận chuyển -->
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white py-3 fw-bold">
+                    <i class="fas fa-shopping-bag me-1"></i> Sản phẩm trong đơn
+                </div>
+                <div class="card-body">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Số lượng</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.items.forEach(item => { %>
+                            <tr>
+                                <td>
+                                    <strong><%= item.product_name_snapshot %></strong>
+                                    <div class="small text-muted">SKU: <%= item.sku_snapshot %></div>
+                                </td>
+                                <td><%= item.price_snapshot.toLocaleString('vi-VN') %>₫</td>
+                                <td>x<%= item.quantity %></td>
+                                <td class="text-end fw-bold"><%= item.line_total.toLocaleString('vi-VN') %>₫</td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                        <tfoot class="border-top-0">
+                            <tr>
+                                <td colspan="3" class="text-end py-3">Tổng tiền hàng:</td>
+                                <td class="text-end py-3 fw-bold"><%= order.total_amount.toLocaleString('vi-VN') %>₫</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end py-3 border-0">Phí giao hàng:</td>
+                                <td class="text-end py-3 fw-bold border-0 text-success">Miễn phí</td>
+                            </tr>
+                            <tr class="fs-5">
+                                <td colspan="3" class="text-end py-3 fw-bold border-0">Tổng cộng:</td>
+                                <td class="text-end py-3 fw-bold border-0 text-danger"><%= order.total_amount.toLocaleString('vi-VN') %>₫</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin khách hàng & Trạng thái -->
+        <div class="col-xl-4">
+            <!-- Loại khách hàng -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white py-3 fw-bold">
+                    <i class="fas fa-user-circle me-1"></i> Khách hàng
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <% if (order.customer && order.customer.user_id) { %>
+                            <div class="avatar-circle mx-auto mb-3 bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-user-check fa-2x"></i>
+                            </div>
+                            <h5 class="mb-0"><%= order.customer_name %></h5>
+                            <span class="badge bg-success rounded-pill px-3 mt-2">Thành viên</span>
+                            <div class="mt-3 text-muted">
+                                <i class="fas fa-envelope me-1"></i> <%= order.customer.user.email %>
+                            </div>
+                        <% } else { %>
+                            <div class="avatar-circle mx-auto mb-3 bg-secondary bg-opacity-10 text-secondary">
+                                <i class="fas fa-user-secret fa-2x"></i>
+                            </div>
+                            <h5 class="mb-0 text-muted"><%= order.customer_name %></h5>
+                            <span class="badge bg-secondary rounded-pill px-3 mt-2">Khách vãng lai</span>
+                        <% } %>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <label class="text-muted small">Số điện thoại:</label>
+                        <div class="fw-bold fs-5"><%= order.customer_phone %></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Địa chỉ nhận hàng:</label>
+                        <div><%= order.delivery_address %></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trạng thái đơn hàng -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white py-3 fw-bold">
+                    <i class="fas fa-tasks me-1"></i> Vận hành
+                </div>
+                <div class="card-body">
+                    <form action="/admin/orders/<%= order.id %>/status" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Trạng thái đơn hàng:</label>
+                            <select name="order_status" class="form-select border-0 bg-light rounded-3">
+                                <option value="pending" <%= order.order_status === 'pending' ? 'selected' : '' %>>Chờ xác nhận</option>
+                                <option value="confirmed" <%= order.order_status === 'confirmed' ? 'selected' : '' %>>Đã xác nhận</option>
+                                <option value="processing" <%= order.order_status === 'processing' ? 'selected' : '' %>>Đang xử lý</option>
+                                <option value="shipping" <%= order.order_status === 'shipping' ? 'selected' : '' %>>Đang giao hàng</option>
+                                <option value="completed" <%= order.order_status === 'completed' ? 'selected' : '' %>>Hoàn thành</option>
+                                <option value="cancelled" <%= order.order_status === 'cancelled' ? 'selected' : '' %>>Đã hủy</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2">Cập nhật trạng thái</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+</style>

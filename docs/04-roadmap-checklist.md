@@ -31,19 +31,23 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 ### 2.3. Auth & Users
 - [x] Bảng Users & Password Bcrypt
 - [x] Auth middleware & Session
-- [x] Login/Logout admin
+- [x] Login/Logout admin (Dùng chung cổng Unified)
+- [x] Register/Login Customer
+- [x] Guest Checkout intervention logic
 
 ### 2.4. Danh mục & Sản phẩm
-- [ ] CRUD Model Category
-- [ ] CRUD Model Product
-- [ ] Image Upload (Cloudinary)
-- [ ] Slug generation (Slugify)
+- [x] CRUD Model Category (Done: S7, S8)
+- [x] CRUD Model Product (Done: S9, S10)
+- [x] Image Upload (Cloudinary) (Multi-images Product OK - S11, S23)
+- [x] Slug generation (Slugify) (Category & Product Name OK)
+- [x] Inventory Logging (Done: S12)
+- [x] Seeding Sample Data (Done: S13)
 
 ### 2.5. Website Public
-- [ ] Header/Footer/Navbar
-- [ ] Home page (Hero, New, Best seller)
-- [ ] Listing / Search / Filter
-- [ ] Detail page (Gallery, Spec, Related)
+- [x] Header/Footer/Navbar (S15 — Dynamic categories, Search, Cart badge)
+- [x] Home page (S16-S18 — Hero, Category circles, Featured, Promo, Why Us, Testimonials, Blog)
+- [x] Listing / Search / Filter (S19, S21 — Sidebar filter: Origin, Price Range, Status, Pagination)
+- [x] Detail page (S20, S22 — Swiper Gallery, Fancybox Image Zoom, Specs, QTY, Tabs)
 
 ### 2.6. Giỏ hàng & Order
 - [ ] Cart Session handler

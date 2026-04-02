@@ -1,0 +1,87 @@
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="/products" class="text-decoration-none">Sản phẩm</a></li>
+            <li class="breadcrumb-item active"><%= product.name %></li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <!-- Ảnh sản phẩm -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <img src="<%= product.image_url || '/images/no-image.jpg' %>" class="img-fluid" alt="<%= product.name %>">
+            </div>
+        </div>
+
+        <!-- Thông tin sản phẩm -->
+        <div class="col-md-6">
+            <h1 class="fw-bold mb-2"><%= product.name %></h1>
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                    <i class="fas fa-check-circle me-1"></i> Còn hàng (<%= product.stock_quantity %>)
+                </span>
+                <span class="text-muted small">SKU: <%= product.sku %></span>
+            </div>
+
+            <div class="price-box mb-4 p-3 bg-light rounded-4">
+                <h2 class="text-danger fw-bold mb-0">
+                    <%= product.price.toLocaleString('vi-VN') %>₫ 
+                    <span class="fs-6 text-muted fw-normal">/ <%= product.unit %></span>
+                </h2>
+            </div>
+
+            <p class="text-muted mb-4"><%= product.short_description %></p>
+
+            <!-- Chọn số lượng -->
+            <div class="quantity-selector mb-4">
+                <label class="form-label fw-bold">Số lượng đặt hàng:</label>
+                <div class="input-group" style="max-width: 150px;">
+                    <button class="btn btn-outline-secondary border-0 bg-light" type="button" onclick="changeQty(-1)">-</button>
+                    <input type="number" id="quantity-input" class="form-control text-center border-0 bg-light" value="1" min="1" max="<%= product.stock_quantity %>">
+                    <button class="btn btn-outline-secondary border-0 bg-light" type="button" onclick="changeQty(1)">+</button>
+                </div>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <button class="btn btn-outline-primary btn-lg w-100 rounded-pill fw-bold py-3 btn-add-to-cart" data-product-id="<%= product.id %>">
+                        <i class="fas fa-cart-plus me-2"></i> Thêm vào giỏ
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 btn-buy-now shadow" data-product-id="<%= product.id %>">
+                        <i class="fas fa-bolt me-2"></i> Mua ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cam kết -->
+            <div class="mt-5 pt-4 border-top">
+                <div class="row text-center g-2">
+                    <div class="col-4">
+                        <div class="small"><i class="fas fa-truck text-primary mb-2"></i><br>Giao hàng toàn quốc</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="small"><i class="fas fa-shield-alt text-primary mb-2"></i><br>Hàng chính hãng</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="small"><i class="fas fa-undo text-primary mb-2"></i><br>Đổi trả 24h</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeQty(delta) {
+        const input = document.getElementById('quantity-input');
+        let newVal = parseInt(input.value) + delta;
+        if (newVal < 1) newVal = 1;
+        if (newVal > <%= product.stock_quantity %>) newVal = <%= product.stock_quantity %>;
+        input.value = newVal;
+    }
+</script>

@@ -5,13 +5,9 @@ const prisma = new PrismaClient();
 async function main() {
   // 1. Create Admin User
   const hashedPassword = await bcrypt.hash('admin123', 10);
-  const admin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'admin@webhoaqua.com' },
-    update: {
-      password_hash: hashedPassword,
-      role: 'admin',
-      status: 'active'
-    },
+    update: { password_hash: hashedPassword },
     create: {
       email: 'admin@webhoaqua.com',
       full_name: 'Quản trị viên',
@@ -44,45 +40,76 @@ async function main() {
     },
   });
 
-  // 3. Create Sample Products
-  await prisma.product.upsert({
-    where: { sku: 'APPLE-ENVY-NZ' },
+  const catStrawberry = await prisma.category.upsert({
+    where: { slug: 'dau-tay' },
     update: {},
     create: {
+      name: 'Dâu tây Hàn Quốc',
+      slug: 'dau-tay',
+      description: 'Dâu tây đỏ mọng, thơm phức nhập từ Hàn Quốc...',
+      is_active: true,
+    },
+  });
+
+  // 3. Create Sample Products
+  const products = [
+    {
       name: 'Táo Envy New Zealand',
       slug: 'tao-envy-new-zealand',
       sku: 'APPLE-ENVY-NZ',
-      short_description: 'Giòn, ngọt và hương thơm đặc trưng.',
-      description: 'Táo Envy New Zealand là loại táo cao cấp nhất thế giới...',
       price: 250000,
-      sale_price: 220000,
       stock_quantity: 50,
       unit: 'kg',
       origin_country: 'New Zealand',
       category_id: catApple.id,
       status: 'published',
-      is_featured: true,
+      is_featured: true
     },
-  });
-
-  await prisma.product.upsert({
-    where: { sku: 'GRAPE-SHINE-KR' },
-    update: {},
-    create: {
+    {
       name: 'Nho Mẫu Đơn Hàn Quốc',
       slug: 'nho-mau-don-han-quoc',
       sku: 'GRAPE-SHINE-KR',
-      short_description: 'Trái to, xanh mướt, vị ngọt như mật.',
-      description: 'Nho mẫu đơn (Shine Muscat) nhập khẩu chính hiệu từ Hàn Quốc...',
       price: 850000,
       stock_quantity: 20,
       unit: 'chùm',
       origin_country: 'Hàn Quốc',
       category_id: catGrape.id,
       status: 'published',
-      is_featured: true,
+      is_featured: true
     },
-  });
+    {
+      name: 'Dâu Tây Seolhyang Hàn Quốc',
+      slug: 'dau-tay-seolhyang',
+      sku: 'STRAW-KR-001',
+      price: 450000,
+      stock_quantity: 30,
+      unit: 'hộp 500g',
+      origin_country: 'Hàn Quốc',
+      category_id: catStrawberry.id,
+      status: 'published',
+      is_featured: true
+    },
+    {
+      name: 'Cam Vàng Navel Mỹ',
+      slug: 'cam-vang-navel-my',
+      sku: 'ORANGE-US-VAL',
+      price: 120000,
+      stock_quantity: 100,
+      unit: 'kg',
+      origin_country: 'Mỹ',
+      category_id: catApple.id,
+      status: 'published',
+      is_best_seller: true
+    }
+  ];
+
+  for (const p of products) {
+    await prisma.product.upsert({
+      where: { sku: p.sku },
+      update: {},
+      create: p
+    });
+  }
 
   console.log('Seed data created successfully!');
 }

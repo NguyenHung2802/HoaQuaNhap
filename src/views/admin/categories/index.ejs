@@ -1,0 +1,125 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Danh mục sản phẩm</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Danh mục</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/admin/categories/create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Thêm danh mục mới
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="card-title mb-0">Danh sách danh mục</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4" style="width: 80px;">ID</th>
+                        <th style="width: 100px;">Hình ảnh</th>
+                        <th>Tên danh mục</th>
+                        <th>Slug</th>
+                        <th>Mô tả</th>
+                        <th>Thứ tự</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (categories && categories.length > 0) { %>
+                        <% categories.forEach(cat => { %>
+                            <tr>
+                                <td class="ps-4 fw-bold text-muted"><%= cat.id %></td>
+                                <td>
+                                    <% if (cat.image_url) { %>
+                                        <img src="<%= cat.image_url %>" alt="<%= cat.name %>" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <% } else { %>
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-image text-muted"></i>
+                                        </div>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark"><%= cat.name %></div>
+                                    <% if (cat.parent_id) { %>
+                                        <span class="badge bg-light text-muted border small">Con của ID: <%= cat.parent_id %></span>
+                                    <% } %>
+                                </td>
+                                <td><code class="small"><%= cat.slug %></code></td>
+                                <td>
+                                    <span class="text-muted small text-truncate d-inline-block" style="max-width: 200px;">
+                                        <%= cat.description || 'Chưa có mô tả' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info bg-opacity-10 text-info"><%= cat.sort_order %></span>
+                                </td>
+                                <td>
+                                    <% if (cat.is_active) { %>
+                                        <span class="badge bg-success bg-opacity-10 text-success border-0 px-2 py-1">Hiện</span>
+                                    <% } else { %>
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border-0 px-2 py-1">Ẩn</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a href="/admin/categories/edit/<%= cat.id %>" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger ms-1" title="Xóa" onclick="deleteCategory(<%= cat.id %>)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
+                                <p class="mb-0">Chưa có danh mục nào được tạo.</p>
+                                <a href="/admin/categories/create" class="btn btn-sm btn-link mt-2">Thêm ngay</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function deleteCategory(id) {
+        if (confirm('Bạn có chắc chắn muốn xóa danh mục này? Hệ thống sẽ kiểm tra xem có sản phẩm thuộc danh mục này không trước khi xóa.')) {
+            try {
+                const response = await fetch(`/admin/categories/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Có lỗi xảy ra khi kết nối tới máy chủ.');
+            }
+        }
+    }
+</script>

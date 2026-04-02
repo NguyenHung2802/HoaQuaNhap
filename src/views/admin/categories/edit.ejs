@@ -1,0 +1,147 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Sửa danh mục: <%= category.name %></h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/admin/categories">Danh mục</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Sửa đổi</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/admin/categories" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form action="/admin/categories/edit/<%= category.id %>" method="POST" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <!-- Name -->
+                        <div class="col-md-12">
+                            <label for="name" class="form-label fw-bold">Tên danh mục <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" id="name" name="name" 
+                                   value="<%= category.name %>" required onkeyup="generateSlug()">
+                        </div>
+
+                        <!-- Slug -->
+                        <div class="col-md-12">
+                            <label for="slug" class="form-label fw-bold">Slug (Đường dẫn thân thiện) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted small">/categories/</span>
+                                <input type="text" class="form-control" id="slug" name="slug" value="<%= category.slug %>" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="generateSlug()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            <div class="form-text small text-muted">Slug sẽ được tự động tạo lại nếu bạn thay đổi Tên.</div>
+                        </div>
+
+                        <!-- Parent Category -->
+                        <div class="col-md-6">
+                            <label for="parent_id" class="form-label fw-bold">Danh mục cha</label>
+                            <select class="form-select" id="parent_id" name="parent_id">
+                                <option value="">--- Không có danh mục cha ---</option>
+                                <% if (categories && categories.length > 0) { %>
+                                    <% categories.forEach(cat => { %>
+                                        <option value="<%= cat.id %>" <%= category.parent_id === cat.id ? 'selected' : '' %>><%= cat.name %></option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <!-- Sort Order -->
+                        <div class="col-md-6">
+                            <label for="sort_order" class="form-label fw-bold">Thứ tự hiển thị</label>
+                            <input type="number" class="form-control" id="sort_order" name="sort_order" value="<%= category.sort_order %>">
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-12">
+                            <label for="description" class="form-label fw-bold">Mô tả</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"><%= category.description %></textarea>
+                        </div>
+
+                        <!-- Image Display & Change -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Hình ảnh đại diện</label>
+                            <div class="d-flex align-items-center mb-3">
+                                <div id="current-image-container" class="<%= category.image_url ? '' : 'd-none' %> p-2 border rounded me-3 bg-light">
+                                    <img id="current-image" src="<%= category.image_url %>" alt="Current" class="img-fluid rounded" style="max-height: 100px;">
+                                </div>
+                                <div id="preview-image-container" class="d-none p-2 border rounded me-3 bg-light border-primary">
+                                    <img id="preview-image" src="" alt="Preview" class="img-fluid rounded" style="max-height: 100px;">
+                                    <div class="small text-primary text-center mt-1">Ảnh mới</div>
+                                </div>
+                            </div>
+
+                            <div class="upload-container bg-light border border-dashed rounded p-3 text-center">
+                                <i class="fas fa-cloud-upload-alt text-muted mb-1"></i>
+                                <span class="small text-muted ms-2">Chọn ảnh khác để thay thế</span>
+                                <input type="file" class="form-control d-none" id="image" name="image" accept="image/*" onchange="previewFile()">
+                                <button type="button" class="btn btn-sm btn-outline-primary ms-3" onclick="document.getElementById('image').click()">Chọn ảnh</button>
+                            </div>
+                        </div>
+
+                        <!-- Active Switch -->
+                        <div class="col-md-12">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="true" <%= category.is_active ? 'checked' : '' %>>
+                                <label class="form-check-input-label fw-bold ms-2" for="is_active">Hiển thị danh mục</label>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/admin/categories" class="btn btn-light px-4">Hủy</a>
+                            <button type="submit" class="btn btn-primary px-5 fw-bold">Lưu thay đổi</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-dashed {
+        border-style: dashed !important;
+    }
+</style>
+
+<script src="/js/slug-generator.js"></script>
+<script>
+    function previewFile() {
+        const preview = document.getElementById('preview-image');
+        const container = document.getElementById('preview-image-container');
+        const file = document.getElementById('image').files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+            container.classList.remove('d-none');
+            // document.getElementById('current-image-container').classList.add('opacity-50');
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+            container.classList.add('d-none');
+        }
+    }
+
+    function generateSlug() {
+        const name = document.getElementById('name').value;
+        const slugInput = document.getElementById('slug');
+        if (typeof slugifyVietnamese === 'function') {
+            slugInput.value = slugifyVietnamese(name);
+        }
+    }
+</script>
