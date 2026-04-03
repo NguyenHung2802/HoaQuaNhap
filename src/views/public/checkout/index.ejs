@@ -1,0 +1,273 @@
+<!-- Breadcrumb -->
+<div class="bg-light-grey py-3 border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/cart">Giỏ hàng</a></li>
+                <li class="breadcrumb-item active">Thanh toán</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<section class="py-5">
+    <div class="container">
+        <h1 class="font-heading text-primary mb-5">Thông tin thanh toán</h1>
+        
+        <form action="/checkout/place-order" method="POST" id="checkoutForm">
+            <div class="row g-5">
+                <!-- ===== LEFT: Customer Info ===== -->
+                <div class="col-lg-7">
+                    
+                    <!-- Contact Info -->
+                    <div class="checkout-card mb-4">
+                        <div class="checkout-card-header">
+                            <span class="step-badge">1</span>
+                            <h5 class="mb-0">Thông tin người đặt hàng</h5>
+                        </div>
+                        <div class="checkout-card-body row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Họ và tên <span class="text-danger">*</span></label>
+                                <input type="text" name="customer_name" class="form-control checkout-input" 
+                                       placeholder="Nguyễn Văn A" required
+                                       value="<%= customerInfo ? customerInfo.full_name : '' %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel" name="customer_phone" class="form-control checkout-input"
+                                       placeholder="0901 234 567" required pattern="[0-9]{10}"
+                                       value="<%= customerInfo ? customerInfo.phone : '' %>">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" name="customer_email" class="form-control checkout-input"
+                                       placeholder="example@gmail.com"
+                                       value="<%= customerInfo ? customerInfo.email : '' %>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <div class="checkout-card mb-4">
+                        <div class="checkout-card-header">
+                            <span class="step-badge">2</span>
+                            <h5 class="mb-0">Địa chỉ giao hàng</h5>
+                        </div>
+                        <div class="checkout-card-body row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+                                <input type="text" name="province" class="form-control checkout-input"
+                                       placeholder="Hồ Chí Minh" required
+                                       value="<%= (customerInfo && customerInfo.address) ? customerInfo.address.province : '' %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Quận / Huyện <span class="text-danger">*</span></label>
+                                <input type="text" name="district" class="form-control checkout-input"
+                                       placeholder="Quận 1" required
+                                       value="<%= (customerInfo && customerInfo.address) ? customerInfo.address.district : '' %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Phường / Xã <span class="text-danger">*</span></label>
+                                <input type="text" name="ward" class="form-control checkout-input"
+                                       placeholder="Phường Bến Nghé" required
+                                       value="<%= (customerInfo && customerInfo.address) ? customerInfo.address.ward : '' %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Số nhà / Đường <span class="text-danger">*</span></label>
+                                <input type="text" name="address_line" class="form-control checkout-input"
+                                       placeholder="123 Nguyễn Huệ" required
+                                       value="<%= (customerInfo && customerInfo.address) ? customerInfo.address.address_line : '' %>">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Địa chỉ đầy đủ (sẽ tự điền)</label>
+                                <input type="text" name="delivery_address" id="delivery_address" class="form-control checkout-input bg-light" readonly
+                                       placeholder="Địa chỉ được ghép tự động...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment & Note -->
+                    <div class="checkout-card mb-4">
+                        <div class="checkout-card-header">
+                            <span class="step-badge">3</span>
+                            <h5 class="mb-0">Thanh toán & Ghi chú</h5>
+                        </div>
+                        <div class="checkout-card-body">
+                            <!-- Payment method: COD only for now -->
+                            <div class="payment-option selected mb-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-money-bill-wave text-success fa-2x"></i>
+                                    <div>
+                                        <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
+                                        <small class="text-muted">Thanh toán bằng tiền mặt khi nhận được hàng</small>
+                                    </div>
+                                    <i class="fas fa-check-circle text-success ms-auto"></i>
+                                </div>
+                                <input type="hidden" name="payment_method" value="COD">
+                            </div>
+                            <div>
+                                <label class="form-label fw-semibold">Ghi chú đơn hàng</label>
+                                <textarea name="note" class="form-control checkout-input" rows="3"
+                                          placeholder="VD: Giao giờ hành chính, gọi trước 30 phút..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ===== RIGHT: Order Summary ===== -->
+                <div class="col-lg-5">
+                    <div class="order-summary-box sticky-top" style="top: 90px;">
+                        <h5 class="font-heading mb-4 pb-3 border-bottom">Tóm tắt đơn hàng</h5>
+                        
+                        <div class="order-items mb-3">
+                            <% items.forEach(item => { %>
+                                <div class="order-item d-flex align-items-center gap-3 mb-3">
+                                    <div class="position-relative">
+                                        <div class="order-item-img rounded-2 overflow-hidden" style="width: 56px; height: 56px; background: #f4f7f3; flex-shrink: 0;">
+                                            <% if (item.image_url) { %>
+                                                <img src="<%= item.image_url %>" alt="<%= item.name %>" class="w-100 h-100 object-fit-cover">
+                                            <% } else { %>
+                                                <div class="w-100 h-100 d-flex align-items-center justify-content-center">🍎</div>
+                                            <% } %>
+                                        </div>
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary" style="font-size: 0.65rem; transform: translate(-70%, -30%)!important;"><%= item.quantity %></span>
+                                    </div>
+                                    <div class="flex-grow-1 min-width-0">
+                                        <div class="fw-semibold text-truncate small"><%= item.name %></div>
+                                    </div>
+                                    <div class="text-nowrap fw-bold small">
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.line_total) %>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+
+                        <div class="border-top pt-3">
+                            <div class="d-flex justify-content-between mb-2 text-muted">
+                                <span>Tạm tính</span>
+                                <span class="fw-semibold text-dark"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalAmount) %></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3 text-muted">
+                                <span>Phí vận chuyển</span>
+                                <span class="fw-semibold text-success">Miễn phí</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-4 fs-5 fw-bold">
+                                <span>Tổng cộng</span>
+                                <span class="text-accent"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalAmount) %></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3" id="placeOrderBtn">
+                            <i class="fas fa-shopping-bag me-2"></i> Đặt hàng ngay
+                        </button>
+                        <a href="/cart" class="btn btn-light w-100 rounded-pill border mt-2 text-muted">
+                            <i class="fas fa-arrow-left me-2"></i> Quay lại giỏ hàng
+                        </a>
+                        <div class="text-center mt-4">
+                            <small class="text-muted">
+                                <i class="fas fa-lock me-1 text-success"></i> Thông tin được bảo mật tuyệt đối
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<style>
+.bg-light-grey { background-color: #f4f7f3; }
+
+/* Checkout Cards */
+.checkout-card {
+    background: #fff;
+    border: 1px solid #e8f0e9;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.checkout-card-header {
+    background: linear-gradient(135deg, #f0faf3 0%, #fafff6 100%);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1px solid #e8f0e9;
+}
+.checkout-card-body {
+    padding: 24px;
+}
+.step-badge {
+    width: 32px;
+    height: 32px;
+    background: var(--brand-primary, #2d7a3a);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+.checkout-input {
+    border-color: #e0ebe1;
+    border-radius: 10px;
+    padding: 10px 14px;
+    transition: all 0.2s ease;
+}
+.checkout-input:focus {
+    border-color: var(--brand-primary, #2d7a3a);
+    box-shadow: 0 0 0 3px rgba(45, 122, 58, 0.12);
+}
+
+/* Payment Option */
+.payment-option {
+    background: #f8fbf8;
+    border: 2px solid #e0ebe1;
+    border-radius: 14px;
+    padding: 16px 20px;
+    transition: all 0.2s ease;
+}
+.payment-option.selected {
+    border-color: var(--brand-primary, #2d7a3a);
+    background: #f2faf4;
+}
+
+/* Order Summary */
+.order-summary-box {
+    background: #fff;
+    border: 1px solid #e8f0e9;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-assemble delivery_address
+    function updateDeliveryAddress() {
+        const addressLine = document.querySelector('[name="address_line"]').value;
+        const ward = document.querySelector('[name="ward"]').value;
+        const district = document.querySelector('[name="district"]').value;
+        const province = document.querySelector('[name="province"]').value;
+        const parts = [addressLine, ward, district, province].filter(Boolean);
+        document.getElementById('delivery_address').value = parts.join(', ');
+    }
+
+    ['address_line', 'ward', 'district', 'province'].forEach(name => {
+        document.querySelector(`[name="${name}"]`).addEventListener('input', updateDeliveryAddress);
+    });
+    updateDeliveryAddress();
+
+    // Loading state on submit
+    document.getElementById('checkoutForm').addEventListener('submit', function() {
+        const btn = document.getElementById('placeOrderBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+    });
+});
+</script>

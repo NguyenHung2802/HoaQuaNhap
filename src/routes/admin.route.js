@@ -7,6 +7,11 @@ const { isAdmin } = require('../middlewares/auth.middleware');
 const categoriesRoute = require('../modules/categories/categories.route');
 const productsRoute = require('../modules/products/products.route');
 const inventoryRoute = require('../modules/inventory/inventory.route');
+const adminOrdersRoute = require('../modules/admin/orders/orders.route');
+const bannersRoute = require('../modules/banners/banners.route');
+const blogsRoute = require('../modules/blogs/blogs.route');
+const reviewsRoute = require('../modules/reviews/reviews.route');
+const settingsRoute = require('../modules/settings/settings.route');
 
 // [GET] /admin/login (Redirect to unified login)
 router.get('/login', (req, res) => res.redirect('/auth/login'));
@@ -21,5 +26,10 @@ router.get('/', isAdmin, dashboardController.renderDashboard);
 router.use('/categories', isAdmin, categoriesRoute);
 router.use('/products', isAdmin, productsRoute);
 router.use('/inventory', isAdmin, inventoryRoute);
+router.use('/orders', isAdmin, adminOrdersRoute);
+router.use('/banners', isAdmin, bannersRoute);
+router.use('/blogs', isAdmin, blogsRoute);
+router.use('/reviews', isAdmin, reviewsRoute);
+router.use('/settings', isAdmin, settingsRoute);
 
 module.exports = router;

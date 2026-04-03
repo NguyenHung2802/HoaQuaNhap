@@ -31,12 +31,27 @@ exports.renderHome = async (req, res, next) => {
       take: 6
     });
 
+    // 4. Banners
+    const banners = await db.banner.findMany({
+      where: { is_active: true },
+      orderBy: { sort_order: 'asc' }
+    });
+
+    // 5. Recent Blogs
+    const latestBlogs = await db.blogPost.findMany({
+      where: { is_published: true },
+      orderBy: { created_at: 'desc' },
+      take: 3
+    });
+
     res.render('public/home/index', {
       title: 'Trang chủ',
       metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại WebHoaQua — Tươi ngon, đảm bảo chất lượng, giao hàng tận nơi.',
       featuredProducts,
       bestSellers,
       categories,
+      banners,
+      latestBlogs,
       layout: 'layouts/main'
     });
   } catch (error) {

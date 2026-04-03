@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h4 class="mb-0">Lịch sử biến động kho</h4>
+        <h4 class="mb-0">Quản lý Kho hàng</h4>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
@@ -10,9 +10,64 @@
     </div>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-white py-3">
-        <h5 class="card-title mb-0">Lịch sử nhập/xuất/điều chỉnh</h5>
+<!-- Stock Overview Summary -->
+<div class="row g-4 mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-boxes me-2 text-primary"></i>Tình trạng tồn kho hiện tại</h5>
+                <span class="badge bg-light text-muted border px-3 rounded-pill"><%= productsStock.length %> sản phẩm</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small text-uppercase sticky-top">
+                            <tr>
+                                <th class="ps-4">Sản phẩm</th>
+                                <th>Danh mục</th>
+                                <th class="text-center">Số lượng tồn</th>
+                                <th>Đơn vị</th>
+                                <th class="text-end pe-4">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% productsStock.forEach(p => { %>
+                                <tr class="<%= p.stock_quantity <= p.min_stock_alert ? 'bg-danger bg-opacity-10' : '' %>">
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark"><%= p.name %></div>
+                                        <div class="small text-muted"><code class="text-secondary"><%= p.sku %></code></div>
+                                    </td>
+                                    <td class="small text-muted"><%= p.category ? p.category.name : 'N/A' %></td>
+                                    <td class="text-center fw-bold">
+                                        <% if (p.stock_quantity <= p.min_stock_alert) { %>
+                                            <span class="text-danger"><%= p.stock_quantity %> <i class="fas fa-exclamation-triangle ms-1"></i></span>
+                                        <% } else { %>
+                                            <span class="text-dark"><%= p.stock_quantity %></span>
+                                        <% } %>
+                                    </td>
+                                    <td class="small text-muted"><%= p.unit %></td>
+                                    <td class="text-end pe-4">
+                                        <% if (p.stock_quantity <= 0) { %>
+                                            <span class="badge bg-danger rounded-pill px-3">Hết hàng</span>
+                                        <% } else if (p.stock_quantity <= p.min_stock_alert) { %>
+                                            <span class="badge bg-warning text-dark rounded-pill px-3">Sắp hết hàng</span>
+                                        <% } else { %>
+                                            <span class="badge bg-success rounded-pill px-3">An toàn</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-header bg-white py-3 border-bottom-0">
+        <h5 class="card-title mb-0 fw-bold"><i class="fas fa-history me-2 text-primary"></i>Lịch sử biến động kho</h5>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -21,18 +76,19 @@
                     <tr>
                         <th class="ps-4">Thời gian</th>
                         <th>Sản phẩm</th>
-                        <th>Loại</th>
-                        <th>Số lượng</th>
+                        <th>Loại biến động</th>
+                        <th class="text-center">Số lượng</th>
                         <th>Trước / Sau</th>
-                        <th>Ghi chú</th>
+                        <th class="pe-4">Ghi chú / Tham chiếu</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% if (logs && logs.length > 0) { %>
                         <% logs.forEach(log => { %>
                             <tr>
-                                <td class="ps-4 text-muted small">
-                                    <%= new Date(log.created_at).toLocaleString('vi-VN') %>
+                                <td class="ps-4 small">
+                                    <div class="text-dark"><%= new Date(log.created_at).toLocaleDateString('vi-VN') %></div>
+                                    <div class="text-muted"><%= new Date(log.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) %></div>
                                 </td>
                                 <td>
                                     <div class="fw-bold text-dark"><%= log.product.name %></div>
@@ -40,32 +96,38 @@
                                 </td>
                                 <td>
                                     <% if (log.type === 'import') { %>
-                                        <span class="badge bg-success bg-opacity-10 text-success border-0 px-2 py-1">Nhập kho</span>
+                                        <span class="badge bg-success bg-opacity-10 text-success border-0 px-2 py-1"><i class="fas fa-arrow-down me-1"></i> Nhập kho</span>
                                     <% } else if (log.type === 'export') { %>
-                                        <span class="badge bg-danger bg-opacity-10 text-danger border-0 px-2 py-1">Xuất kho</span>
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border-0 px-2 py-1"><i class="fas fa-arrow-up me-1"></i> Xuất hàng</span>
                                     <% } else if (log.type === 'adjust') { %>
-                                        <span class="badge bg-warning bg-opacity-10 text-warning border-0 px-2 py-1">Điều chỉnh</span>
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border-0 px-2 py-1"><i class="fas fa-cog me-1"></i> Điều chỉnh</span>
+                                    <% } else if (log.type === 'order_sub') { %>
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border-0 px-2 py-1"><i class="fas fa-shopping-cart me-1"></i> Trừ đơn hàng</span>
+                                    <% } else if (log.type === 'order_add') { %>
+                                        <span class="badge bg-info bg-opacity-10 text-info border-0 px-2 py-1"><i class="fas fa-undo me-1"></i> Bù (Hủy đơn)</span>
                                     <% } else { %>
-                                        <span class="badge bg-secondary opacity-10 text-secondary border-0 px-2 py-1"><%= log.type %></span>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border-0 px-2 py-1"><%= log.type %></span>
                                     <% } %>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <span class="fw-bold <%= log.quantity >= 0 ? 'text-success' : 'text-danger' %>">
                                         <%= log.quantity >= 0 ? '+' : '' %><%= log.quantity %>
                                     </span>
                                 </td>
-                                <td class="small text-muted">
-                                    <%= log.before_quantity %> <i class="fas fa-arrow-right mx-1 opacity-50"></i> <%= log.after_quantity %>
+                                <td class="small">
+                                    <span class="text-muted"><%= log.before_quantity %></span>
+                                    <i class="fas fa-arrow-right mx-2 text-muted opacity-50"></i>
+                                    <span class="fw-bold text-dark"><%= log.after_quantity %></span>
                                 </td>
-                                <td>
-                                    <span class="text-muted"><%= log.note || '---' %></span>
+                                <td class="pe-4 small text-muted">
+                                    <%= log.note || '---' %>
                                 </td>
                             </tr>
                         <% }) %>
                     <% } else { %>
                         <tr>
                             <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="fas fa-history fa-3x mb-3 opacity-25"></i>
+                                <i class="fas fa-history fa-5x mb-3 opacity-10"></i>
                                 <p class="mb-0">Chưa có lích sử biến động kho nào.</p>
                             </td>
                         </tr>

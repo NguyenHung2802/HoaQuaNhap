@@ -1,45 +1,54 @@
-<!-- ===== HERO SECTION ===== -->
-<section class="hero-section">
-    <div class="hero-bg"></div>
-    <div class="container h-100">
-        <div class="row h-100 align-items-center">
-            <div class="col-lg-6 hero-text-col">
-                <p class="hero-eyebrow">🍃 Nhập khẩu chính hãng • Tươi ngon mỗi ngày</p>
-                <h1 class="hero-title">Tinh Hoa <br>Trái Cây <span class="hero-title-accent">Nhập Khẩu</span><br>Toàn Cầu.</h1>
-                <p class="hero-subtitle">Hàng trăm loại trái cây thượng hạng từ Hàn Quốc, Mỹ, New Zealand... mang đến tận tay bạn mỗi ngày.</p>
-                <div class="d-flex gap-3 flex-wrap mt-4">
-                    <a href="/products" class="btn btn-primary btn-lg rounded-pill px-5">
-                        Mua sắm ngay <i class="fas fa-arrow-right ms-2"></i>
-                    </a>
-                    <a href="#categories" class="btn btn-outline-light btn-lg rounded-pill px-5">
-                        Khám phá
-                    </a>
+<!-- ===== HERO SECTION (Dynamic Slider) ===== -->
+<section class="hero-slider-section">
+    <div class="swiper heroSwiper">
+        <div class="swiper-wrapper">
+            <% if (banners && banners.length > 0) { %>
+                <% banners.forEach(banner => { %>
+                    <div class="swiper-slide">
+                        <div class="hero-slide-item" style="background: linear-gradient(rgba(15, 45, 31, 0.7), rgba(15, 45, 31, 0.5)), url('<%= banner.image_url %>') center/cover no-repeat;">
+                            <div class="container h-100">
+                                <div class="row h-100 align-items-center">
+                                    <div class="col-lg-7 text-white">
+                                        <% if (banner.title) { %>
+                                            <h2 class="display-3 fw-bold mb-3 animate__animated animate__fadeInUp"><%= banner.title %></h2>
+                                        <% } %>
+                                        <% if (banner.subtitle) { %>
+                                            <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s opacity-75"><%= banner.subtitle %></p>
+                                        <% } %>
+                                        <% if (banner.link_url) { %>
+                                            <a href="<%= banner.link_url %>" class="btn btn-primary btn-lg rounded-pill px-5 animate__animated animate__fadeInUp animate__delay-2s">Khám phá ngay</a>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <!-- Fallback static if no banners -->
+                <div class="swiper-slide">
+                    <div class="hero-slide-item flex-hero" style="background: var(--hero-bg);">
+                        <div class="container h-100">
+                            <div class="row h-100 align-items-center">
+                                <div class="col-lg-6 hero-text-col">
+                                    <p class="hero-eyebrow">🍃 Nhập khẩu chính hãng • Tươi ngon mỗi ngày</p>
+                                    <h1 class="hero-title">Tinh Hoa <br>Trái Cây <span class="hero-title-accent">Nhập Khẩu</span><br>Toàn Cầu.</h1>
+                                    <a href="/products" class="btn btn-primary btn-lg rounded-pill px-5 mt-4">Mua sắm ngay</a>
+                                </div>
+                                <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+                                    <div class="hero-image-wrap">
+                                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80" alt="Trái cây nhập khẩu" class="hero-main-img">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- Trust badges -->
-                <div class="d-flex gap-4 mt-5 trust-badges">
-                    <div class="trust-badge">
-                        <span class="badge-number">500+</span>
-                        <span class="badge-label">Loại trái cây</span>
-                    </div>
-                    <div class="trust-badge">
-                        <span class="badge-number">10K+</span>
-                        <span class="badge-label">Khách hàng tin yêu</span>
-                    </div>
-                    <div class="trust-badge">
-                        <span class="badge-number">30+</span>
-                        <span class="badge-label">Quốc gia xuất xứ</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 d-none d-lg-flex justify-content-center">
-                <div class="hero-image-wrap">
-                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80" alt="Trái cây nhập khẩu tươi ngon" class="hero-main-img">
-                    <div class="hero-badge-float">
-                        <i class="fas fa-check-circle me-2"></i> Đảm bảo chất lượng
-                    </div>
-                </div>
-            </div>
+            <% } %>
         </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
     </div>
 </section>
 
@@ -249,25 +258,28 @@
             <a href="/blog" class="btn btn-outline-primary rounded-pill px-4 d-none d-md-block">Xem tất cả</a>
         </div>
         <div class="row g-4">
-            <% [
-                { title: 'Bí Quyết Bảo Quản Táo Nhập Khẩu Luôn Tươi Ngon', date: '28/03/2025', tag: 'Mẹo hay', img: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&q=80' },
-                { title: 'Trái Cây Vitamin C Cực Cần Thiết Cho Mùa Hè', date: '25/03/2025', tag: 'Sức khỏe', img: 'https://images.unsplash.com/photo-1543218024-57a70143c369?w=400&q=80' },
-                { title: 'Nghệ Thuật Trao Quà: Hộp Trái Cây Đẳng Cấp', date: '22/03/2025', tag: 'Phong cách', img: 'https://images.unsplash.com/photo-1471927272523-e75852d3a4b1?w=400&q=80' }
-            ].forEach(b => { %>
-                <div class="col-md-4">
-                    <a href="/blog" class="blog-card d-block">
-                        <div class="blog-img-wrap">
-                            <img src="<%= b.img %>" alt="<%= b.title %>" loading="lazy">
-                            <span class="blog-tag"><%= b.tag %></span>
-                        </div>
-                        <div class="blog-body">
-                            <p class="blog-date"><i class="far fa-calendar me-1"></i><%= b.date %></p>
-                            <h5 class="blog-title"><%= b.title %></h5>
-                            <span class="blog-link">Đọc thêm <i class="fas fa-arrow-right ms-1"></i></span>
-                        </div>
-                    </a>
-                </div>
-            <% }) %>
+        <div class="row g-4">
+            <% if (latestBlogs && latestBlogs.length > 0) { %>
+                <% latestBlogs.forEach(b => { %>
+                    <div class="col-md-4">
+                        <a href="/blog/<%= b.slug %>" class="blog-card d-block h-100">
+                            <div class="blog-img-wrap">
+                                <img src="<%= b.thumbnail_url || 'https://via.placeholder.com/600x400?text=News' %>" alt="<%= b.title %>" loading="lazy">
+                                <span class="blog-tag">Tin mới</span>
+                            </div>
+                            <div class="blog-body">
+                                <p class="blog-date"><i class="far fa-calendar me-1"></i><%= new Date(b.created_at).toLocaleDateString('vi-VN') %></p>
+                                <h5 class="blog-title"><%= b.title %></h5>
+                                <p class="small text-muted mb-3 line-clamp-2"><%= b.summary %></p>
+                                <span class="blog-link">Đọc thêm <i class="fas fa-arrow-right ms-1"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="col-12 text-center py-5 text-muted small italic">Chưa có bài viết mới.</div>
+            <% } %>
+        </div>
         </div>
     </div>
 </section>
@@ -278,6 +290,12 @@
 :root {
     --hero-bg: #0f2d1f;
     --bg-light-grey: #f4f7f3;
+}
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
 }
 .bg-light-grey { background: var(--bg-light-grey); }
 .section-eyebrow {
@@ -454,10 +472,32 @@
 .blog-date { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
 .blog-title { font-size: 1rem; font-weight: 700; color: var(--brand-primary); line-height: 1.4; margin-bottom: 12px; }
 .blog-link { font-size: 0.85rem; color: var(--brand-accent); font-weight: 600; }
+    .hero-slider-section { position: relative; overflow: hidden; }
+    .hero-slide-item { min-height: 85vh; display: flex; align-items: center; position: relative; }
+    .hero-slide-item.flex-hero { background: var(--hero-bg); }
+    .hero-slide-item::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.2); z-index: 1; }
+    .hero-slide-item .container { position: relative; z-index: 2; }
+    .heroSwiper .swiper-button-next, .heroSwiper .swiper-button-prev { color: #fff; transform: scale(0.7); }
+    .heroSwiper .swiper-pagination-bullet { background: #fff; opacity: 0.5; }
+    .heroSwiper .swiper-pagination-bullet-active { background: var(--brand-accent); opacity: 1; }
 
-@media (max-width: 768px) {
-    .hero-section { min-height: 80vh; }
-    .promo-banner-card { padding: 36px 24px; }
-    .cat-circle-img { width: 70px; height: 70px; }
-}
+    @media (max-width: 768px) {
+        .hero-slide-item { min-height: 50vh; }
+        .hero-slide-item h2 { font-size: 2rem !important; }
+        .promo-banner-card { padding: 36px 24px; }
+        .cat-circle-img { width: 70px; height: 70px; }
+    }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const swiper = new Swiper('.heroSwiper', {
+            loop: true,
+            autoplay: { delay: 5000, disableOnInteraction: false },
+            pagination: { el: '.swiper-pagination', clickable: true },
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            effect: 'fade',
+            fadeEffect: { crossFade: true }
+        });
+    });
+</script>

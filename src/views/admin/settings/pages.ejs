@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Quản lý Trang tĩnh</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Trang tĩnh</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase font-weight-bold">
+                    <tr>
+                        <th class="ps-4">Tên trang</th>
+                        <th>Khóa (Key)</th>
+                        <th>Nội dung sơ bộ</th>
+                        <th class="text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (pages && pages.length > 0) { %>
+                        <% pages.forEach(page => { %>
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark"><%= page.description %></div>
+                                </td>
+                                <td>
+                                    <code class="text-primary"><%= page.key %></code>
+                                </td>
+                                <td>
+                                    <div class="small text-muted text-truncate" style="max-width: 400px;">
+                                        <%= page.value ? page.value.replace(/<[^>]*>?/gm, '').substring(0, 100) : 'Trống' %>...
+                                    </div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="/admin/settings/pages/edit/<%= page.key %>" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit me-1"></i>Chỉnh sửa nội dung
+                                    </a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted small italic">
+                                Chưa có trang tĩnh nào được cấu hình trong DB.
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

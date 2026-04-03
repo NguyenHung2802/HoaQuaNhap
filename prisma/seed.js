@@ -111,6 +111,25 @@ async function main() {
     });
   }
 
+  // 4. Static Pages Settings
+  const staticPages = [
+    { key: 'about_us', description: 'Giới thiệu WebHoaQua', value: '<h2>Chúng tôi là ai?</h2><p>WebHoaQua là hệ thống phân phối trái cây nhập khẩu hàng đầu Việt Nam...</p>' },
+    { key: 'faq', description: 'Câu hỏi thường gặp (FAQ)', value: '<h2>Các câu hỏi thường gặp</h2><p>1. Cách thức đặt hàng?<br>2. Quy trình đổi trả?</p>' },
+    { key: 'shipping_policy', description: 'Chính sách vận chuyển', value: '<h2>Chính sách giao hàng</h2><p>Miễn phí vận chuyển cho đơn hàng từ 500k tại nội thành...</p>' },
+    { key: 'privacy_policy', description: 'Chính sách bảo mật', value: '<h2>Bảo mật thông tin khách hàng</h2><p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn...</p>' }
+  ];
+
+  for (const page of staticPages) {
+    await prisma.setting.upsert({
+      where: { key: page.key },
+      update: {},
+      create: {
+        ...page,
+        group_key: 'static_page'
+      }
+    });
+  }
+
   console.log('Seed data created successfully!');
 }
 

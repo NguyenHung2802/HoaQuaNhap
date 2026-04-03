@@ -12,11 +12,28 @@ const renderLog = async (req, res, next) => {
             limit: 20
         });
 
+        // Fetch current stock for all products to show in an overview
+        const { PrismaClient } = require('@prisma/client');
+        const prisma = new PrismaClient();
+        const productsStock = await prisma.product.findMany({
+            select: {
+                id: true,
+                name: true,
+                sku: true,
+                stock_quantity: true,
+                min_stock_alert: true,
+                unit: true,
+                category: { select: { name: true } }
+            },
+            orderBy: { stock_quantity: 'asc' }
+        });
+
         res.render('admin/inventory/index', {
-            title: 'Lịch sử kho hàng',
+            title: 'Quản lý kho hàng',
             logs,
             total,
             totalPages,
+            productsStock,
             currentPage: parseInt(page),
             layout: 'layouts/admin'
         });

@@ -113,13 +113,25 @@ exports.renderDetail = async (req, res, next) => {
             where: { slug },
             include: {
                 images: { orderBy: { sort_order: 'asc' } },
-                category: true
+                category: true,
+                reviews: {
+                    where: { is_approved: true },
+                    orderBy: { created_at: 'desc' }
+                }
             }
         });
 
         if (!product) {
             return res.status(404).render('public/404', { title: 'Không tìm thấy', layout: 'layouts/main' });
         }
+
+        // Calculate average rating
+        const avgRating = product.reviews.length > 0 
+            ? (product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length).toFixed(1)
+            : 0;
+        
+        product.avg_rating = parseFloat(avgRating);
+        product.review_count = product.reviews.length;
 
         const relatedProducts = await db.product.findMany({
             where: {
@@ -142,5 +154,36 @@ exports.renderDetail = async (req, res, next) => {
         });
     } catch (error) {
         next(error);
+    }
+};
+/**
+ * [POST] /product/:id/review - Submit product review
+ */
+exports.submitReview = async (req, res, next) => {
+    try {
+        const product_id = parseInt(req.params.id);
+        const { customer_name, rating, content } = req.body;
+
+        if (!customer_name || !rating) {
+            return res.status(400).json({ success: false, message: 'Vui lòng nhập tên và số sao đánh giá.' });
+        }
+
+        await db.review.create({
+            data: {
+                product_id,
+                customer_name,
+                rating: parseInt(rating),
+                content,
+                is_approved: false // Requirement: admin must approve
+            }
+        });
+
+        res.json({ 
+            success: true, 
+            message: 'Cảm ơn bạn đã đánh giá! Phản hồi của bạn đang được duyệt và sẽ sớm hiển thị.' 
+        });
+    } catch (error) {
+        console.error('Submit review error:', error);
+        res.status(500).json({ success: false, message: 'Có lỗi xảy ra, vui lòng thử lại sau.' });
     }
 };

@@ -1,0 +1,92 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Chỉnh sửa Banner</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/admin/banners">Banner</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/admin/banners" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="fas fa-arrow-left me-1"></i>Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <form action="/admin/banners/edit/<%= banner.id %>" method="POST" enctype="multipart/form-data" class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Tiêu đề (Tùy chọn)</label>
+                        <input type="text" name="title" class="form-control rounded-pill border-light-green" value="<%= banner.title %>" placeholder="Ví dụ: Táo New Zealand Giảm Giá 20%">
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Phụ đề (Tùy chọn)</label>
+                        <textarea name="subtitle" class="form-control rounded-4 border-light-green" rows="2" placeholder="Ví dụ: Chỉ áp dụng trong hôm nay cho đơn hàng > 500k"><%= banner.subtitle %></textarea>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Thay đổi Banner (Tùy chọn)</label>
+                        <input type="file" name="image" class="form-control rounded-pill border-light-green" accept="image/*" onchange="previewBanner(this)">
+                        <div class="small text-muted mt-1 italic">Để trống nếu không muốn thay đổi ảnh hiện tại.</div>
+                        <div id="image-preview" class="mt-3">
+                            <img src="<%= banner.image_url %>" alt="Current" class="rounded shadow-sm border w-100 object-fit-cover" style="max-height: 250px;">
+                            <div class="small text-center text-muted mt-1 current-label">Ảnh hiện tại</div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label fw-bold">Link điều hướng (URL)</label>
+                        <input type="url" name="link_url" class="form-control rounded-pill border-light-green" value="<%= banner.link_url %>" placeholder="https://example.com/shop/promo">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Thứ tự hiển thị</label>
+                        <input type="number" name="sort_order" class="form-control rounded-pill border-light-green" value="<%= banner.sort_order %>" min="0">
+                    </div>
+                    <div class="col-md-12 mt-4">
+                        <div class="form-check form-switch p-3 bg-light rounded-4 border">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" name="is_active" id="is_active" <%= banner.is_active ? 'checked' : '' %>>
+                            <label class="form-check-label fw-bold" for="is_active">Hiển thị Banner này trên trang chủ</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white p-4 border-top-0 pt-0">
+                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow-sm">
+                    <i class="fas fa-save me-2"></i>Cập nhật thông tin Banner
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-4 text-center">
+        <div class="bg-light-green border-0 rounded-4 p-4 text-primary text-center">
+            <h6 class="fw-bold mb-3"><i class="fas fa-eye me-2"></i>Xem trước Banner</h6>
+            <div class="p-2 bg-white rounded shadow-sm">
+               <img src="<%= banner.image_url %>" id="side-preview" class="w-100 rounded object-fit-cover" style="max-height: 150px;">
+            </div>
+            <p class="small mt-2 mb-0">Đây là ảnh hiện đang hiển thị.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewBanner(input) {
+        const preview = document.getElementById('image-preview');
+        const sidePreview = document.getElementById('side-preview');
+        const previewImg = preview.querySelector('img');
+        const label = preview.querySelector('.current-label');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                sidePreview.src = e.target.result;
+                label.innerText = 'Ảnh mới chuẩn bị thay thế';
+                label.classList.add('text-primary');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>

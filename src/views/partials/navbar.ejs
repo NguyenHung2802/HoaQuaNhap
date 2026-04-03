@@ -58,7 +58,7 @@
                 <!-- Cart -->
                 <a href="/cart" class="nav-icon-btn position-relative" title="Giỏ hàng">
                     <i class="fas fa-shopping-basket"></i>
-                    <span class="cart-badge">0</span>
+                    <span class="cart-badge" id="nav-cart-badge"><%= typeof cartItemsCount !== 'undefined' ? cartItemsCount : 0 %></span>
                 </a>
 
                 <!-- User Account -->

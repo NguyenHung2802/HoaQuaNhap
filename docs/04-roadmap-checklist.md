@@ -50,21 +50,30 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 - [x] Detail page (S20, S22 — Swiper Gallery, Fancybox Image Zoom, Specs, QTY, Tabs)
 
 ### 2.6. Giỏ hàng & Order
-- [ ] Cart Session handler
-- [ ] Checkout form (Validation Info)
-- [ ] Success page
-- [ ] Trừ tồn kho tạm khi nhận đơn
+- [x] Cart Session handler (Done: S24)
+- [x] Checkout form (Validation Info) (Done: S25)
+- [x] Success page (Done: S26)
+- [x] Trừ tồn kho tạm khi nhận đơn (Done: S26)
 
 ### 2.7. Admin Operations
-- [ ] Order Listing / Search
-- [ ] Order Status transition (History logs)
-- [ ] Dashboard charts (Revenue)
+- [x] Order Listing / Search (Done: S27)
+- [x] Order Status transition (History logs) (Done: S28)
+- [x] Dashboard charts (Revenue) (Done: S29)
+- [x] Inventory Management Overview (Done: Fixed)
 
-### 2.8. Tối ưu SEO
-- [ ] Meta Title/Description động
-- [ ] Breadcrumbs
+### 2.8. Nội dung & Truyền thông (Giai đoạn 7)
+- [x] Banner Management (S30 — Slider dynamic)
+- [x] Blog / News Management (S31 — Quill Editor, Public list/detail)
+- [x] Product Reviews (S32 — Approval logic, Public submit stars)
+- [x] Static Pages (S33 — FAQ, Policies, About, Settings model)
+
+### 2.9. Tối ưu & Nâng cao
+- [x] Meta Title/Description động (Done)
+- [x] Breadcrumbs (Done)
+- [ ] Coupon / Discount code
 - [ ] Thêm thẻ Alt cho ảnh tự động
-
+- [ ] Performance (Lazy loading images)
+- [ ] Production deployment (Linux/VPS/Docker)
 ---
 > [!TIP]
 > Hãy luôn cập nhật checklist sau mỗi Giai đoạn hoàn thành thành công và được test kỹ lưỡng.

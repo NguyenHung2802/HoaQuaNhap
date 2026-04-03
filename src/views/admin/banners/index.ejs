@@ -1,0 +1,102 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Quản lý Banner</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Banner</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/admin/banners/create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Thêm Banner mới
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4">Hình ảnh</th>
+                        <th>Nội dung</th>
+                        <th>Thứ tự</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (banners && banners.length > 0) { %>
+                        <% banners.forEach(banner => { %>
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="banner-thumb rounded-3 overflow-hidden border shadow-sm" style="width: 160px; height: 80px;">
+                                        <img src="<%= banner.image_url %>" alt="<%= banner.title %>" class="w-100 h-100 object-fit-cover">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark"><%= banner.title || 'Không có tiêu đề' %></div>
+                                    <div class="small text-muted mb-1"><%= banner.subtitle || '' %></div>
+                                    <div class="small"><i class="fas fa-link me-1 opacity-50"></i><a href="<%= banner.link_url %>" target="_blank" class="text-decoration-none text-muted"><%= banner.link_url || '#' %></a></div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border px-3"><%= banner.sort_order %></span>
+                                </td>
+                                <td>
+                                    <% if (banner.is_active) { %>
+                                        <span class="badge bg-success bg-opacity-10 text-success border-0 px-3 py-1">Đang hiển thị</span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border-0 px-3 py-1">Đang ẩn</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a href="/admin/banners/edit/<%= banner.id %>" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger ms-1" title="Xóa" onclick="deleteBanner(<%= banner.id %>)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-images fa-4x mb-3 opacity-10"></i>
+                                <p class="mb-0">Chưa có banner nào được tạo.</p>
+                                <a href="/admin/banners/create" class="btn btn-sm btn-link mt-2">Thêm ngay</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function deleteBanner(id) {
+        if (confirm('Bạn có chắc chắn muốn xóa banner này không?')) {
+            try {
+                const response = await fetch(`/admin/banners/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Xóa thành công!');
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Delete error', error);
+                alert('Có lỗi xảy ra!');
+            }
+        }
+    }
+</script>

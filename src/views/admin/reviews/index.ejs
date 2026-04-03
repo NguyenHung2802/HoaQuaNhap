@@ -1,0 +1,144 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Quản lý Đánh giá sản phẩm</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Đánh giá</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase font-weight-bold">
+                    <tr>
+                        <th class="ps-4">Ngày gửi</th>
+                        <th style="width: 200px;">Sản phẩm</th>
+                        <th>Khách hàng</th>
+                        <th>Rating</th>
+                        <th>Nội dung</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (reviews && reviews.length > 0) { %>
+                        <% reviews.forEach(review => { %>
+                            <tr id="review-row-<%= review.id %>">
+                                <td class="ps-4 small">
+                                    <%= new Date(review.created_at).toLocaleDateString('vi-VN') %>
+                                    <div class="text-muted"><%= new Date(review.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) %></div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark text-truncate" style="max-width: 180px;"><%= review.product.name %></div>
+                                    <small class="text-muted"><%= review.product.sku %></small>
+                                </td>
+                                <td>
+                                    <div class="fw-bold"><%= review.customer_name %></div>
+                                </td>
+                                <td>
+                                    <div class="text-warning small text-nowrap">
+                                        <% for(let i=1; i<=5; i++) { %>
+                                            <i class="<%= i <= review.rating ? 'fas' : 'far' %> fa-star"></i>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="small text-muted"><%= review.content || '(Không có nội dung)' %></div>
+                                </td>
+                                <td id="status-<%= review.id %>">
+                                    <% if (review.is_approved) { %>
+                                        <span class="badge bg-success bg-opacity-10 text-success border-0 px-3 py-1">Đã duyệt</span>
+                                    <% } else { %>
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border-0 px-3 py-1">Chờ duyệt</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <% if (!review.is_approved) { %>
+                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="approveReview(<%= review.id %>)" title="Duyệt">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        <% } %>
+                                        <button type="button" class="btn btn-sm btn-outline-danger ms-1" onclick="deleteReview(<%= review.id %>)" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-star fa-4x mb-3 opacity-10"></i>
+                                <p class="mb-0">Chưa có đánh giá nào từ khách hàng.</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <% if (totalPages > 1) { %>
+        <div class="card-footer bg-white py-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>">Trước</a>
+                    </li>
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    async function approveReview(id) {
+        if (confirm('Duyệt đánh giá này để hiển thị trên website?')) {
+            try {
+                const response = await fetch(`/admin/reviews/approve/${id}`, { method: 'POST' });
+                const result = await response.json();
+                if (result.success) {
+                    const statusTd = document.getElementById(`status-${id}`);
+                    statusTd.innerHTML = '<span class="badge bg-success bg-opacity-10 text-success border-0 px-3 py-1">Đã duyệt</span>';
+                    const approveBtn = document.querySelector(`button[onclick="approveReview(${id})"]`);
+                    if (approveBtn) approveBtn.remove();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Approve error', error);
+                alert('Có lỗi xảy ra!');
+            }
+        }
+    }
+
+    async function deleteReview(id) {
+        if (confirm('Xóa vĩnh viễn đánh giá này?')) {
+            try {
+                const response = await fetch(`/admin/reviews/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById(`review-row-${id}`).remove();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Delete error', error);
+                alert('Có lỗi xảy ra!');
+            }
+        }
+    }
+</script>

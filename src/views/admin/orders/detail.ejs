@@ -1,53 +1,87 @@
-<div class="container-fluid px-4 pb-5">
-    <h1 class="mt-4"><%= title %></h1>
-    <div class="mb-4">
-        <a href="/admin/orders" class="btn btn-outline-secondary rounded-pill btn-sm">
-            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Chi tiết Đơn hàng: <span class="text-primary"><%= order.order_code %></span></h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/admin/orders">Đơn hàng</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/admin/orders" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="fas fa-arrow-left me-1"></i>Quay lại danh sách
         </a>
     </div>
+</div>
 
-    <div class="row g-4">
-        <!-- Thông tin vận chuyển -->
-        <div class="col-xl-8">
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white py-3 fw-bold">
-                    <i class="fas fa-shopping-bag me-1"></i> Sản phẩm trong đơn
-                </div>
-                <div class="card-body">
-                    <table class="table align-middle">
-                        <thead>
+<div class="row g-4">
+    <!-- LEFT: Order Content -->
+    <div class="col-lg-8">
+        <!-- Order Items -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white py-3 border-bottom-0">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-shopping-basket me-2 text-primary"></i>Danh sách sản phẩm</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="bg-light small text-muted text-uppercase">
                             <tr>
-                                <th>Sản phẩm</th>
-                                <th>Giá</th>
-                                <th>Số lượng</th>
-                                <th class="text-end">Thành tiền</th>
+                                <th class="ps-4">Sản phẩm</th>
+                                <th class="text-center">Đơn giá</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end pe-4">Thành tiền</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% order.items.forEach(item => { %>
-                            <tr>
-                                <td>
-                                    <strong><%= item.product_name_snapshot %></strong>
-                                    <div class="small text-muted">SKU: <%= item.sku_snapshot %></div>
-                                </td>
-                                <td><%= item.price_snapshot.toLocaleString('vi-VN') %>₫</td>
-                                <td>x<%= item.quantity %></td>
-                                <td class="text-end fw-bold"><%= item.line_total.toLocaleString('vi-VN') %>₫</td>
-                            </tr>
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded border bg-light me-3" style="width: 50px; height: 50px; overflow: hidden; flex-shrink: 0;">
+                                                <% if (item.product && item.product.images && item.product.images.length > 0) { %>
+                                                    <img src="<%= item.product.images[0].image_url %>" class="w-100 h-100 object-fit-cover">
+                                                <% } else { %>
+                                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center">🌿</div>
+                                                <% } %>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold small mb-1"><%= item.product_name_snapshot %></div>
+                                                <div class="small text-muted">SKU: <%= item.sku_snapshot %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center small">
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price_snapshot) %>
+                                    </td>
+                                    <td class="text-center fw-semibold">x <%= item.quantity %></td>
+                                    <td class="text-end pe-4 fw-bold text-dark">
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.line_total) %>
+                                    </td>
+                                </tr>
                             <% }) %>
                         </tbody>
                         <tfoot class="border-top-0">
                             <tr>
-                                <td colspan="3" class="text-end py-3">Tổng tiền hàng:</td>
-                                <td class="text-end py-3 fw-bold"><%= order.total_amount.toLocaleString('vi-VN') %>₫</td>
+                                <td colspan="2"></td>
+                                <td class="text-end text-muted small py-3">Tạm tính:</td>
+                                <td class="text-end pe-4 py-3 fw-semibold">
+                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.subtotal_amount) %>
+                                </td>
                             </tr>
                             <tr>
-                                <td colspan="3" class="text-end py-3 border-0">Phí giao hàng:</td>
-                                <td class="text-end py-3 fw-bold border-0 text-success">Miễn phí</td>
+                                <td colspan="2"></td>
+                                <td class="text-end text-muted small pb-3">Phí vận chuyển:</td>
+                                <td class="text-end pe-4 pb-3 fw-semibold text-success">Miễn phí</td>
                             </tr>
                             <tr class="fs-5">
-                                <td colspan="3" class="text-end py-3 fw-bold border-0">Tổng cộng:</td>
-                                <td class="text-end py-3 fw-bold border-0 text-danger"><%= order.total_amount.toLocaleString('vi-VN') %>₫</td>
+                                <td colspan="2"></td>
+                                <td class="text-end fw-bold pb-4 border-top">Tổng cộng:</td>
+                                <td class="text-end pe-4 fw-bold text-accent pb-4 border-top">
+                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total_amount) %>
+                                </td>
                             </tr>
                         </tfoot>
                     </table>
@@ -55,77 +89,163 @@
             </div>
         </div>
 
-        <!-- Thông tin khách hàng & Trạng thái -->
-        <div class="col-xl-4">
-            <!-- Loại khách hàng -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white py-3 fw-bold">
-                    <i class="fas fa-user-circle me-1"></i> Khách hàng
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <% if (order.customer && order.customer.user_id) { %>
-                            <div class="avatar-circle mx-auto mb-3 bg-success bg-opacity-10 text-success">
-                                <i class="fas fa-user-check fa-2x"></i>
+        <!-- Timeline Log -->
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white py-3 border-bottom-0">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-history me-2 text-primary"></i>Lịch sử trạng thái đơn hàng</h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <% if (order.status_logs && order.status_logs.length > 0) { %>
+                        <% order.status_logs.forEach((log, index) => { %>
+                            <div class="timeline-item pb-4 <%= index === order.status_logs.length - 1 ? 'border-0' : 'border-start ms-2 ps-4' %> position-relative">
+                                <div class="timeline-dot position-absolute start-0 top-0 rounded-circle bg-primary" style="width: 12px; height: 12px; margin-left: -6px; margin-top: 5px;"></div>
+                                <div class="small fw-bold">
+                                    <span class="text-uppercase text-primary"><%= log.new_status %></span>
+                                    <span class="text-muted ms-2 fw-normal">bởi <%= log.changed_by %></span>
+                                </div>
+                                <div class="text-muted" style="font-size: 0.8rem;"><%= new Date(log.changed_at).toLocaleString('vi-VN') %></div>
+                                <% if (log.note) { %>
+                                    <div class="mt-2 p-2 bg-light rounded small italic">"<%= log.note %>"</div>
+                                <% } %>
                             </div>
-                            <h5 class="mb-0"><%= order.customer_name %></h5>
-                            <span class="badge bg-success rounded-pill px-3 mt-2">Thành viên</span>
-                            <div class="mt-3 text-muted">
-                                <i class="fas fa-envelope me-1"></i> <%= order.customer.user.email %>
-                            </div>
-                        <% } else { %>
-                            <div class="avatar-circle mx-auto mb-3 bg-secondary bg-opacity-10 text-secondary">
-                                <i class="fas fa-user-secret fa-2x"></i>
-                            </div>
-                            <h5 class="mb-0 text-muted"><%= order.customer_name %></h5>
-                            <span class="badge bg-secondary rounded-pill px-3 mt-2">Khách vãng lai</span>
-                        <% } %>
-                    </div>
-                    <hr>
-                    <div class="mb-3">
-                        <label class="text-muted small">Số điện thoại:</label>
-                        <div class="fw-bold fs-5"><%= order.customer_phone %></div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small">Địa chỉ nhận hàng:</label>
-                        <div><%= order.delivery_address %></div>
-                    </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="text-center py-3 text-muted small italic">Chưa có lịch sử cập nhật.</div>
+                    <% } %>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Trạng thái đơn hàng -->
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white py-3 fw-bold">
-                    <i class="fas fa-tasks me-1"></i> Vận hành
-                </div>
-                <div class="card-body">
-                    <form action="/admin/orders/<%= order.id %>/status" method="POST">
+    <!-- RIGHT: Info and Actions -->
+    <div class="col-lg-4">
+        <!-- Status Action -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+            <div class="card-header bg-primary text-white py-3 border-0">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-cog me-2"></i>Cập nhật trạng thái</h6>
+            </div>
+            <div class="card-body p-4">
+                <form id="statusForm">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Trạng thái hiện tại:</label>
+                        <% 
+                        let statusClass = 'bg-secondary';
+                        let statusText = order.order_status;
+                        switch(order.order_status) {
+                            case 'pending': statusClass = 'bg-warning text-dark'; statusText = 'Chờ xác nhận'; break;
+                            case 'confirmed': statusClass = 'bg-info text-white'; statusText = 'Đã xác nhận'; break;
+                            case 'processing': statusClass = 'bg-primary text-white'; statusText = 'Đang xử lý'; break;
+                            case 'shipping': statusClass = 'bg-info text-white'; statusText = 'Đang giao'; break;
+                            case 'completed': statusClass = 'bg-success text-white'; statusText = 'Hoàn thành'; break;
+                            case 'cancelled': statusClass = 'bg-danger text-white'; statusText = 'Đã hủy'; break;
+                        }
+                        %>
+                        <div class="badge <%= statusClass %> rounded-pill d-block p-2" style="font-size: 0.85rem;">
+                            <%= statusText %>
+                        </div>
+                    </div>
+
+                    <% if (!['completed', 'cancelled'].includes(order.order_status)) { %>
                         <div class="mb-3">
-                            <label class="form-label small text-muted">Trạng thái đơn hàng:</label>
-                            <select name="order_status" class="form-select border-0 bg-light rounded-3">
-                                <option value="pending" <%= order.order_status === 'pending' ? 'selected' : '' %>>Chờ xác nhận</option>
-                                <option value="confirmed" <%= order.order_status === 'confirmed' ? 'selected' : '' %>>Đã xác nhận</option>
-                                <option value="processing" <%= order.order_status === 'processing' ? 'selected' : '' %>>Đang xử lý</option>
-                                <option value="shipping" <%= order.order_status === 'shipping' ? 'selected' : '' %>>Đang giao hàng</option>
-                                <option value="completed" <%= order.order_status === 'completed' ? 'selected' : '' %>>Hoàn thành</option>
-                                <option value="cancelled" <%= order.order_status === 'cancelled' ? 'selected' : '' %>>Đã hủy</option>
+                            <label class="form-label small fw-bold">Chuyển sang:</label>
+                            <select id="new_status" class="form-select form-select-sm rounded-pill">
+                                <option value="" hidden>-- Chọn trạng thái --</option>
+                                <option value="pending" <%= order.order_status === 'pending' ? 'disabled' : '' %>>Chờ xác nhận</option>
+                                <option value="confirmed">Đã xác nhận</option>
+                                <option value="processing">Đang xử lý</option>
+                                <option value="shipping">Đang giao</option>
+                                <option value="completed">Đã hoàn thành & Thanh toán</option>
+                                <option value="cancelled">Hủy đơn hàng (Trả kho)</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2">Cập nhật trạng thái</button>
-                    </form>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold">Ghi chú (Nội bộ):</label>
+                            <textarea id="status_note" class="form-control rounded-3" rows="2" placeholder="Lý do thay đổi..."></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100 rounded-pill fw-bold" onclick="handleUpdateStatus(<%= order.id %>)">
+                            Lưu cập nhật
+                        </button>
+                    <% } else { %>
+                        <div class="alert alert-light border small text-center mb-0">
+                            Đơn hàng đã ở trạng thái cuối cùng. Không thể điều chỉnh thêm.
+                        </div>
+                    <% } %>
+                </form>
+            </div>
+        </div>
+
+        <!-- Customer Card -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white py-3 border-bottom-0">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-user-tag me-2 text-primary"></i>Thông tin Khách hàng</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-light-green text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; flex-shrink: 0;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="fw-bold"><%= order.customer_name %></div>
+                        <div class="small text-muted"><%= order.customer_phone %></div>
+                    </div>
                 </div>
+                <hr class="my-3 opacity-50">
+                <div class="small mb-2"><i class="fas fa-envelope text-muted me-2" style="width: 16px;"></i><%= order.customer_email || 'Chưa cung cấp email' %></div>
+                <div class="small mb-0">
+                    <i class="fas fa-history text-muted me-2" style="width: 16px;"></i> 
+                    Khách <%= order.customer_id ? 'thành viên' : 'vãng lai' %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping Card -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white py-3 border-bottom-0">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-truck-moving me-2 text-primary"></i>Đia chỉ nhận hàng</h6>
+            </div>
+            <div class="card-body">
+                <div class="small fw-bold text-muted mb-2 text-uppercase" style="font-size: 0.65rem;">Địa chỉ chi tiết:</div>
+                <p class="small mb-3"><%= order.delivery_address %></p>
+                <div class="small fw-bold text-muted mb-2 text-uppercase" style="font-size: 0.65rem;">Ghi chú giao hàng:</div>
+                <p class="small italic text-muted mb-0">
+                    <% if (order.note) { %>
+                        "<%= order.note %>"
+                    <% } else { %>
+                        <span class="text-muted opacity-50">Không có ghi chú.</span>
+                    <% } %>
+                </p>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .avatar-circle {
-        width: 80px;
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
+<script>
+    async function handleUpdateStatus(id) {
+        const newStatus = document.getElementById('new_status').value;
+        const note = document.getElementById('status_note').value;
+
+        if (!newStatus) return alert('Vui lòng chọn trạng thái mới!');
+
+        if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái đơn hàng này?')) {
+            try {
+                const response = await fetch(`/admin/orders/${id}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus, note: note })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Cập nhật thành công!');
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Update status error', error);
+                alert('Có lỗi xảy ra!');
+            }
+        }
     }
-</style>
+</script>

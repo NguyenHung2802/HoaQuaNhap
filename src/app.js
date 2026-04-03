@@ -57,6 +57,11 @@ app.use(async (req, res, next) => {
     res.locals.error = req.flash('error');
     res.locals.user = req.session.user || null;
     res.locals.req = req;
+    
+    // Global Cart Item Count
+    const sessionCart = req.session.cart || [];
+    res.locals.cartItemsCount = sessionCart.reduce((total, item) => total + parseInt(item.quantity), 0);
+
     try {
         res.locals.globalCategories = await _prisma.category.findMany({
             where: { is_active: true },

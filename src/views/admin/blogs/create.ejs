@@ -1,0 +1,131 @@
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Viết bài mới</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/admin/blogs">Tin tức</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Viết bài</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/admin/blogs" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="fas fa-arrow-left me-1"></i>Hủy và quay lại
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-9">
+        <form id="blogForm" action="/admin/blogs" method="POST" enctype="multipart/form-data" class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Tiêu đề bài viết <span class="text-danger">*</span></label>
+                        <input type="text" name="title" id="titleInput" class="form-control form-control-lg rounded-pill border-light-green" required placeholder="Nhập tiêu đề hấp dẫn...">
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Tóm tắt ngắn</label>
+                        <textarea name="summary" class="form-control rounded-4 border-light-green" rows="3" placeholder="Đoạn giới thiệu ngắn thu hút độc giả (hiển thị ở trang danh sách)"></textarea>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Nội dung chi tiết <span class="text-danger">*</span></label>
+                        <div id="editor-container" style="height: 500px;" class="rounded-4 border-light-green"></div>
+                        <input type="hidden" name="content" id="contentInput">
+                    </div>
+
+                    <div class="col-md-12 mt-4">
+                        <div class="form-check form-switch p-3 bg-light rounded-4 border">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" name="is_published" id="is_published" checked>
+                            <label class="form-check-label fw-bold" for="is_published">Xuất bản bài viết này ngay (Hiển thị công khai)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white p-4 border-top-0 pt-0">
+                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow-sm">
+                    <i class="fas fa-paper-plane me-2"></i>Đăng bài viết
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="col-lg-3">
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold">Ảnh đại diện (Thumbnail)</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div id="thumb-preview" class="mb-3 d-none">
+                        <img src="" alt="Thumbnail" class="w-100 rounded shadow-sm border object-fit-cover" style="height: 150px;">
+                    </div>
+                    <label class="btn btn-outline-primary btn-sm rounded-pill w-100 mb-2">
+                        <i class="fas fa-upload me-2"></i>Chọn ảnh
+                        <input type="file" name="thumbnail" class="d-none" accept="image/*" onchange="previewThumb(this)" form="blogForm">
+                    </label>
+                    <small class="text-muted italic">Kích thước khuyên dùng: 800x500px</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-light-green border-0 rounded-4 p-4 text-primary">
+            <h6 class="fw-bold mb-3"><i class="fas fa-lightbulb me-2"></i>Mẹo viết bài</h6>
+            <ul class="small ps-3 mb-0">
+                <li class="mb-2">Tiêu đề nên chứa từ khóa chính về loại hoa quả hoặc chủ đề.</li>
+                <li class="mb-2">Sử dụng các thẻ tiêu đề (H2, H3) để phân cấp nội dung giúp khách hàng dễ đọc.</li>
+                <li>Chèn thêm ảnh vào nội dung để bài viết thêm sinh động.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Quill Editor -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+    const quill = new Quill('#editor-container', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [2, 3, 4, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['link', 'image', 'video'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'color': [] }, { 'background': [] }],
+                ['clean']
+            ]
+        },
+        placeholder: 'Bắt đầu viết nội dung tại đây...'
+    });
+
+    // Preview thumbnail
+    function previewThumb(input) {
+        const preview = document.getElementById('thumb-preview');
+        const previewImg = preview.querySelector('img');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.classList.remove('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Submit form
+    document.getElementById('blogForm').onsubmit = function() {
+        const content = document.getElementById('contentInput');
+        content.value = quill.root.innerHTML;
+        
+        if (quill.getText().trim().length === 0 && !quill.root.innerHTML.includes('<img')) {
+            alert('Vui lòng nhập nội dung bài viết!');
+            return false;
+        }
+        return true;
+    };
+</script>

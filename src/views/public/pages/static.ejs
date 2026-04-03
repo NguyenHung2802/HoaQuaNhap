@@ -1,0 +1,40 @@
+<!-- ===== BREADCRUMB ===== -->
+<nav class="bg-light py-3 border-bottom">
+    <div class="container">
+        <ol class="breadcrumb mb-0 small uppercase fw-bold" style="letter-spacing: 0.05em;">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= page.description %></li>
+        </ol>
+    </div>
+</nav>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border">
+                    <h1 class="display-5 fw-bold text-primary mb-4 pb-3 border-bottom"><%= page.description %></h1>
+                    
+                    <div class="ql-editor p-0" style="font-size: 1.1rem; line-height: 1.8; color: #1a202c !important;">
+                        <%- page.value %>
+                    </div>
+                    
+                    <div class="mt-5 pt-4 border-top">
+                        <div class="d-flex align-items-center gap-3 text-muted small">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Nội dung được cập nhật lần cuối vào tháng 04/2025. Cảm ơn bạn đã đồng hành cùng WebHoaQua.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quill Styles to ensure consistency -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-editor h2 { margin-top: 2rem; margin-bottom: 1rem; color: var(--brand-primary); font-weight: 700; font-family: var(--font-heading); }
+    .ql-editor p { margin-bottom: 1.2rem; }
+    .ql-editor ul { margin-bottom: 1.5rem; }
+</style>
