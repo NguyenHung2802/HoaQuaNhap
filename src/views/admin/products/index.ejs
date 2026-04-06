@@ -115,10 +115,15 @@
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group">
-                                        <a href="/admin/products/edit/<%= p.id %>" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                        <a href="/admin/products/edit/<%= p.id %>" class="btn btn-sm btn-outline-primary shadow-none" title="Sửa">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-outline-danger ms-1" title="Xóa" onclick="deleteProduct(<%= p.id %>)">
+                                        <form action="/admin/products/duplicate/<%= p.id %>" method="POST" class="d-inline" onsubmit="return confirm('Bạn có muốn nhân bản sản phẩm này thành bản nháp mới không?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-info shadow-none ms-1" title="Nhân bản">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </form>
+                                        <button type="button" class="btn btn-sm btn-outline-danger shadow-none ms-1" title="Xóa" onclick="deleteProduct(<%= p.id %>)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>

@@ -1,0 +1,177 @@
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800"><%= title %></h1>
+        <a href="/admin/promotions" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
+
+    <!-- Flash Messages -->
+    <% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error_msg %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+
+    <form action="/admin/promotions/create" method="POST">
+        <div class="row">
+            <!-- Cấu hình chung -->
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Thông tin chiến dịch</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Tên chiến dịch <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="Ví dụ: Khuyến mãi Tết Nguyên Đán">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Chi tiết về chương trình..."></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="type" class="form-label">Loại giảm giá <span class="text-danger">*</span></label>
+                                <select class="form-select" id="type" name="type" required>
+                                    <option value="percent">Phần trăm (%)</option>
+                                    <option value="amount">Số tiền cố định (VND)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="value" class="form-label">Giá trị giảm <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="value" name="value" required min="1" step="0.01">
+                                <small class="text-muted">Nhập 10 cho 10% hoặc 10000 cho 10.000đ</small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="min_order_value" class="form-label">ĐK: Giá sản phẩm tối thiểu</label>
+                                <input type="number" class="form-control" id="min_order_value" name="min_order_value" min="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="max_discount_value" class="form-label">Mức giảm tối đa (Cho %)</label>
+                                <input type="number" class="form-control" id="max_discount_value" name="max_discount_value" min="0">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="start_at" class="form-label">Ngày bắt đầu</label>
+                                <input type="date" class="form-control" id="start_at" name="start_at">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="end_at" class="form-label">Ngày kết thúc</label>
+                                <input type="date" class="form-control" id="end_at" name="end_at">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cấu hình đối tượng áp dụng -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Đối tượng áp dụng</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label d-block">Phạm vi áp dụng</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="target_type" id="targetAll" value="all" checked onchange="toggleTargets()">
+                                <label class="form-check-label" for="targetAll">Toàn bộ cửa hàng</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="target_type" id="targetCategory" value="category" onchange="toggleTargets()">
+                                <label class="form-check-label" for="targetCategory">Theo Danh mục</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="target_type" id="targetProduct" value="product" onchange="toggleTargets()">
+                                <label class="form-check-label" for="targetProduct">Theo Sản phẩm</label>
+                            </div>
+                        </div>
+
+                        <!-- Danh mục list -->
+                        <div id="categorySelect" class="target-selection d-none">
+                            <label class="form-label">Chọn danh mục áp dụng</label>
+                            <div class="row g-2 border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                <% categories.forEach(cat => { %>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="category_ids" value="<%= cat.id %>" id="cat-<%= cat.id %>">
+                                            <label class="form-check-label text-truncate w-100" for="cat-<%= cat.id %>" title="<%= cat.name %>">
+                                                <%= cat.name %>
+                                            </label>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+
+                        <!-- Sản phẩm list -->
+                        <div id="productSelect" class="target-selection d-none">
+                            <label class="form-label">Chọn sản phẩm áp dụng</label>
+                            <div class="row g-2 border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                <% products.forEach(prod => { %>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="product_ids" value="<%= prod.id %>" id="prod-<%= prod.id %>">
+                                            <label class="form-check-label text-truncate w-100" for="prod-<%= prod.id %>" title="<%= prod.name %>">
+                                                <%= prod.name %> (<%= prod.sku %>)
+                                            </label>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                            <small class="text-muted">Lưu ý: Chỉ hiển thị 100 sản phẩm gần nhất.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side configuration -->
+            <div class="col-lg-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Kích hoạt</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="apply_type" class="form-label">Cơ chế áp dụng</label>
+                            <select class="form-select" id="apply_type" name="apply_type">
+                                <option value="auto">Tự động (Hệ thống gợi ý)</option>
+                                <option value="manual">Thủ công (Người dùng chọn)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="true" checked>
+                                <label class="form-check-label" for="is_active">Kích hoạt ngay</label>
+                            </div>
+                        </div>
+                        <hr>
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-save me-2"></i>Lưu chiến dịch
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function toggleTargets() {
+        const type = document.querySelector('input[name="target_type"]:checked').value;
+        document.querySelectorAll('.target-selection').forEach(el => el.classList.add('d-none'));
+        
+        if (type === 'category') {
+            document.getElementById('categorySelect').classList.remove('d-none');
+        } else if (type === 'product') {
+            document.getElementById('productSelect').classList.remove('d-none');
+        }
+    }
+</script>

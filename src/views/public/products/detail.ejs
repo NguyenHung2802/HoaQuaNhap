@@ -81,6 +81,7 @@
                 </div>
 
                 <!-- Price Block -->
+                <!-- Price Block -->
                 <div class="detail-price-block">
                     <% if (product.sale_price) { %>
                         <span class="detail-price-sale">
@@ -98,6 +99,27 @@
                         </span>
                     <% } %>
                 </div>
+                
+                <!-- Promotion Box -->
+                <% if (productPromotions && productPromotions.length > 0) { %>
+                    <div class="product-promotions-box p-3 border rounded-4 mb-4 bg-light">
+                        <div class="fw-bold small text-primary mb-2"><i class="fas fa-gift me-2"></i>Ưu đãi đang áp dụng:</div>
+                        <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+                            <% productPromotions.forEach(promo => { %>
+                                <li class="small d-flex align-items-start gap-2">
+                                    <i class="fas fa-check-circle text-success mt-1"></i>
+                                    <div>
+                                        <span class="fw-bold text-accent"><%= promo.name %></span>: 
+                                        Giảm <%= promo.type === 'percent' ? promo.value + '%' : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.value) %>
+                                        <% if (promo.min_order_value > 0) { %>
+                                            (Cho đơn hàng từ <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.min_order_value) %>)
+                                        <% } %>
+                                    </div>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                <% } %>
 
                 <!-- Short Desc -->
                 <% if (product.short_description) { %>
@@ -413,4 +435,28 @@
             alert('Có lỗi xảy ra!');
         }
     };
+</script>
+
+<!-- SEO Structured Data: JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "<%= product.name %>",
+  "image": "<%= product.images && product.images.length > 0 ? product.images[0].image_url : '' %>",
+  "description": "<%= (product.short_description || '').replace(/"/g, "'") %>",
+  "sku": "<%= product.sku %>",
+  "brand": {
+    "@type": "Brand",
+    "name": "WebHoaQua"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "<%= baseUrl %>/product/<%= product.slug %>",
+    "priceCurrency": "VND",
+    "price": "<%= product.sale_price || product.price %>",
+    "availability": "https://schema.org/<%= product.stock_quantity > 0 ? 'InStock' : 'OutOfStock' %>",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+}
 </script>

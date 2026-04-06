@@ -1,0 +1,88 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Chỉnh sửa khách hàng</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/admin/customers">Khách hàng</a></li>
+                <li class="breadcrumb-item"><a href="/admin/customers/<%= customer.id %>"><%= customer.full_name %></a></li>
+                <li class="breadcrumb-item active">Chỉnh sửa</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="/admin/customers/<%= customer.id %>" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>Quay lại
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-user-edit text-primary me-2"></i>Thông tin khách hàng</h6>
+            </div>
+            <div class="card-body p-4">
+                <form action="/admin/customers/<%= customer.id %>/update" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Họ và tên <span class="text-danger">*</span></label>
+                            <input type="text" name="full_name" class="form-control" value="<%= customer.full_name %>" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+                            <input type="text" name="phone" class="form-control font-monospace" value="<%= customer.phone %>" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input type="email" name="email" class="form-control" value="<%= customer.email || '' %>" placeholder="email@domain.com">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Giới tính</label>
+                            <select name="gender" class="form-select">
+                                <option value="">-- Chọn --</option>
+                                <option value="male" <%= customer.gender === 'male' ? 'selected' : '' %>>Nam</option>
+                                <option value="female" <%= customer.gender === 'female' ? 'selected' : '' %>>Nữ</option>
+                                <option value="other" <%= customer.gender === 'other' ? 'selected' : '' %>>Khác</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Ngày sinh</label>
+                            <input type="date" name="birthday" class="form-control" 
+                                   value="<%= customer.birthday ? new Date(customer.birthday).toISOString().split('T')[0] : '' %>">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Ghi chú nội bộ</label>
+                            <textarea name="note" class="form-control" rows="3" placeholder="Ghi chú dành cho quản trị viên..."><%= customer.note || '' %></textarea>
+                            <div class="form-text">Ghi chú này chỉ hiển thị cho admin, khách hàng không nhìn thấy.</div>
+                        </div>
+                    </div>
+
+                    <!-- Read-only stats -->
+                    <div class="mt-4 p-3 bg-light rounded-3">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="small text-muted">Tổng đơn hàng</div>
+                                <div class="fs-5 fw-bold text-primary"><%= customer.total_orders %></div>
+                            </div>
+                            <div class="col-4">
+                                <div class="small text-muted">Tổng chi tiêu</div>
+                                <div class="fs-5 fw-bold text-success"><%= new Intl.NumberFormat('vi-VN').format(customer.total_spent) %>đ</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="small text-muted">Khách hàng từ</div>
+                                <div class="fs-6 fw-bold"><%= new Date(customer.created_at).toLocaleDateString('vi-VN') %></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-1"></i>Lưu thay đổi
+                        </button>
+                        <a href="/admin/customers/<%= customer.id %>" class="btn btn-light border">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

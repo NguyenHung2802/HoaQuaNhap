@@ -1,0 +1,132 @@
+<!-- Breadcrumb -->
+<nav class="bg-light py-3 border-bottom">
+    <div class="container">
+        <ol class="breadcrumb mb-0 small uppercase fw-bold" style="letter-spacing: 0.05em;">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Đơn hàng của tôi</li>
+        </ol>
+    </div>
+</nav>
+
+<section class="section-padding py-5">
+    <div class="container">
+        <h2 class="display-6 fw-bold mb-4" style="font-family: var(--font-heading);">Lịch sử đơn hàng</h2>
+
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                            <div class="bg-brand-accent text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 50px; height: 50px;">
+                                <%= user.full_name.charAt(0) %>
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="fw-bold mb-0"><%= user.full_name %></h6>
+                                <small class="text-muted"><%= user.phone %></small>
+                            </div>
+                        </div>
+                        <nav class="nav flex-column gap-2 menu-aside">
+                            <a href="/profile" class="nav-link px-3 py-2 rounded-3 text-dark"><i class="fas fa-user-circle me-2 text-muted"></i>Tài khoản</a>
+                            <a href="/orders" class="nav-link px-3 py-2 rounded-3 bg-brand-light-green text-brand-primary fw-bold"><i class="fas fa-box me-2"></i>Đơn hàng</a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders List -->
+            <div class="col-lg-9">
+                <% if (!orders || orders.length === 0) { %>
+                    <div class="text-center py-5 bg-light rounded-4 border border-dashed">
+                        <div class="mb-3 text-muted" style="font-size: 3rem;"><i class="fas fa-box-open"></i></div>
+                        <h5>Bạn chưa có đơn hàng nào</h5>
+                        <p class="text-muted mb-4">Hãy khám phá ngay những loại trái cây tươi ngon tại WebHoaQua.</p>
+                        <a href="/products" class="btn btn-primary rounded-pill px-4">Mua sắm ngay</a>
+                    </div>
+                <% } else { %>
+                    <div class="d-flex flex-column gap-4">
+                        <% orders.forEach(order => { %>
+                            <div class="card border border-light-subtle rounded-4 shadow-sm overflow-hidden order-card">
+                                <!-- Order Header -->
+                                <div class="card-header bg-light border-bottom p-3 p-md-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <span class="text-muted small d-block mb-1">Mã đơn hàng</span>
+                                        <span class="fw-bold text-dark fs-5">#<%= order.order_code %></span>
+                                    </div>
+                                    <div class="text-md-end">
+                                        <span class="text-muted small d-block mb-1">Ngày đặt hàng</span>
+                                        <span class="fw-semibold"><%= new Date(order.created_at).toLocaleDateString('vi-VN') %> <%= new Date(order.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) %></span>
+                                    </div>
+                                    <div class="text-md-end">
+                                        <% 
+                                            let statusClass, statusText;
+                                            switch(order.order_status) {
+                                                case 'pending': statusClass = 'bg-warning text-dark'; statusText = 'Đang chờ xử lý'; break;
+                                                case 'confirmed': statusClass = 'bg-info text-dark'; statusText = 'Đã xác nhận'; break;
+                                                case 'processing': statusClass = 'bg-primary text-white'; statusText = 'Đang đóng gói'; break;
+                                                case 'shipping': statusClass = 'bg-primary text-white'; statusText = 'Đang giao hàng'; break;
+                                                case 'completed': statusClass = 'bg-success text-white'; statusText = 'Đã giao thành công'; break;
+                                                case 'cancelled': statusClass = 'bg-danger text-white'; statusText = 'Đã hủy'; break;
+                                                default: statusClass = 'bg-secondary text-white'; statusText = order.order_status;
+                                            }
+                                        %>
+                                        <span class="badge <%= statusClass %> rounded-pill px-3 py-2 fw-semibold"><%= statusText %></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Order Items -->
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush">
+                                        <% order.items.forEach(item => { %>
+                                            <li class="list-group-item p-3 p-md-4">
+                                                <div class="row align-items-center">
+                                                    <div class="col-3 col-md-2">
+                                                        <div class="ratio ratio-1x1 bg-light rounded-3 overflow-hidden border">
+                                                            <img src="<%= item.product && item.product.images[0] ? item.product.images[0].image_url : '/images/placeholder.jpg' %>" alt="<%= item.product_name_snapshot %>" class="object-fit-cover w-100 h-100">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-9 col-md-5">
+                                                        <h6 class="fw-bold mb-1"><%= item.product_name_snapshot %></h6>
+                                                        <div class="text-muted small mb-2">SKU: <%= item.sku_snapshot %></div>
+                                                        <div class="d-md-none fw-semibold"><%= item.quantity %> x <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price_snapshot) %></div>
+                                                    </div>
+                                                    <div class="col-12 col-md-5 text-md-end mt-3 mt-md-0 d-none d-md-flex align-items-center justify-content-end gap-4">
+                                                        <div class="text-muted"><%= item.quantity %> x <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price_snapshot) %></div>
+                                                        <div class="fw-bold text-accent"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.line_total) %></div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        <% }) %>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Order Footer -->
+                                <div class="card-footer bg-white p-3 p-md-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6 mb-3 mb-md-0 text-muted small">
+                                            <i class="fas fa-truck text-muted me-2"></i>Giao đến: <span class="text-dark fw-semibold"><%= order.delivery_address %>, <%= order.ward %>, <%= order.district %>, <%= order.province %></span>
+                                        </div>
+                                        <div class="col-md-6 text-md-end">
+                                            <span class="text-muted me-3">Thành tiền:</span>
+                                            <span class="fs-4 fw-bold text-brand-primary"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total_amount) %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.bg-brand-accent { background-color: var(--brand-accent, #4caf50); }
+.bg-brand-light-green { background-color: var(--brand-light-green, #e8f5e9); }
+.text-brand-primary { color: var(--brand-primary, #2e7d32); }
+.text-accent { color: var(--brand-accent, #4caf50); }
+.menu-aside .nav-link:hover { background-color: #f8f9fa; }
+.order-card { transition: box-shadow 0.3s ease; }
+.order-card:hover { box-shadow: 0 .5rem 1rem rgba(0,0,0,.08)!important; }
+</style>

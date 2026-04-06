@@ -67,13 +67,18 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 - [x] Product Reviews (S32 — Approval logic, Public submit stars)
 - [x] Static Pages (S33 — FAQ, Policies, About, Settings model)
 
-### 2.9. Tối ưu & Nâng cao
+### 2.9. Tối ưu & Nâng cao (Giai đoạn 8)
 - [x] Meta Title/Description động (Done)
 - [x] Breadcrumbs (Done)
-- [ ] Coupon / Discount code
-- [ ] Thêm thẻ Alt cho ảnh tự động
-- [ ] Performance (Lazy loading images)
-- [ ] Production deployment (Linux/VPS/Docker)
+- [x] Coupon / Discount code (S34-S35: Admin CRUD & Public Apply)
+- [x] Báo cáo doanh thu & Thống kê Admin (S36-S37: Chart.js & Insights)
+- [x] SEO: Sitemap.xml & Robots.txt (S38)
+- [x] Schema.org JSON-LD (Product Detail) (S38)
+- [x] Performance: Lazy loading images (S38)
+- [x] Tính năng Nhân bản sản phẩm (S39: Duplicate)
+- [x] Chiến dịch khuyến mãi (S40-S43: Admin CRUD, Public Checkout Apply, Product Detail Display)
+- [x] Quản lý Khách hàng (S44: Admin List/Detail/Edit/Delete, Stats, Order History, Public Profile & Address CRUD)
+- [ ] Production deployment (Linux/VPS/Docker) (Giai đoạn 9)
 ---
 > [!TIP]
 > Hãy luôn cập nhật checklist sau mỗi Giai đoạn hoàn thành thành công và được test kỹ lưỡng.

@@ -73,9 +73,18 @@
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
-                                <td class="text-end text-muted small pb-3">Phí vận chuyển:</td>
-                                <td class="text-end pe-4 pb-3 fw-semibold text-success">Miễn phí</td>
+                                <td class="text-end text-muted small pb-2">Phí vận chuyển:</td>
+                                <td class="text-end pe-4 pb-2 fw-semibold">Tùy địa điểm</td>
                             </tr>
+                            <% if (order.shipping_campaign_id) { %>
+                                <tr>
+                                    <td colspan="2"></td>
+                                    <td class="text-end text-success small pb-3">Ưu đãi vận chuyển (Note):</td>
+                                    <td class="text-end pe-4 pb-3 fw-bold text-success">
+                                        Giảm <%= order.shipping_discount_amount %><%= order.shipping_discount_amount < 100 ? '%' : 'đ' %>
+                                    </td>
+                                </tr>
+                            <% } %>
                             <tr class="fs-5">
                                 <td colspan="2"></td>
                                 <td class="text-end fw-bold pb-4 border-top">Tổng cộng:</td>
@@ -120,6 +129,37 @@
 
     <!-- RIGHT: Info and Actions -->
     <div class="col-lg-4">
+        <!-- Payment Status Action (For Bank Transfer) -->
+        <% if (order.payment_method === 'BANK_TRANSFER') { %>
+            <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden border-start border-4 border-warning">
+                <div class="card-header bg-warning bg-opacity-10 text-dark py-3 border-0">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-university me-2"></i>Thanh toán Chuyển khoản</h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <span class="small fw-bold">Trạng thái thanh toán:</span>
+                        <span class="badge <%= order.payment_status === 'paid' ? 'bg-success' : 'bg-warning text-dark' %> rounded-pill px-3 py-1">
+                            <%= order.payment_status === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán' %>
+                        </span>
+                    </div>
+                    
+                    <% if (order.payment_status !== 'paid') { %>
+                        <div class="alert alert-warning small mb-3 border-0 bg-warning bg-opacity-10">
+                            Khách hàng đã đặt đơn Chuyển khoản. Vui lòng xác nhận sau khi nhận được tiền.
+                        </div>
+                        <button type="button" class="btn btn-warning w-100 rounded-pill fw-bold" onclick="handleUpdatePaymentStatus(<%= order.id %>, 'paid')">
+                            Xác nhận đã nhận tiền
+                        </button>
+                    <% } else { %>
+                        <div class="text-center py-2">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                            <div class="small fw-bold text-success">Đã xác nhận thanh toán</div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
+
         <!-- Status Action -->
         <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
             <div class="card-header bg-primary text-white py-3 border-0">
@@ -225,10 +265,30 @@
         const newStatus = document.getElementById('new_status').value;
         const note = document.getElementById('status_note').value;
 
-        if (!newStatus) return alert('Vui lòng chọn trạng thái mới!');
+        if (!newStatus) {
+            return Swal.fire('Cảnh báo', 'Vui lòng chọn trạng thái mới!', 'warning');
+        }
 
-        if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái đơn hàng này?')) {
+        const confirmResult = await Swal.fire({
+            title: 'Xác nhận thay đổi?',
+            text: "Dữ liệu trạng thái này sẽ cập nhật ngay lập tức!",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#2e7d32',
+            cancelButtonColor: '#dc3545',
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (confirmResult.isConfirmed) {
             try {
+                // Hiển thị loading spinner lúc xử lý
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
                 const response = await fetch(`/admin/orders/${id}/status`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -236,15 +296,54 @@
                 });
 
                 const result = await response.json();
+                
                 if (result.success) {
-                    alert('Cập nhật thành công!');
+                    await Swal.fire({
+                        title: 'Thành công!',
+                        text: 'Trạng thái đơn hàng đã được cập nhật.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                     window.location.reload();
                 } else {
-                    alert('Lỗi: ' + result.message);
+                    Swal.fire('Lỗi', result.message || 'Cập nhật thất bại.', 'error');
                 }
             } catch (error) {
                 console.error('Update status error', error);
-                alert('Có lỗi xảy ra!');
+                Swal.fire('Lỗi', 'Có lỗi xảy ra trong quá trình xử lý!', 'error');
+            }
+        }
+    }
+
+    async function handleUpdatePaymentStatus(id, status) {
+        const confirmResult = await Swal.fire({
+            title: 'Xác nhận thanh toán?',
+            text: "Xác nhận bạn đã nhận được tiền của khách hàng qua tài khoản ngân hàng.",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            cancelButtonColor: '#dc3545',
+            confirmButtonText: 'Đã nhận tiền',
+            cancelButtonText: 'Chưa'
+        });
+
+        if (confirmResult.isConfirmed) {
+            try {
+                const response = await fetch(`/admin/orders/${id}/payment-status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ payment_status: status })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire('Thành công', result.message, 'success').then(() => window.location.reload());
+                } else {
+                    Swal.fire('Lỗi', result.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Lỗi', 'Có lỗi xảy ra!', 'error');
             }
         }
     }

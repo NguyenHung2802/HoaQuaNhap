@@ -168,11 +168,29 @@ const deleteProduct = async (req, res, next) => {
     }
 };
 
+/**
+ * [POST] /admin/products/duplicate/:id
+ */
+const duplicate = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const newProduct = await productsService.duplicateProduct(id);
+        
+        req.flash('success_msg', 'Nhân bản sản phẩm thành công! Vui lòng cập nhật thông tin và SKU mới.');
+        res.redirect('/admin/products/edit/' + newProduct.id);
+    } catch (error) {
+        console.error('Error duplicating product: ', error);
+        req.flash('error_msg', 'Lỗi khi nhân bản sản phẩm: ' + error.message);
+        res.redirect('/admin/products');
+    }
+};
+
 module.exports = {
     renderList,
     renderCreateForm,
     create,
     renderEditForm,
     update,
-    deleteProduct
+    deleteProduct,
+    duplicate
 };

@@ -1,37 +1,31 @@
-# Master Plan: Phase 7 - Nội dung & Truyền thông
+# Master Plan - Cải tiến cơ chế nhập địa chỉ WebHoaQua
 
-## 1. Mục tiêu
-Làm giàu nội dung trang web để thu hút và giữ chân người dùng thông qua Banner, Blog, các chính sách, và các đánh giá từ khách hàng khác. Mang lại diện mạo một cửa hàng trực tuyến đầy đủ, uy tín.
+## 1. Các Slice thực thi (Slices)
 
-## 2. Kiến trúc giải pháp
-- **Content Controller:** Quản lý các trang thông tin tĩnh Công khai (Giới thiệu, Chính sách).
-- **Blog Controller (Admin & Public):** CRUD và hiển thị tin tức.
-- **Banner Controller (Admin):** Quản lý ảnh quảng cáo cho trang chủ.
-- **Review Service:** Xử lý gửi đánh giá và Admin phê duyệt.
-- **Tích hợp TinyMCE:** Để Admin soạn thảo nội dung Blog giàu văn bản.
+### Slice 1: Nền tảng Address Helper (Frontend JS)
+*Mục tiêu:* Tạo Class JS dùng chung để xử lý việc nạp Tỉnh/Huyện/Xã từ API công khai.
+*Hành động:*
+1. Tạo tệp `public/js/address-helper.js`. (Đã hoàn thành sơ bộ).
+2. Tích hợp khả năng tự động chọn (pre-select) dựa trên `data-selected` attribute.
 
-## 3. Các Slices (Lát cắt thực thi)
+### Slice 2: Cập nhật Giao diện Checkout (UI Tier) -> Ưu tiên cao nhất
+*Mục tiêu:* Thay thế manual input bằng Select dropdown trong trang Thanh toán.
+*Hành động:*
+1. Sửa `src/views/public/checkout/index.ejs`: 
+    - Thay thế các `input` Tỉnh/Huyện/Xã bằng `<select>`.
+    - Thêm link script `address-helper.js`.
+    - Khởi tạo `AddressHelper` và gắn listener để tự động update `delivery_address`.
+2. Sửa lỗi "không tự động cập nhật": Đảm bảo logic JS ghép địa chỉ lắng nghe sự kiện `change` từ cả 3 dropdown.
 
-### Lát cắt 1: S30 - Banner Management (Admin)
-- **Backend:** CRUD `Banner`. Có trường `sort_order` để sắp xếp banner nào xuất hiện trước.
-- **UI Admin:** Lưới danh sách banner, form upload ảnh banner lên Cloudinary.
-- **UI Public:** Fetch banner có `is_active=true` và truyền vào Swiper Slider ở trang chủ.
+### Slice 3: Cập nhật Giao diện Sổ địa chỉ (UI Tier)
+*Mục tiêu:* Đồng bộ dropdown cho phần quản lý địa chỉ trong Profile.
+*Hành động:*
+1. Sửa `src/views/public/profile/index.ejs`: 
+    - Cập nhật Form Modal địa chỉ sử dụng `<select>`.
+    - Import và khởi tạo `AddressHelper` cho modal.
+    - Cẩn trọng phần gán giá trị khi nhấn "Sửa địa chỉ" (phải gán vào `dataset.selected` và trigger load API).
 
-### Lát cắt 2: S31 - Blog / News (Admin & Public)
-- **Backend:** CRUD `BlogPost`. Slug tự động sinh từ tiêu đề. Phân trang cho trang danh sách tin tức.
-- **UI Admin:** Tích hợp TinyMCE/Quill. Form upload ảnh Thumbnail.
-- **UI Public:** Trang `/blogs` (danh sách) và `/blog/:slug` (chi tiết). Hiển thị "Bài viết mới nhất" tại trang chủ.
-
-### Lát cắt 3: S32 - Product Reviews (Public & Admin)
-- **Public:** Form đánh giá cuối trang Chi tiết sản phẩm (Rating + Content).
-- **Backend:** `POST /product/:id/review`. Mặc định `is_approved = false`.
-- **UI Admin:** `GET /admin/reviews` để phê duyệt (Approve) hoặc Xóa (Delete).
-- **Logic:** Tính toán trung bình số sao hiển thị trên trang sản phẩm.
-
-### Lát cắt 4: S33 - Trang thông tin tĩnh (Static Content & FAQ)
-- **Backend:** CRUD `Setting` với `group_key="pages"`. Key có thể là `about-us`, `delivery-policy`, `refund-policy`, `faq`.
-- **Frontend:** Các route `/about`, `/policy/:key`, `/faq`. Tên footer sẽ dẫn tới các link này.
-
-## 4. Những cải tiến bổ sung (Should-do)
-- Thêm SEO metadata (Meta title/desc) cho từng bài blog.
-- Gửi email thông báo cho Admin khi có review mới chờ duyệt.
+## 2. Kiểm thử (Test)
+- Đảm bảo chọn Tỉnh thành thì Quận/Huyện mới hiện ra tương ứng.
+- Đảm bảo khi chọn đủ 3 cấp, trường "Địa chỉ đầy đủ" ở Checkout được ghép đúng.
+- Đảm bảo trang Profile "Sửa địa chỉ" vẫn load lại đúng Tỉnh/Huyện/Xã cũ từ DB.

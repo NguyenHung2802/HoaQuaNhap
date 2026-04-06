@@ -18,6 +18,10 @@ const renderCheckout = async (req, res, next) => {
 
         const { items, totalAmount } = await cartService.getCartDetails(sessionCart);
 
+        // Fetch available promotions
+        const promotionsService = require('../../promotions/promotions.service');
+        const availablePromotions = await promotionsService.getAvailablePromotions(items);
+
         // Check if any item is out of stock, prevent checkout
         const hasErrors = items.some(i => i.is_out_of_stock);
         if (hasErrors) {
@@ -25,7 +29,7 @@ const renderCheckout = async (req, res, next) => {
             return res.redirect('/cart');
         }
 
-        // If user is logged in, try to fetch customer linked to pre-fill
+        // ... (customer logic) ...
         let customerInfo = null;
         if (req.session.user) {
             customerInfo = {
@@ -34,7 +38,6 @@ const renderCheckout = async (req, res, next) => {
                 phone: req.session.user.phone || ''
             };
             
-            // Try to find if user has a customer profile and default address
             const customer = await prisma.customer.findUnique({
                 where: { user_id: req.session.user.id },
                 include: {
@@ -53,10 +56,21 @@ const renderCheckout = async (req, res, next) => {
             }
         }
 
+        // Fetch active shipping campaigns
+        const shippingCampaigns = await prisma.shippingCampaign.findMany({
+            where: {
+                is_active: true,
+                OR: [{ end_at: null }, { end_at: { gte: new Date() } }]
+            },
+            orderBy: { min_order_value: 'asc' }
+        });
+
         res.render('public/checkout/index', {
             title: 'Thanh toán đơn hàng',
             items,
             totalAmount,
+            availablePromotions,
+            shippingCampaigns,
             customerInfo,
             layout: 'layouts/main'
         });

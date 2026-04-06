@@ -57,21 +57,24 @@
                         <div class="checkout-card-body row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Tỉnh / Thành phố <span class="text-danger">*</span></label>
-                                <input type="text" name="province" class="form-control checkout-input"
-                                       placeholder="Hồ Chí Minh" required
-                                       value="<%= (customerInfo && customerInfo.address) ? customerInfo.address.province : '' %>">
+                                <select name="province" class="form-select checkout-input" required
+                                        data-selected="<%= (customerInfo && customerInfo.address) ? customerInfo.address.province : '' %>">
+                                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Quận / Huyện <span class="text-danger">*</span></label>
-                                <input type="text" name="district" class="form-control checkout-input"
-                                       placeholder="Quận 1" required
-                                       value="<%= (customerInfo && customerInfo.address) ? customerInfo.address.district : '' %>">
+                                <select name="district" class="form-select checkout-input" required
+                                        data-selected="<%= (customerInfo && customerInfo.address) ? customerInfo.address.district : '' %>">
+                                    <option value="">-- Chọn Quận/Huyện --</option>
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Phường / Xã <span class="text-danger">*</span></label>
-                                <input type="text" name="ward" class="form-control checkout-input"
-                                       placeholder="Phường Bến Nghé" required
-                                       value="<%= (customerInfo && customerInfo.address) ? customerInfo.address.ward : '' %>">
+                                <select name="ward" class="form-select checkout-input" required
+                                        data-selected="<%= (customerInfo && customerInfo.address) ? customerInfo.address.ward : '' %>">
+                                    <option value="">-- Chọn Phường/Xã --</option>
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Số nhà / Đường <span class="text-danger">*</span></label>
@@ -94,17 +97,36 @@
                             <h5 class="mb-0">Thanh toán & Ghi chú</h5>
                         </div>
                         <div class="checkout-card-body">
-                            <!-- Payment method: COD only for now -->
-                            <div class="payment-option selected mb-4">
-                                <div class="d-flex align-items-center gap-3">
-                                    <i class="fas fa-money-bill-wave text-success fa-2x"></i>
-                                    <div>
-                                        <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
-                                        <small class="text-muted">Thanh toán bằng tiền mặt khi nhận được hàng</small>
+                            <!-- Payment methods -->
+                            <div class="payment-methods mb-4">
+                                <!-- COD -->
+                                <div class="payment-option selected mb-3 cursor-pointer" onclick="selectPaymentMethod('COD')">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="payment-radio">
+                                            <input type="radio" name="payment_method" value="COD" checked class="d-none">
+                                            <i class="fas fa-check-circle text-success status-icon"></i>
+                                        </div>
+                                        <i class="fas fa-money-bill-wave text-success fa-2x"></i>
+                                        <div>
+                                            <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
+                                            <small class="text-muted small">Thanh toán bằng tiền mặt khi nhận hàng</small>
+                                        </div>
                                     </div>
-                                    <i class="fas fa-check-circle text-success ms-auto"></i>
                                 </div>
-                                <input type="hidden" name="payment_method" value="COD">
+                                <!-- Bank Transfer -->
+                                <div class="payment-option mb-3 cursor-pointer" onclick="selectPaymentMethod('BANK_TRANSFER')">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="payment-radio">
+                                            <input type="radio" name="payment_method" value="BANK_TRANSFER" class="d-none">
+                                            <i class="far fa-circle text-muted status-icon"></i>
+                                        </div>
+                                        <i class="fas fa-university text-primary fa-2x"></i>
+                                        <div>
+                                            <div class="fw-bold">Chuyển khoản VietQR</div>
+                                            <small class="text-muted small">Quét mã QR để thanh toán nhanh chóng</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div>
                                 <label class="form-label fw-semibold">Ghi chú đơn hàng</label>
@@ -143,19 +165,102 @@
                                 </div>
                             <% }) %>
                         </div>
+                        
+                        <!-- Promotion Campaigns Section -->
+                        <% if (availablePromotions && availablePromotions.length > 0) { %>
+                            <div class="promotion-section mb-4 pb-3 border-bottom">
+                                <label class="form-label small fw-bold text-primary mb-2">Ưu đãi dành cho bạn</label>
+                                <div class="campaign-list d-flex flex-column gap-2">
+                                    <% availablePromotions.forEach(promo => { %>
+                                        <div class="campaign-item p-2 border rounded-3 bg-light d-flex align-items-center gap-2 cursor-pointer" 
+                                             onclick="selectPromotion(<%= promo.id %>, '<%= promo.name %>', <%= promo.estimatedDiscount %>)">
+                                            <div class="campaign-icon text-accent">
+                                                <i class="fas fa-gift"></i>
+                                            </div>
+                                            <div class="flex-grow-1 min-width-0">
+                                                <div class="small fw-bold text-truncate text-uppercase"><%= promo.name %></div>
+                                                <div class="x-small text-muted fw-bold">GIẢM <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.estimatedDiscount) %></div>
+                                            </div>
+                                            <div class="campaign-check">
+                                                <input type="radio" name="selected_promotion" value="<%= promo.id %>" class="form-check-input" id="promo-<%= promo.id %>">
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                                <input type="hidden" name="promotion_id" id="hiddenPromotionId">
+                                <input type="hidden" name="promotion_discount" id="hiddenPromotionDiscount" value="0">
+                            </div>
+                        <% } %>
+
+                        <!-- Shipping Promotion Section -->
+                        <% if (shippingCampaigns && shippingCampaigns.length > 0) { %>
+                            <div class="shipping-section mb-4 pb-3 border-bottom">
+                                <label class="form-label small fw-bold text-success mb-2">
+                                    <i class="fas fa-truck-fast me-1"></i> Ưu đãi vận chuyển
+                                </label>
+                                <div class="shipping-promo-list d-flex flex-column gap-2">
+                                    <% shippingCampaigns.forEach(promo => { 
+                                        const isEligible = totalAmount >= (promo.min_order_value || 0);
+                                        const benefitText = promo.type === 'percent' ? (parseFloat(promo.value) == 100 ? 'MIỄN PHÍ SHIP' : `GIẢM ${promo.value}% PHÍ SHIP`) : `GIẢM ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.value)} PHÍ SHIP`;
+                                    %>
+                                        <div class="shipping-promo-item p-2 border rounded-3 <%= isEligible ? 'bg-light' : 'opacity-50' %> d-flex align-items-center gap-2 cursor-pointer" 
+                                             id="ship-item-<%= promo.id %>"
+                                             <% if (isEligible) { %> onclick="selectShippingPromo(<%= promo.id %>, '<%= benefitText %>')"<% } %>>
+                                            <div class="shipping-promo-icon text-success">
+                                                <i class="fas fa-truck-fast"></i>
+                                            </div>
+                                            <div class="flex-grow-1 min-width-0">
+                                                <div class="small fw-bold text-truncate text-uppercase"><%= promo.name %></div>
+                                                <div class="x-small text-muted fw-bold text-success"><%= benefitText %></div>
+                                                <% if (!isEligible) { %>
+                                                    <div class="x-small text-danger fw-bold">(Đơn từ <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.min_order_value) %>)</div>
+                                                <% } %>
+                                            </div>
+                                            <div class="shipping-promo-check">
+                                                <input type="radio" name="selected_shipping_promotion" value="<%= promo.id %>" class="form-check-input" id="ship-radio-<%= promo.id %>" <%= isEligible ? '' : 'disabled' %>>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                                <input type="hidden" name="shipping_campaign_id" id="hiddenShippingCampaignId">
+                            </div>
+                        <% } %>
+
+                        <!-- Coupon Section -->
+                        <div class="coupon-section mb-4 pb-3 border-bottom">
+                            <label class="form-label small fw-bold text-muted mb-2">Mã giảm giá (Coupon)</label>
+                            <div class="input-group">
+                                <input type="text" id="couponCodeInput" class="form-control checkout-input shadow-none" placeholder="Nhập mã...">
+                                <button class="btn btn-outline-primary px-3 fw-bold" type="button" id="applyCouponBtn">Áp dụng</button>
+                            </div>
+                            <div id="couponMessage" class="small mt-2" style="display: none;"></div>
+                            
+                            <!-- Hidden inputs for form submission -->
+                            <input type="hidden" name="coupon_code" id="hiddenCouponCode">
+                            <input type="hidden" name="discount_amount" id="hiddenDiscountAmount" value="0">
+                        </div>
 
                         <div class="border-top pt-3">
                             <div class="d-flex justify-content-between mb-2 text-muted">
                                 <span>Tạm tính</span>
                                 <span class="fw-semibold text-dark"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalAmount) %></span>
                             </div>
-                            <div class="d-flex justify-content-between mb-3 text-muted">
-                                <span>Phí vận chuyển</span>
-                                <span class="fw-semibold text-success">Miễn phí</span>
+                            <div class="d-flex justify-content-between mb-2 text-muted" id="discountRow" style="display: none!important;">
+                                <span>Giảm giá (Sản phẩm)</span>
+                                <span class="fw-semibold text-danger">- <span id="discountValueText">0đ</span></span>
                             </div>
-                            <div class="d-flex justify-content-between mb-4 fs-5 fw-bold">
-                                <span>Tổng cộng</span>
-                                <span class="text-accent"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalAmount) %></span>
+                            <!-- Shipping Details -->
+                            <div class="d-flex justify-content-between mb-2 text-muted">
+                                <span>Phí vận chuyển</span>
+                                <span class="fw-semibold text-dark">Tùy địa điểm</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3 text-muted" id="shippingDiscountRow" style="display: none;">
+                                <span class="text-success small"><i class="fas fa-gift me-1"></i> Ưu đãi vận chuyển</span>
+                                <span class="fw-semibold text-success font-italic" id="shippingDiscountValueText"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-4 fs-5 fw-bold bg-light p-2 rounded-3 border">
+                                <span>Tổng cộng <small class="text-muted fw-normal">(Chưa gồm ship)</small></span>
+                                <span class="text-accent" id="finalTotalText"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalAmount) %></span>
                             </div>
                         </div>
 
@@ -235,17 +340,44 @@
     border-color: var(--brand-primary, #2d7a3a);
     background: #f2faf4;
 }
-
-/* Order Summary */
-.order-summary-box {
-    background: #fff;
-    border: 1px solid #e8f0e9;
-    border-radius: 20px;
-    padding: 28px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+.payment-option:hover:not(.selected) {
+    border-color: #ddd;
+    background: #fdfdfd;
 }
+.status-icon {
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+/* Promotion Campaigns */
+.campaign-item {
+    transition: all 0.2s ease;
+    border: 1px solid #eee!important;
+}
+.campaign-item:hover {
+    background-color: #f0faf3!important;
+    border-color: var(--brand-primary, #2d7a3a)!important;
+}
+.campaign-item.active {
+    border-color: var(--brand-primary, #2d7a3a)!important;
+    background-color: #f2faf4!important;
+    box-shadow: 0 0 0 2px rgba(45, 122, 58, 0.1);
+}
+.campaign-icon {
+    width: 36px;
+    height: 36px;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.x-small { font-size: 0.75rem; }
+.cursor-pointer { cursor: pointer; }
 </style>
 
+<script src="/js/address-helper.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-assemble delivery_address
@@ -258,16 +390,207 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('delivery_address').value = parts.join(', ');
     }
 
-    ['address_line', 'ward', 'district', 'province'].forEach(name => {
-        document.querySelector(`[name="${name}"]`).addEventListener('input', updateDeliveryAddress);
+    // Initialize AddressHelper for Checkout
+    const addrHelper = new AddressHelper({
+        provinceSelector: '[name="province"]',
+        districtSelector: '[name="district"]',
+        wardSelector: '[name="ward"]',
+        onAddressChange: updateDeliveryAddress
     });
-    updateDeliveryAddress();
 
-    // Loading state on submit
-    document.getElementById('checkoutForm').addEventListener('submit', function() {
-        const btn = document.getElementById('placeOrderBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+    document.querySelector('[name="address_line"]').addEventListener('input', updateDeliveryAddress);
+
+    // Payment Method Selection
+    window.selectPaymentMethod = function(method) {
+        // Clear all selected
+        document.querySelectorAll('.payment-option').forEach(opt => {
+            opt.classList.remove('selected');
+            const radioNode = opt.querySelector('input[type="radio"]');
+            radioNode.checked = false;
+            const iconNode = opt.querySelector('.status-icon');
+            iconNode.className = 'far fa-circle text-muted status-icon';
+        });
+
+        // Select the clicked one
+        const selectedOpt = document.querySelector(`input[name="payment_method"][value="${method}"]`).closest('.payment-option');
+        selectedOpt.classList.add('selected');
+        selectedOpt.querySelector('input[type="radio"]').checked = true;
+        selectedOpt.querySelector('.status-icon').className = 'fas fa-check-circle text-success status-icon';
+    };
+
+    // Initial trigger to assemble if there's data from profile
+    setTimeout(updateDeliveryAddress, 800); // Wait for API to load and pre-select
+    // Coupon Logic
+    const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const couponCodeInput = document.getElementById('couponCodeInput');
+    const couponMessage = document.getElementById('couponMessage');
+    const discountRow = document.getElementById('discountRow');
+    const appliedCouponText = document.getElementById('appliedCouponText');
+    const discountValueText = document.getElementById('discountValueText');
+    const baseTotal = <%= totalAmount %>;
+    const shippingCampaigns = <%- JSON.stringify(shippingCampaigns) %>;
+    
+    const shippingDiscountRow = document.getElementById('shippingDiscountRow');
+    const shippingDiscountValueText = document.getElementById('shippingDiscountValueText');
+    
+    let couponDiscount = 0;
+    let promoDiscount = 0;
+    let shippingDiscount = 0;
+
+    function updateShipping() {
+        // Check Shipping Campaigns (Chỉ lấy ghi chú, không tính tiền)
+        shippingDiscount = 0;
+        let promoText = "";
+        for (const promo of shippingCampaigns) {
+            if (baseTotal >= parseFloat(promo.min_order_value)) {
+                let currentDiscountValue = parseFloat(promo.value);
+                if (currentDiscountValue >= shippingDiscount) {
+                    shippingDiscount = currentDiscountValue;
+                    if (promo.type === 'percent') {
+                        promoText = `Giảm ${currentDiscountValue}% phí ship`;
+                    } else {
+                        promoText = `Giảm ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentDiscountValue)} phí ship`;
+                    }
+                }
+            }
+        }
+
+        if (shippingDiscount > 0) {
+            shippingDiscountRow.style.display = 'flex';
+            shippingDiscountValueText.innerText = promoText;
+        } else {
+            shippingDiscountRow.style.display = 'none';
+        }
+
+        updateFinalTotal();
+    }
+
+    const finalTotalText = document.getElementById('finalTotalText');
+    const hiddenCouponCode = document.getElementById('hiddenCouponCode');
+    const hiddenDiscountAmount = document.getElementById('hiddenDiscountAmount');
+    
+    function updateFinalTotal() {
+        const totalDiscount = couponDiscount + promoDiscount;
+        // Tổng tiền KHÔNG cộng ship, KHÔNG trừ discount ship
+        const finalTotal = baseTotal - totalDiscount;
+
+        if (totalDiscount > 0) {
+            discountRow.style.setProperty('display', 'flex', 'important');
+            discountValueText.innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalDiscount);
+        } else {
+            discountRow.style.setProperty('display', 'none', 'important');
+        }
+
+        finalTotalText.innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.max(0, finalTotal));
+    }
+
+    // Export selectPromotion to global scope
+    window.selectPromotion = function(id, name, discount) {
+        const radio = document.getElementById(`promo-${id}`);
+        const wasChecked = radio.checked;
+        
+        // Deselect all
+        document.querySelectorAll('.campaign-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('input[name="selected_promotion"]').forEach(el => el.checked = false);
+
+        if (wasChecked) {
+            radio.checked = false;
+            promoDiscount = 0;
+            document.getElementById('hiddenPromotionId').value = '';
+            document.getElementById('hiddenPromotionDiscount').value = 0;
+        } else {
+            radio.checked = true;
+            document.getElementById(`promo-${id}`).closest('.campaign-item').classList.add('active');
+            promoDiscount = parseFloat(discount);
+            document.getElementById('hiddenPromotionId').value = id;
+            document.getElementById('hiddenPromotionDiscount').value = promoDiscount;
+        }
+
+        updateFinalTotal();
+    };
+
+    // Shipping Promotion Selection
+    window.selectShippingPromo = function(id, benefitText) {
+        const radio = document.getElementById(`ship-radio-${id}`);
+        const wasChecked = radio.checked;
+        
+        // Deselect all
+        document.querySelectorAll('.shipping-promo-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('input[name="selected_shipping_promotion"]').forEach(el => el.checked = false);
+
+        if (wasChecked) {
+            radio.checked = false;
+            document.getElementById('hiddenShippingCampaignId').value = '';
+            shippingDiscountRow.style.display = 'none';
+        } else {
+            radio.checked = true;
+            document.getElementById(`ship-item-${id}`).classList.add('active');
+            document.getElementById('hiddenShippingCampaignId').value = id;
+            
+            // Show benefit note
+            shippingDiscountRow.style.display = 'flex';
+            document.getElementById('shippingDiscountValueText').innerText = benefitText;
+        }
+    };
+
+    // Assign updateShipping to onAddressChange
+    addrHelper.options.onAddressChange = function() {
+        updateDeliveryAddress();
+        updateShipping();
+    }
+    
+    // Manual trigger for first load
+    setTimeout(() => {
+        updateDeliveryAddress();
+        updateShipping();
+    }, 1000);
+
+    applyCouponBtn.addEventListener('click', async () => {
+        const code = couponCodeInput.value.trim();
+        if (!code) return;
+
+        try {
+            const response = await fetch('/api/coupons/apply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, totalAmount: baseTotal })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                couponDiscount = data.coupon.discountAmount;
+                couponMessage.style.display = 'block';
+                couponMessage.className = 'small mt-2 text-success';
+                couponMessage.innerHTML = '<i class="fas fa-check-circle me-1"></i>' + data.message;
+                
+                appliedCouponText.innerText = data.coupon.code;
+                
+                // Update hidden inputs
+                hiddenCouponCode.value = data.coupon.code;
+                hiddenDiscountAmount.value = couponDiscount;
+                
+                couponCodeInput.classList.add('is-valid');
+                couponCodeInput.classList.remove('is-invalid');
+            } else {
+                couponDiscount = 0;
+                couponMessage.style.display = 'block';
+                couponMessage.className = 'small mt-2 text-danger';
+                couponMessage.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>' + data.message;
+                
+                hiddenCouponCode.value = '';
+                hiddenDiscountAmount.value = 0;
+                
+                couponCodeInput.classList.add('is-invalid');
+                couponCodeInput.classList.remove('is-valid');
+            }
+            updateFinalTotal();
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+            alert('Có lỗi xảy ra khi áp dụng mã giảm giá!');
+        } finally {
+            applyCouponBtn.disabled = false;
+            applyCouponBtn.innerText = 'Áp dụng';
+        }
     });
 });
 </script>

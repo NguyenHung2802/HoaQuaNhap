@@ -1,0 +1,107 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0 fw-bold">Khuyến mãi Vận chuyển</h4>
+    <a href="/admin/shipping-campaigns/create" class="btn btn-primary rounded-pill shadow-sm px-4">
+        <i class="fas fa-plus me-2"></i>Thêm khuyến mãi
+    </a>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Tên chiến dịch</th>
+                    <th>Loại</th>
+                    <th>Giá trị ưu đãi</th>
+                    <th>Đơn tối thiểu</th>
+                    <th>Trạng thái</th>
+                    <th>Thời gian</th>
+                    <th class="text-end pe-4">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (campaigns && campaigns.length > 0) { %>
+                    <% campaigns.forEach(campaign => { %>
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold"><%= campaign.name %></div>
+                                <div class="small text-muted text-truncate" style="max-width: 250px;"><%= campaign.description %></div>
+                            </td>
+                            <td>
+                                <span class="badge <%= campaign.type === 'percent' ? 'bg-info' : 'bg-primary' %> bg-opacity-10 text-<%= campaign.type === 'percent' ? 'info' : 'primary' %> rounded-pill px-3 py-1">
+                                    <%= campaign.type === 'percent' ? 'Phần trăm' : 'Số tiền cố định' %>
+                                </span>
+                            </td>
+                            <td class="fw-bold">
+                                <%= campaign.type === 'percent' ? campaign.value + '%' : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(campaign.value) %>
+                            </td>
+                            <td>
+                                <%= campaign.min_order_value ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(campaign.min_order_value) : 'Không có' %>
+                            </td>
+                            <td>
+                                <% if (campaign.is_active) { %>
+                                    <span class="badge bg-success rounded-pill px-2 py-1"><i class="fas fa-check me-1"></i>Đang chạy</span>
+                                <% } else { %>
+                                    <span class="badge bg-secondary rounded-pill px-2 py-1">Tạm dừng</span>
+                                <% } %>
+                            </td>
+                            <td class="small">
+                                <div>Từ: <%= campaign.start_at ? new Date(campaign.start_at).toLocaleDateString('vi-VN') : '---' %></div>
+                                <div>Đến: <%= campaign.end_at ? new Date(campaign.end_at).toLocaleDateString('vi-VN') : '---' %></div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="/admin/shipping-campaigns/edit/<%= campaign.id %>" class="btn btn-sm btn-outline-primary border-0 rounded-circle me-1" title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" 
+                                    onclick="deleteCampaign(<%= campaign.id %>)" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="fas fa-truck-fade fa-3x mb-3 opacity-25"></i>
+                            <p>Chưa có khuyến mãi vận chuyển nào được tạo.</p>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    async function deleteCampaign(id) {
+        const result = await Swal.fire({
+            title: 'Xác nhận xóa?',
+            text: "Bạn không thể hoàn tác hành động này!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa ngay',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/admin/shipping-campaigns/${id}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire('Đã xóa!', data.message, 'success').then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire('Lỗi!', data.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Lỗi!', 'Có lỗi xảy ra khi kết nối máy chủ.', 'error');
+            }
+        }
+    }
+</script>

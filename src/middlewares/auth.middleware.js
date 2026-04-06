@@ -19,3 +19,18 @@ exports.loadUser = (req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
 };
+
+/**
+ * Middleware kiểm tra login của người dùng (Customer)
+ */
+exports.ensureAuthenticated = (req, res, next) => {
+    if (req.session && req.session.user) {
+        // Đã đăng nhập (admin hay customer đều được)
+        return next();
+    }
+    
+    // Chưa đăng nhập thì đá về trang đăng nhập
+    req.flash('error_msg', 'Vui lòng đăng nhập để tiếp tục.');
+    // Lưu lại URL muốn vào để redirect sau khi login thành công (nếu cần xử lý phức tạp sau này)
+    res.redirect(`/auth/login?redirect=${encodeURIComponent(req.originalUrl)}`);
+};

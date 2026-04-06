@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <% staticUrls.forEach(url => { %>
+        <url>
+            <loc><%= baseUrl %><%= url %></loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+        </url>
+    <% }) %>
+    
+    <% products.forEach(p => { %>
+        <url>
+            <loc><%= baseUrl %>/product/<%= p.slug %></loc>
+            <lastmod><%= p.updated_at.toISOString().split('T')[0] %></lastmod>
+            <changefreq>daily</changefreq>
+            <priority>1.0</priority>
+        </url>
+    <% }) %>
+
+    <% categories.forEach(c => { %>
+        <url>
+            <loc><%= baseUrl %>/products?category_id=<%= c.id %></loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.7</priority>
+        </url>
+    <% }) %>
+
+    <% blogs.forEach(b => { %>
+        <url>
+            <loc><%= baseUrl %>/blog/<%= b.id %></loc>
+            <lastmod><%= b.updated_at.toISOString().split('T')[0] %></lastmod>
+            <changefreq>monthly</changefreq>
+            <priority>0.6</priority>
+        </url>
+    <% }) %>
+</urlset>

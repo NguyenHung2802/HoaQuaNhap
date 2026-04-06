@@ -1,25 +1,30 @@
-# NHẬT KÝ YÊU CẦU — Giai đoạn 3: Quản lý danh mục và sản phẩm
-- Ngày tạo: 2026-04-02 10:15
+# Nhật ký yêu cầu gốc - Phase 08: Optimization
 
-## Yêu cầu gốc
-Tiến hành thực hiện giai đoạn 3 của dự án WebHoaQua.
-Mục tiêu: Cho phép admin quản lý danh sách sản phẩm và danh mục hoa quả.
+- Ngày tạo: 2026-04-03 11:45
+- Feature: Giai đoạn 08 - Tối ưu & Nâng cao
 
-Các việc cần làm (theo docs/phases/03-category-product.md):
-- CRUD categories (Danh mục) - có hiển thị hình ảnh.
-- CRUD products (Sản phẩm) - quản lý thông tin SKU, Giá, Xuất sứ, Đơn vị tính.
-- Upload nhiều ảnh cho sản phẩm và resize bằng Cloudinary.
-- Thiết lập trạng thái Publish / Hide (Ẩn/Hiện) sản phẩm.
-- Quản lý tồn kho ban đầu (số lượng trong kho).
-- Danh sách sản phẩm admin với bộ lọc, tìm kiếm.
-- Tạo module `inventory` để ghi log nhập kho cơ bản.
+## Yêu cầu gốc (từ docs/phases/08-optimization.md)
+- [ ] Coupon Management (Mã giảm giá):
+    - Tạo mã giảm giá: Theo % hoặc Theo số tiền cụ thể
+    - Cấu hình theo: Giá trị đơn tối thiểu, Số lần sử dụng, Thời gian hết hạn
+    - API/Logic apply mã khi thanh toán
+- [ ] Báo cáo doanh thu chi tiết (Advanced Reports):
+    - Top khách hàng trung thành
+    - Trend doanh thu theo biểu đồ đường
+    - Danh sách sản phẩm bán chậm (Để ra plan sale)
+- [ ] SEO Level 2:
+    - Sitemap XML tự động gen
+    - Robots.txt
+    - Schema Google (Structured data) cho Sản phẩm để chiếm Rich Snippet
+- [ ] Tối ưu tốc độ (Performance):
+    - Lazy load ảnh
+    - Cache trang chủ, danh sách sản phẩm với Redis (Nếu cần)
+    - Resize ảnh thumbnail đúng tỉ lệ
 
-Kết quả đầu ra:
-- Giao diện admin quản lý sản phẩm mượt mà.
-- Dữ liệu lưu trong DB qua Prisma.
-- Hình ảnh lưu trên Cloudinary.
-- Có dữ liệu mẫu (Seeding).
-- Slug sản phẩm sinh tự động.
+## Yêu cầu bổ sung (từ 00_recommendations_log.md)
+- SHOULD: Thêm thuộc tính original_url cho ảnh SP để lưu ảnh gốc. (Cân nhắc đưa vào slice tối ưu ảnh)
+- COULD: Thêm chức năng "Duplicate Product" để admin tạo nhanh. (Cân nhắc đưa vào slice Admin UI)
+- MAYBE: Hỗ trợ Đa ngôn ngữ (I18n) cho tên sản phẩm/danh mục. (Out of scope for this phase unless requested)
 
 ## Cập nhật/Điều chỉnh
-- 2026-04-02 10:15: Khởi tạo BA cho Giai đoạn 3.
+- 2026-04-03 11:45: Khởi tạo nhật ký theo yêu cầu của Phase 08.

@@ -23,6 +23,7 @@ const getCartDetails = async (sessionCart) => {
             sale_price: true,
             stock_quantity: true,
             status: true,
+            category_id: true,
             images: {
                 where: { is_thumbnail: true },
                 take: 1
@@ -51,6 +52,7 @@ const getCartDetails = async (sessionCart) => {
                 image_url: (product.images && product.images.length > 0) ? product.images[0].image_url : null,
                 price: activePrice,
                 original_price: parseFloat(product.price),
+                category_id: product.category_id,
                 quantity: cartItem.quantity,
                 stock_quantity: product.stock_quantity,
                 line_total: lineTotal,

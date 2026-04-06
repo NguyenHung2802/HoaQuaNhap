@@ -11,4 +11,7 @@ router.get('/:id', ordersController.renderDetail);
 // [POST] /admin/orders/:id/status
 router.post('/:id/status', ordersController.updateStatus);
 
+// [POST] /admin/orders/:id/payment-status
+router.post('/:id/payment-status', ordersController.updatePaymentStatus);
+
 module.exports = router;

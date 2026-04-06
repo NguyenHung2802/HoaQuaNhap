@@ -18,6 +18,9 @@ router.get('/edit/:id', productsController.renderEditForm);
 // [POST] /admin/products/edit/:id
 router.post('/edit/:id', upload.array('images', 5), productsController.update);
 
+// [POST] /admin/products/duplicate/:id
+router.post('/duplicate/:id', productsController.duplicate);
+
 // [DELETE] /admin/products/:id
 router.delete('/:id', productsController.deleteProduct);
 

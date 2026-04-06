@@ -183,8 +183,51 @@ const updateStatus = async (req, res, next) => {
     }
 };
 
+/**
+ * [POST] /admin/orders/:id/payment-status
+ */
+const updatePaymentStatus = async (req, res, next) => {
+    try {
+        const orderId = parseInt(req.params.id);
+        const { payment_status, note } = req.body;
+        const adminUser = req.session.user;
+
+        const currentOrder = await prisma.order.findUnique({
+            where: { id: orderId }
+        });
+
+        if (!currentOrder) {
+            return res.json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        }
+
+        await prisma.$transaction(async (tx) => {
+            await tx.order.update({
+                where: { id: orderId },
+                data: { payment_status }
+            });
+
+            // Log change
+            await tx.orderStatusLog.create({
+                data: {
+                    order_id: orderId,
+                    old_status: currentOrder.payment_status,
+                    new_status: `PAYMENT_${payment_status.toUpperCase()}`,
+                    note: note || `Cập nhật trạng thái thanh toán sang ${payment_status}`,
+                    changed_by: adminUser ? adminUser.full_name : 'Admin'
+                }
+            });
+        });
+
+        res.json({ success: true, message: 'Cập nhật trạng thái thanh toán thành công' });
+    } catch (error) {
+        console.error('Update payment status error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi cập nhật thanh toán' });
+    }
+};
+
 module.exports = {
     renderList,
     renderDetail,
-    updateStatus
+    updateStatus,
+    updatePaymentStatus
 };

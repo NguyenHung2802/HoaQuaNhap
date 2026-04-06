@@ -231,10 +231,56 @@ const deleteProduct = async (id) => {
   });
 };
 
+/**
+ * Duplicate product
+ */
+const duplicateProduct = async (id) => {
+    const original = await prisma.product.findUnique({
+        where: { id: parseInt(id) },
+        include: { images: true }
+    });
+
+    if (!original) throw new Error('Không tìm thấy sản phẩm gốc');
+
+    const suffix = '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
+    
+    return await prisma.$transaction(async (tx) => {
+        // 1. Create New Product
+        const { id: _, created_at, updated_at, images, ...productData } = original;
+        
+        const duplicated = await tx.product.create({
+            data: {
+                ...productData,
+                name: `${productData.name} (Copy)`,
+                sku: `${productData.sku}${suffix}`,
+                slug: `${productData.slug}${suffix.toLowerCase()}`,
+                status: 'draft', // Set to draft for review
+                stock_quantity: 0, // Reset stock for duplicate
+            }
+        });
+
+        // 2. Copy Images
+        if (images && images.length > 0) {
+            await tx.productImage.createMany({
+                data: images.map(img => ({
+                    product_id: duplicated.id,
+                    image_url: img.image_url,
+                    public_id: img.public_id,
+                    is_thumbnail: img.is_thumbnail,
+                    sort_order: img.sort_order
+                }))
+            });
+        }
+
+        return duplicated;
+    });
+};
+
 module.exports = {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  duplicateProduct
 };

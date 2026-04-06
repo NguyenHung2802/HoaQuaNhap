@@ -1,0 +1,81 @@
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-4">
+            <a href="/admin/shipping-campaigns" class="btn btn-sm btn-outline-secondary rounded-circle me-3" title="Quay lại">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h4 class="mb-0 fw-bold">Thêm khuyến mãi vận chuyển mới</h4>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+            <form action="/admin/shipping-campaigns/create" method="POST">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-muted">Tên chiến dịch*</label>
+                        <input type="text" name="name" class="form-control rounded-pill px-4" placeholder="Ví dụ: Miễn phí vận chuyển đơn từ 500K" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small fw-bold text-muted">Mô tả hiển thị</label>
+                        <textarea name="description" class="form-control rounded-3 px-4" rows="3" placeholder="Chi tiết khuyến mãi cho khách hàng thấy..."></textarea>
+                    </div>
+
+                    <div class="col-md-6 text-muted font-italic">
+                        <label class="form-label small fw-bold">Loại chiết khấu*</label>
+                        <select name="type" class="form-select rounded-pill px-4" required>
+                            <option value="percent">Phần trăm (%)</option>
+                            <option value="amount">Số tiền cố định (đ)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Giá trị giảm*</label>
+                        <div class="input-group">
+                            <input type="number" name="value" class="form-control rounded-pill px-4" placeholder="Ví dụ: 100 hoặc 20000" min="0" required>
+                        </div>
+                        <small class="text-muted d-block mt-2">Nếu chọn 100% nghĩa là Miễn Phí.</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Đơn hàng tối thiểu (Tùy chọn)</label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-pill bg-light">đ</span>
+                            <input type="number" name="min_order_value" class="form-control rounded-end-pill px-3" placeholder="Ví dụ: 500000" min="0">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Hỗ trợ tối đa (Tùy chọn)</label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-pill bg-light">đ</span>
+                            <input type="number" name="max_discount_value" class="form-control rounded-end-pill px-3" placeholder="Chỉ áp dụng cho loại %" min="0">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Ngày bắt đầu</label>
+                        <input type="date" name="start_at" class="form-control rounded-pill px-4">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Ngày kết thúc</label>
+                        <input type="date" name="end_at" class="form-control rounded-pill px-4">
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <div class="form-check form-switch p-0 d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" name="is_active" value="true" checked id="isActiveCampaign">
+                            <label class="form-check-label fw-bold text-muted small" for="isActiveCampaign">Kích hoạt ngay chương trình này</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-4 text-center">
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 shadow-sm">
+                            <i class="fas fa-save me-2"></i>Lưu khuyến mãi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+<!-- ===== BREADCRUMB ===== -->
+<nav class="bg-light py-3 border-bottom">
+    <div class="container">
+        <ol class="breadcrumb mb-0 small uppercase fw-bold" style="letter-spacing: 0.05em;">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Liên hệ</li>
+        </ol>
+    </div>
+</nav>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Contact Info -->
+            <div class="col-lg-5">
+                <p class="text-primary fw-bold mb-2">Kết nối với chúng tôi</p>
+                <h1 class="display-6 fw-bold text-dark mb-4" style="font-family: var(--font-heading);">Liên Hệ WebHoaQua</h1>
+                <p class="text-muted mb-5">Chúng tôi luôn sẵn sàng lắng nghe và giải đáp mọi thắc mắc của bạn về sản phẩm, dịch vụ và đơn hàng. Đừng ngần ngại liên hệ với chúng tôi qua các kênh dưới đây.</p>
+                
+                <div class="d-flex align-items-center mb-4 p-4 bg-light rounded-4 border">
+                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-primary shadow-sm" style="width: 50px; height: 50px; min-width: 50px;">
+                        <i class="fas fa-map-marker-alt fs-5"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="fw-bold mb-1 text-dark">Địa chỉ cửa hàng</h6>
+                        <p class="text-muted small mb-0">123 Đường Ngọc Hân Công Chúa, Phường Võ Cường, TP Bắc Ninh</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center mb-4 p-4 bg-light rounded-4 border">
+                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-primary shadow-sm" style="width: 50px; height: 50px; min-width: 50px;">
+                        <i class="fas fa-phone-alt fs-5"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="fw-bold mb-1 text-dark">Số điện thoại</h6>
+                        <p class="text-muted small mb-0">0900 000 000 (8:00 - 21:00)</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center p-4 bg-light rounded-4 border">
+                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-primary shadow-sm" style="width: 50px; height: 50px; min-width: 50px;">
+                        <i class="fas fa-envelope fs-5"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="fw-bold mb-1 text-dark">Email hỗ trợ</h6>
+                        <p class="text-muted small mb-0">info@webhoaqua.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-7">
+                <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border h-100">
+                    <h4 class="fw-bold mb-4 text-dark" style="font-family: var(--font-heading);">Gửi tin nhắn cho chúng tôi</h4>
+                    <form action="/contact/submit" method="POST" onsubmit="event.preventDefault(); const form=this; fetch('/contact/submit', {method: 'POST', body: new URLSearchParams(new FormData(form))}).then(res=>res.json()).then(data=>{ if(data.success) { Swal.fire({title: 'Thành công!', text: data.message, icon: 'success', confirmButtonColor: '#2e7d32'}); form.reset(); } else { Swal.fire('Lỗi', data.message, 'error')} });">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-muted">Họ và tên <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control form-control-lg bg-light border-0 shadow-none" placeholder="Nguyễn Văn A" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-muted">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel" name="phone" class="form-control form-control-lg bg-light border-0 shadow-none" placeholder="09xx xxx xxx" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small text-muted">Email</label>
+                                <input type="email" name="email" class="form-control form-control-lg bg-light border-0 shadow-none" placeholder="email@example.com">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small text-muted">Nội dung tin nhắn <span class="text-danger">*</span></label>
+                                <textarea name="content" class="form-control form-control-lg bg-light border-0 shadow-none" rows="5" placeholder="Để lại lời nhắn của bạn tại đây..." required></textarea>
+                            </div>
+                            <div class="col-12 mt-4 text-end">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm" style="transition: all 0.3s ease;">
+                                    <i class="fas fa-paper-plane me-2"></i> Gửi tin nhắn
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google Map Embedded -->
+        <div class="row mt-5 pt-4 mb-5">
+            <div class="col-12">
+                <div class="rounded-4 overflow-hidden border shadow-sm" style="height: 450px; background: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                    <iframe src="https://maps.google.com/maps?q=47%20Nguy%E1%BB%85n%20Du,%20P.%20Ti%E1%BB%81n%20An,%20Kinh%20B%E1%BA%AFc,%20B%E1%BA%AFc%20Ninh,%20Vi%E1%BB%87t%20Nam&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

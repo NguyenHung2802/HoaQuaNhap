@@ -1,0 +1,192 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Báo cáo & Thống kê doanh thu</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Báo cáo doanh thu</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-3">
+        <form action="/admin/reports/revenue" method="GET" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Từ ngày</label>
+                <input type="date" name="start_date" class="form-control form-control-sm" value="<%= filters.start_date %>">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Đến ngày</label>
+                <input type="date" name="end_date" class="form-control form-control-sm" value="<%= filters.end_date %>">
+            </div>
+            <div class="col-md-4 d-grid gap-2">
+                <button type="submit" class="btn btn-sm btn-primary px-4">Xem báo cáo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-primary text-white">
+            <div class="card-body p-4">
+                <h6 class="text-uppercase small mb-2 opacity-75">Tổng doanh thu thực tế</h6>
+                <h2 class="mb-0 fw-bold"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(report.summary.totalRevenue) %></h2>
+                <div class="mt-2 text-white-50 small">Tính trên các đơn không bị hủy</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-success text-white">
+            <div class="card-body p-4">
+                <h6 class="text-uppercase small mb-2 opacity-75">Số lượng đơn hàng</h6>
+                <h2 class="mb-0 fw-bold"><%= report.summary.orderCount %></h2>
+                <div class="mt-2 text-white-50 small">Số đơn hàng phát sinh trong kì</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-warning text-white">
+            <div class="card-body p-4">
+                <h6 class="text-uppercase small mb-2 opacity-75">Tổng tiền đã giảm</h6>
+                <h2 class="mb-0 fw-bold"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(report.summary.totalDiscount) %></h2>
+                <div class="mt-2 text-white-50 small">Thông qua các mã giảm giá</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Section -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white py-3 border-bottom-0">
+        <h6 class="mb-0 fw-bold"><i class="fas fa-chart-area me-2 text-primary"></i>Biểu đồ biến động doanh thu</h6>
+    </div>
+    <div class="card-body">
+        <div class="chart-container" style="position: relative; height:40vh; width:100%">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Table Section -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white py-3 border-bottom-0">
+        <h6 class="mb-0 fw-bold"><i class="fas fa-table me-2 text-primary"></i>Chi tiết doanh thu từng ngày</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light small text-uppercase fw-bold text-muted">
+                    <tr>
+                        <th class="ps-4">Ngày</th>
+                        <th>Số lượng đơn</th>
+                        <th class="text-end pe-4">Doanh thu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% 
+                    const sortedLabels = Object.keys(report.rawStats).sort((a,b) => new Date(b) - new Date(a));
+                    if (sortedLabels.length > 0) {
+                        sortedLabels.forEach(date => {
+                            const stat = report.rawStats[date];
+                    %>
+                        <tr>
+                            <td class="ps-4 fw-medium"><%= new Date(date).toLocaleDateString('vi-VN') %></td>
+                            <td><span class="badge bg-light text-dark border px-2"><%= stat.orders %> đơn</span></td>
+                            <td class="text-end pe-4 fw-bold text-primary"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(stat.revenue) %></td>
+                        </tr>
+                    <% }) } else { %>
+                        <tr>
+                            <td colspan="3" class="text-center py-5 text-muted small">Không có dữ liệu trong khoảng thời gian này</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const labels = <%- JSON.stringify(report.chartData.labels) %>;
+        const dataValues = <%- JSON.stringify(report.chartData.data) %>;
+        
+        // Format labels if needed (MM/DD)
+        const formattedLabels = labels.map(l => {
+            const d = new Date(l);
+            return `${d.getDate()}/${d.getMonth() + 1}`;
+        });
+
+        const revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: formattedLabels,
+                datasets: [{
+                    label: 'Doanh thu (VND)',
+                    data: dataValues,
+                    borderColor: '#2e7d32',
+                    backgroundColor: 'rgba(46, 125, 50, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#2e7d32',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('vi-VN', { notation: 'compact', compactDisplay: 'short' }).format(value);
+                            }
+                        },
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>

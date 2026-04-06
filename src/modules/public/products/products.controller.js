@@ -145,11 +145,38 @@ exports.renderDetail = async (req, res, next) => {
             take: 4
         });
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+        // Fetch active promotions for this product
+        const now = new Date();
+        const productPromotions = await db.promotionCampaign.findMany({
+            where: {
+                is_active: true,
+                AND: [
+                    { OR: [{ start_at: null }, { start_at: { lte: now } }] },
+                    { OR: [{ end_at: null }, { end_at: { gte: now } }] }
+                ],
+                OR: [
+                    { target_type: 'all' },
+                    { 
+                        target_type: 'category',
+                        categories: { some: { category_id: product.category_id } }
+                    },
+                    {
+                        target_type: 'product',
+                        products: { some: { product_id: product.id } }
+                    }
+                ]
+            }
+        });
+
         res.render('public/products/detail', {
             title: product.name,
             metaDesc: product.short_description || `Mua ${product.name} tươi ngon tại WebHoaQua`,
             product,
             relatedProducts,
+            productPromotions,
+            baseUrl,
             layout: 'layouts/main'
         });
     } catch (error) {
