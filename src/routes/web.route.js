@@ -30,12 +30,29 @@ router.use('/blogs', blogsRoute);
 router.get('/contact', (req, res) => res.render('public/pages/contact', { title: 'Liên hệ', layout: 'layouts/main' }));
 const { PrismaClient } = require('@prisma/client');
 const prismaClient = new PrismaClient();
+const contactsController = require('../modules/contacts/contacts.controller');
+
 router.post('/contact/submit', async (req, res) => {
     try {
         const { name, phone, email, content } = req.body;
-        await prismaClient.contactMessage.create({
-            data: { name, phone, email, content }
+        const newContact = await prismaClient.contactRequest.create({
+            data: { 
+                name, 
+                phone, 
+                email: email || null, 
+                note: content || '',
+                need: 'Liên hệ qua trang /contact',
+                status: 'new',
+                source_url: '/contact'
+            }
         });
+
+        // Trigger notifications asynchronously
+        Promise.allSettled([
+            contactsController.sendContactNotificationEmail(newContact),
+            contactsController.sendTelegramNotification(newContact)
+        ]);
+        
         res.json({ success: true, message: 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất.' });
     } catch (e) {
         console.error(e);
@@ -61,6 +78,8 @@ router.get('/checkout/success/:orderCode', ordersController.renderSuccess);
 // Customer Pages
 const { ensureAuthenticated } = require('../middlewares/auth.middleware');
 router.use('/profile', profileRoutes);
+const wishlistRoutes = require('../modules/wishlist/wishlist.route');
+router.use('/wishlist', ensureAuthenticated, wishlistRoutes);
 router.get('/orders', ensureAuthenticated, ordersController.renderMyOrders);
 
 module.exports = router;

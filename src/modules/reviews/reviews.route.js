@@ -8,6 +8,9 @@ router.get('/', reviewsController.renderList);
 // [POST] /admin/reviews/approve/:id
 router.post('/approve/:id', reviewsController.approveReview);
 
+// [POST] /admin/reviews/toggle/:id
+router.post('/toggle/:id', reviewsController.toggleVisibility);
+
 // [DELETE] /admin/reviews/:id
 router.delete('/:id', reviewsController.deleteReview);
 

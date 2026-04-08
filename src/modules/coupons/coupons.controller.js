@@ -1,4 +1,5 @@
 const couponsService = require('./coupons.service');
+const db = require('../../config/db');
 
 /**
  * [GET] /admin/coupons
@@ -131,14 +132,53 @@ const applyCoupon = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Vui lòng nhập mã giảm giá' });
         }
 
-        const coupon = await couponsService.getCouponByCode(code.toUpperCase());
+        let coupon = await couponsService.getCouponByCode(code.toUpperCase());
         
+        let manualPromo = null;
         if (!coupon) {
-            return res.status(404).json({ success: false, message: 'Mã giảm giá không tồn tại' });
+            // Fallback: Try to find a manual PromotionCampaign with a name that slugifies to this code
+            const campaigns = await db.promotionCampaign.findMany({
+                where: { is_active: true, apply_type: 'manual' },
+            });
+            
+            const slugify = (text) => {
+                return text.toString().toLowerCase()
+                    .replace(/á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/g, 'a')
+                    .replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/g, 'e')
+                    .replace(/i|í|ì|ỉ|ĩ|ị/g, 'i')
+                    .replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/g, 'o')
+                    .replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/g, 'u')
+                    .replace(/ý|ỳ|ỷ|ỹ|ỵ/g, 'y')
+                    .replace(/đ/g, 'd')
+                    .replace(/\s+/g, '') // No spaces for code matching
+                    .replace(/[^\w-]+/g, '');
+            };
+
+            const searchCode = slugify(code);
+            manualPromo = campaigns.find(p => slugify(p.name) === searchCode);
         }
 
-        if (!coupon.is_active) {
-            return res.status(400).json({ success: false, message: 'Mã giảm giá đã bị tạm dừng' });
+        if (!coupon && !manualPromo) {
+            return res.status(404).json({ success: false, message: 'Mã giảm giá không chính xác hoặc đã hết hạn.' });
+        }
+
+        // If it's a promotion campaign instead of a coupon
+        if (manualPromo) {
+            // Calculate discount for promotion campaign manually here or reuse logic
+            // To keep it simple, we'll convert it to a pseudo-coupon object for the response
+            coupon = {
+                id: manualPromo.id,
+                code: manualPromo.name,
+                type: manualPromo.type,
+                value: manualPromo.value,
+                min_order_value: manualPromo.min_order_value,
+                max_discount_value: manualPromo.max_discount_value,
+                is_promo_campaign: true // Mark for frontend differentiate
+            };
+        } else {
+            if (!coupon.is_active) {
+                return res.status(400).json({ success: false, message: 'Mã giảm giá này hiện không khả dụng.' });
+            }
         }
 
         // Check date
@@ -187,9 +227,10 @@ const applyCoupon = async (req, res) => {
             coupon: {
                 id: coupon.id,
                 code: coupon.code,
-                discountAmount: Math.round(discountAmount)
+                discountAmount: Math.round(discountAmount),
+                isPromotion: coupon.is_promo_campaign || false
             },
-            message: 'Áp dụng mã giảm giá thành công'
+            message: coupon.is_promo_campaign ? 'Đã áp dụng ưu đãi!' : 'Áp dụng mã giảm giá thành công'
         });
 
     } catch (error) {

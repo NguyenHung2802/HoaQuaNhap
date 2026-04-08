@@ -11,111 +11,114 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   full_name     String
-  email         String   @unique
+  email         String    @unique
   phone         String?
   password_hash String
   avatar_url    String?
-  role          String   @default("customer") // admin, customer, editor
-  status        String   @default("active") // active, inactive, locked
+  role          String    @default("customer") // admin, customer, editor
+  status        String    @default("active") // active, inactive, locked
   last_login_at DateTime?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  blog_posts    BlogPost[]
-  customer      Customer?
-}
-
-model Category {
-  id            Int       @id @default(autoincrement())
-  name          String
-  slug          String    @unique
-  description   String?
-  image_url     String?
-  parent_id     Int?
-  sort_order    Int       @default(0)
-  is_active     Boolean   @default(true)
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
 
-  products      Product[]
-  promotions    PromotionCategory[]
+  blog_posts BlogPost[]
+  customer   Customer?
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  image_url   String?
+  parent_id   Int?
+  sort_order  Int      @default(0)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  products   Product[]
+  promotions PromotionCategory[]
 }
 
 model Product {
-  id                Int      @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   name              String
-  slug              String   @unique
-  sku               String   @unique
+  slug              String    @unique
+  sku               String    @unique
   short_description String?
   description       String?
   category_id       Int
   origin_country    String?
-  unit              String?  @default("kg") // kg, box, etc.
+  unit              String?   @default("kg") // kg, box, etc.
   weight_value      Float?
-  packing_type      String?  // thùng, hộp, túi
-  price             Decimal  @db.Decimal(10, 2)
-  sale_price        Decimal? @db.Decimal(10, 2)
-  cost_price        Decimal? @db.Decimal(10, 2)
-  stock_quantity    Int      @default(0)
-  min_stock_alert   Int      @default(5)
-  status            String   @default("published") // published, draft, out_of_stock
-  is_featured       Boolean  @default(false)
-  is_best_seller    Boolean  @default(false)
+  packing_type      String? // thùng, hộp, túi
+  price             Decimal   @db.Decimal(10, 2)
+  sale_price        Decimal?  @db.Decimal(10, 2)
+  cost_price        Decimal?  @db.Decimal(10, 2)
+  stock_quantity    Int       @default(0)
+  min_stock_alert   Int       @default(5)
+  status            String    @default("published") // published, draft, out_of_stock
+  is_featured       Boolean   @default(false)
+  is_best_seller    Boolean   @default(false)
+  nutritional_info  String?   @db.Text
   published_at      DateTime?
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
 
-  category          Category @relation(fields: [category_id], references: [id])
-  images            ProductImage[]
-  tags              ProductTag[]
-  cart_items        CartItem[]
-  order_items       OrderItem[]
-  inventory_logs    InventoryLog[]
-  reviews           Review[]
-  promotions        PromotionProduct[]
+  category       Category           @relation(fields: [category_id], references: [id])
+  images         ProductImage[]
+  tags           ProductTag[]
+  cart_items     CartItem[]
+  order_items    OrderItem[]
+  inventory_logs InventoryLog[]
+  reviews        Review[]
+  promotions     PromotionProduct[]
+  wishlist       Wishlist[]
 }
 
 model ProductImage {
   id           Int      @id @default(autoincrement())
   product_id   Int
   image_url    String
-  public_id    String?  // From Cloudinary
+  public_id    String? // From Cloudinary
   alt_text     String?
   sort_order   Int      @default(0)
   is_thumbnail Boolean  @default(false)
   created_at   DateTime @default(now())
 
-  product      Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model ProductTag {
-  id         Int     @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   product_id Int
   tag_name   String
 
-  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model Customer {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   full_name    String
-  phone        String   @unique
-  email        String?  @unique
+  phone        String    @unique
+  email        String?   @unique
   gender       String?
   birthday     DateTime?
   note         String?
-  total_orders Int      @default(0)
-  total_spent  Decimal  @default(0) @db.Decimal(12, 2)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  total_orders Int       @default(0)
+  total_spent  Decimal   @default(0) @db.Decimal(12, 2)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 
-  user_id      Int?     @unique
-  user         User?    @relation(fields: [user_id], references: [id])
-  addresses    CustomerAddress[]
-  carts        Cart[]
-  orders       Order[]
+  user_id   Int?              @unique
+  user      User?             @relation(fields: [user_id], references: [id])
+  addresses CustomerAddress[]
+  carts     Cart[]
+  orders    Order[]
+  wishlist  Wishlist[]
 }
 
 model CustomerAddress {
@@ -131,7 +134,7 @@ model CustomerAddress {
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
-  customer       Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
 }
 
 model Cart {
@@ -142,8 +145,8 @@ model Cart {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  customer    Customer? @relation(fields: [customer_id], references: [id])
-  items       CartItem[]
+  customer Customer?  @relation(fields: [customer_id], references: [id])
+  items    CartItem[]
 }
 
 model CartItem {
@@ -155,42 +158,42 @@ model CartItem {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  cart       Cart     @relation(fields: [cart_id], references: [id], onDelete: Cascade)
-  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  cart    Cart    @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model Order {
-  id               Int      @id @default(autoincrement())
-  order_code       String   @unique
-  customer_id      Int?
-  customer_name    String
-  customer_phone   String
-  customer_email   String?
-  receiver_name    String
-  receiver_phone   String
-  delivery_address String
-  province         String
-  district         String
-  ward             String
-  note             String?
-  subtotal_amount  Decimal  @db.Decimal(12, 2)
-  shipping_fee     Decimal  @default(0) @db.Decimal(12, 2)
-  shipping_discount_amount Decimal @default(0) @db.Decimal(12, 2)
-  discount_amount  Decimal  @default(0) @db.Decimal(12, 2)
-  total_amount     Decimal  @db.Decimal(12, 2)
-  payment_method   String   @default("COD")
-  payment_status   String   @default("pending") // pending, paid, failed, refunded
-  order_status     String   @default("pending") // pending, confirmed, processing, shipping, completed, cancelled
-  promotion_id     Int?
-  shipping_campaign_id Int?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id                       Int      @id @default(autoincrement())
+  order_code               String   @unique
+  customer_id              Int?
+  customer_name            String
+  customer_phone           String
+  customer_email           String?
+  receiver_name            String
+  receiver_phone           String
+  delivery_address         String
+  province                 String
+  district                 String
+  ward                     String
+  note                     String?
+  subtotal_amount          Decimal  @db.Decimal(12, 2)
+  shipping_fee             Decimal  @default(0) @db.Decimal(12, 2)
+  shipping_discount_amount Decimal  @default(0) @db.Decimal(12, 2)
+  discount_amount          Decimal  @default(0) @db.Decimal(12, 2)
+  total_amount             Decimal  @db.Decimal(12, 2)
+  payment_method           String   @default("COD")
+  payment_status           String   @default("pending") // pending, paid, failed, refunded
+  order_status             String   @default("pending") // pending, confirmed, processing, shipping, completed, cancelled
+  promotion_id             Int?
+  shipping_campaign_id     Int?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
 
-  customer         Customer? @relation(fields: [customer_id], references: [id])
-  promotion        PromotionCampaign? @relation(fields: [promotion_id], references: [id])
-  shipping_campaign ShippingCampaign? @relation(fields: [shipping_campaign_id], references: [id])
-  items            OrderItem[]
-  status_logs      OrderStatusLog[]
+  customer          Customer?          @relation(fields: [customer_id], references: [id])
+  promotion         PromotionCampaign? @relation(fields: [promotion_id], references: [id])
+  shipping_campaign ShippingCampaign?  @relation(fields: [shipping_campaign_id], references: [id])
+  items             OrderItem[]
+  status_logs       OrderStatusLog[]
 }
 
 model OrderItem {
@@ -203,8 +206,8 @@ model OrderItem {
   quantity              Int
   line_total            Decimal @db.Decimal(12, 2)
 
-  order                 Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
-  product               Product @relation(fields: [product_id], references: [id])
+  order   Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id])
 }
 
 model OrderStatusLog {
@@ -216,23 +219,23 @@ model OrderStatusLog {
   changed_by String   @default("system")
   changed_at DateTime @default(now())
 
-  order      Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
 }
 
 model InventoryLog {
   id              Int      @id @default(autoincrement())
   product_id      Int
-  type            String   // import, export, adjust, order_sub, order_add
+  type            String // import, export, adjust, order_sub, order_add
   quantity        Int
   before_quantity Int
   after_quantity  Int
-  reference_type  String?  // order, manual
-  reference_id    Int?     // order_id or other ref
+  reference_type  String? // order, manual
+  reference_id    Int? // order_id or other ref
   note            String?
   created_by      String   @default("admin")
   created_at      DateTime @default(now())
 
-  product         Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model Banner {
@@ -260,7 +263,7 @@ model BlogPost {
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
 
-  author        User      @relation(fields: [author_id], references: [id])
+  author User @relation(fields: [author_id], references: [id])
 }
 
 model Review {
@@ -272,21 +275,21 @@ model Review {
   is_approved   Boolean  @default(false)
   created_at    DateTime @default(now())
 
-  product       Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model Coupon {
-  id                  Int      @id @default(autoincrement())
-  code                String   @unique
-  type                String   // percent, amount
-  value               Decimal  @db.Decimal(10, 2)
-  min_order_value     Decimal? @db.Decimal(12, 2)
-  max_discount_value  Decimal? @db.Decimal(12, 2)
-  usage_limit         Int?
-  used_count          Int      @default(0)
-  start_at            DateTime?
-  end_at              DateTime?
-  is_active           Boolean  @default(true)
+  id                 Int       @id @default(autoincrement())
+  code               String    @unique
+  type               String // percent, amount
+  value              Decimal   @db.Decimal(10, 2)
+  min_order_value    Decimal?  @db.Decimal(12, 2)
+  max_discount_value Decimal?  @db.Decimal(12, 2)
+  usage_limit        Int?
+  used_count         Int       @default(0)
+  start_at           DateTime?
+  end_at             DateTime?
+  is_active          Boolean   @default(true)
 }
 
 model Setting {
@@ -298,26 +301,26 @@ model Setting {
 }
 
 model PromotionCampaign {
-  id                  Int      @id @default(autoincrement())
-  name                String
-  description         String?
-  type                String   // percent, amount
-  value               Decimal  @db.Decimal(10, 2)
-  min_order_value     Decimal? @db.Decimal(12, 2)
-  max_discount_value  Decimal? @db.Decimal(12, 2)
-  
-  apply_type          String   @default("auto") // auto (system pick), manual (user choose)
-  target_type         String   @default("all") // all, category, product
-  
-  start_at            DateTime?
-  end_at              DateTime?
-  is_active           Boolean  @default(true)
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  id                 Int      @id @default(autoincrement())
+  name               String
+  description        String?
+  type               String // percent, amount
+  value              Decimal  @db.Decimal(10, 2)
+  min_order_value    Decimal? @db.Decimal(12, 2)
+  max_discount_value Decimal? @db.Decimal(12, 2)
 
-  categories          PromotionCategory[]
-  products            PromotionProduct[]
-  orders              Order[]
+  apply_type  String @default("auto") // auto (system pick), manual (user choose)
+  target_type String @default("all") // all, category, product
+
+  start_at   DateTime?
+  end_at     DateTime?
+  is_active  Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  categories PromotionCategory[]
+  products   PromotionProduct[]
+  orders     Order[]
 }
 
 model PromotionCategory {
@@ -325,6 +328,7 @@ model PromotionCategory {
   category_id  Int
   promotion    PromotionCampaign @relation(fields: [promotion_id], references: [id], onDelete: Cascade)
   category     Category          @relation(fields: [category_id], references: [id], onDelete: Cascade)
+
   @@id([promotion_id, category_id])
 }
 
@@ -333,33 +337,48 @@ model PromotionProduct {
   product_id   Int
   promotion    PromotionCampaign @relation(fields: [promotion_id], references: [id], onDelete: Cascade)
   product      Product           @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
   @@id([promotion_id, product_id])
 }
 
 model ShippingCampaign {
-  id                  Int      @id @default(autoincrement())
-  name                String
-  description         String?
-  type                String   // percent, amount
-  value               Decimal  @db.Decimal(10, 2)
-  min_order_value     Decimal? @db.Decimal(12, 2)
-  max_discount_value  Decimal? @db.Decimal(12, 2)
-  
-  start_at            DateTime?
-  end_at              DateTime?
-  is_active           Boolean  @default(true)
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  id                 Int      @id @default(autoincrement())
+  name               String
+  description        String?
+  type               String // percent, amount
+  value              Decimal  @db.Decimal(10, 2)
+  min_order_value    Decimal? @db.Decimal(12, 2)
+  max_discount_value Decimal? @db.Decimal(12, 2)
 
-  orders              Order[]
+  start_at   DateTime?
+  end_at     DateTime?
+  is_active  Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  orders Order[]
 }
 
-model ContactMessage {
+model ContactRequest {
   id         Int      @id @default(autoincrement())
   name       String
   phone      String
-  email      String?
-  content    String   @db.Text
-  is_read    Boolean  @default(false)
+  need       String // Gợi ý nhu cầu mua
+  email      String? // Optional
+  note       String?  @db.Text
+  status     String   @default("new") // new, processing, resolved
+  source_url String?
   created_at DateTime @default(now())
+}
+
+model Wishlist {
+  id          Int      @id @default(autoincrement())
+  customer_id Int
+  product_id  Int
+  created_at  DateTime @default(now())
+
+  customer Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([customer_id, product_id])
 }

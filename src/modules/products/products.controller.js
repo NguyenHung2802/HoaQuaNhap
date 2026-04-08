@@ -185,6 +185,34 @@ const duplicate = async (req, res, next) => {
     }
 };
 
+/**
+ * [GET] /admin/products/sku-suggest?name=...
+ */
+const getSkuSuggest = async (req, res, next) => {
+    try {
+        const { name } = req.query;
+        if (!name) return res.json({ sku: '' });
+        const sku = await productsService.getUniqueSkuSuggest(name);
+        res.json({ sku });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+/**
+ * [GET] /admin/products/slug-suggest?name=...
+ */
+const getSlugSuggest = async (req, res, next) => {
+    try {
+        const { name } = req.query;
+        if (!name) return res.json({ slug: '' });
+        const slug = await productsService.getUniqueSlugSuggest(name);
+        res.json({ slug });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     renderList,
     renderCreateForm,
@@ -192,5 +220,7 @@ module.exports = {
     renderEditForm,
     update,
     deleteProduct,
-    duplicate
+    duplicate,
+    getSkuSuggest,
+    getSlugSuggest
 };

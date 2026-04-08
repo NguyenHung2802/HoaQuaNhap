@@ -25,14 +25,14 @@
                     <div class="mb-3">
                         <label for="name" class="form-label fw-bold">Tên sản phẩm <span class="text-danger">*</span></label>
                         <input type="text" class="form-control form-control-lg" id="name" name="name" 
-                               placeholder="Ví dụ: Nho mẫu đơn Hàn Quốc" required onkeyup="generateSlug()">
+                               placeholder="Ví dụ: Nho mẫu đơn Hàn Quốc" required onkeyup="generateSlug(); syncSku();">
                     </div>
 
                     <div class="mb-3">
                         <label for="slug" class="form-label fw-bold">Slug (Đường dẫn thân thiện) <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <span class="input-group-text bg-light text-muted small">/products/</span>
-                            <input type="text" class="form-control" id="slug" name="slug" placeholder="nho-mau-don-han-quoc" required>
+                            <input type="text" class="form-control" id="slug" name="slug" placeholder="nho-mau-don-han-quoc" required data-auto="true">
                             <button class="btn btn-outline-secondary" type="button" onclick="generateSlug()">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
@@ -44,9 +44,14 @@
                         <textarea class="form-control" id="short_description" name="short_description" rows="2" placeholder="Hiển thị nhanh ở trang danh sách..."></textarea>
                     </div>
 
-                    <div class="mb-0">
+                    <div class="mb-3">
                         <label for="description" class="form-label fw-bold">Mô tả chi tiết</label>
-                        <textarea class="form-control" id="description" name="description" rows="6" placeholder="Thông tin chi tiết về sản phẩm..."></textarea>
+                        <textarea class="form-control" id="description" name="description" rows="5" placeholder="Thông tin chi tiết về sản phẩm..."></textarea>
+                    </div>
+
+                    <div class="mb-0">
+                        <label for="nutritional_info" class="form-label fw-bold">Thông tin dinh dưỡng</label>
+                        <textarea class="form-control" id="nutritional_info" name="nutritional_info" rows="5" placeholder="Giá trị dinh dưỡng, vitamin..."></textarea>
                     </div>
                 </div>
             </div>
@@ -79,7 +84,7 @@
                         </div>
                         <div class="col-md-4">
                             <label for="sku" class="form-label fw-bold">Mã SKU <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="sku" name="sku" placeholder="NHO-HAN-001" required>
+                            <input type="text" class="form-control" id="sku" name="sku" placeholder="NHO-HAN-001" required data-auto="true">
                         </div>
                     </div>
                 </div>
@@ -215,13 +220,27 @@
 
 <script src="/js/slug-generator.js"></script>
 <script>
-    function generateSlug() {
+    async function generateSlug() {
         const name = document.getElementById('name').value;
         const slugInput = document.getElementById('slug');
-        if (typeof slugifyVietnamese === 'function') {
-            slugInput.value = slugifyVietnamese(name);
+        if (!name) return;
+
+        try {
+            const res = await fetch(`/admin/products/slug-suggest?name=${encodeURIComponent(name)}`);
+            const data = await res.json();
+            if (data.slug && (slugInput.value === '' || slugInput.dataset.auto === 'true')) {
+                slugInput.value = data.slug;
+                slugInput.dataset.auto = 'true';
+            }
+        } catch (err) {
+            console.error('Slug suggest error:', err);
         }
     }
+
+    // Mark Slug as manually edited if user types in it
+    document.getElementById('slug').addEventListener('input', function() {
+        this.dataset.auto = 'false';
+    });
 
     const dataTransfer = new DataTransfer();
 
@@ -269,4 +288,31 @@
         document.getElementById('images-input').files = dataTransfer.files;
         renderPreviews();
     }
+
+    // SKU Suggest Logic
+    let skuTimeout = null;
+    function syncSku() {
+        const name = document.getElementById('name').value;
+        const skuInput = document.getElementById('sku');
+        
+        clearTimeout(skuTimeout);
+        skuTimeout = setTimeout(async () => {
+            if (!name) return;
+            try {
+                const res = await fetch(`/admin/products/sku-suggest?name=${encodeURIComponent(name)}`);
+                const data = await res.json();
+                if (data.sku && (skuInput.value === '' || skuInput.dataset.auto === 'true')) {
+                    skuInput.value = data.sku;
+                    skuInput.dataset.auto = 'true';
+                }
+            } catch (err) {
+                console.error('SKU suggest error:', err);
+            }
+        }, 500);
+    }
+
+    // Mark SKU as manually edited if user types in it
+    document.getElementById('sku').addEventListener('input', function() {
+        this.dataset.auto = 'false';
+    });
 </script>

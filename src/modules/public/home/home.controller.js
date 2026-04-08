@@ -1,4 +1,5 @@
 const db = require('../../../config/db');
+const { getActivePromotions, calculateBestPrice } = require('../../../utils/promotion-helper');
 
 /**
  * Hiển thị trang chủ - Phase 4 Version
@@ -44,11 +45,17 @@ exports.renderHome = async (req, res, next) => {
       take: 3
     });
 
+    const activePromotions = await getActivePromotions();
+    const mapWithBestPrice = (p) => ({
+      ...p,
+      ...calculateBestPrice(p, activePromotions)
+    });
+
     res.render('public/home/index', {
       title: 'Trang chủ',
       metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại WebHoaQua — Tươi ngon, đảm bảo chất lượng, giao hàng tận nơi.',
-      featuredProducts,
-      bestSellers,
+      featuredProducts: featuredProducts.map(mapWithBestPrice),
+      bestSellers: bestSellers.map(mapWithBestPrice),
       categories,
       banners,
       latestBlogs,

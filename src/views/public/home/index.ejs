@@ -123,16 +123,19 @@
                                 <% } else if (p.is_featured) { %>
                                     <span class="fruit-tag new">Nổi bật ✨</span>
                                 <% } %>
+                                <% if (p.discountPercent > 0) { %>
+                                    <span class="fruit-tag discount">-<%= p.discountPercent %>%</span>
+                                <% } %>
                             </div>
                             <div class="fruit-card-body">
                                 <h5 class="fruit-card-name"><%= p.name %></h5>
                                 <div class="fruit-card-price-wrap">
                                     <span class="price-main">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.sale_price || p.price) %>
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.bestPrice) %>
                                     </span>
-                                    <% if (p.sale_price) { %>
+                                    <% if (p.isDiscounted) { %>
                                         <span class="price-old">
-                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price) %>
+                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.originalPrice) %>
                                         </span>
                                     <% } %>
                                 </div>
@@ -407,6 +410,7 @@
 }
 .fruit-tag.hot { background: #fee2e2; color: #dc2626; }
 .fruit-tag.new { background: #e0f2fe; color: #0369a1; }
+.fruit-tag.discount { background: var(--brand-accent); color: #fff; top: 12px; right: 12px; left: auto; }
 .fruit-card-body { padding: 16px; }
 .fruit-card-name {
     font-family: var(--font-heading);

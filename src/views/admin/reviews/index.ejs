@@ -52,18 +52,16 @@
                                 </td>
                                 <td id="status-<%= review.id %>">
                                     <% if (review.is_approved) { %>
-                                        <span class="badge bg-success bg-opacity-10 text-success border-0 px-3 py-1">Đã duyệt</span>
+                                        <span class="badge bg-success bg-opacity-10 text-success border-0 px-3 py-1">Đang hiển thị</span>
                                     <% } else { %>
-                                        <span class="badge bg-warning bg-opacity-10 text-warning border-0 px-3 py-1">Chờ duyệt</span>
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border-0 px-3 py-1">Đã ẩn</span>
                                     <% } %>
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group">
-                                        <% if (!review.is_approved) { %>
-                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="approveReview(<%= review.id %>)" title="Duyệt">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        <% } %>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleVisibility(<%= review.id %>)" id="toggle-btn-<%= review.id %>" title="<%= review.is_approved ? 'Ẩn đánh giá' : 'Hiện đánh giá' %>">
+                                            <i class="fas <%= review.is_approved ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                                        </button>
                                         <button type="button" class="btn btn-sm btn-outline-danger ms-1" onclick="deleteReview(<%= review.id %>)" title="Xóa">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -105,23 +103,30 @@
 </div>
 
 <script>
-    async function approveReview(id) {
-        if (confirm('Duyệt đánh giá này để hiển thị trên website?')) {
-            try {
-                const response = await fetch(`/admin/reviews/approve/${id}`, { method: 'POST' });
-                const result = await response.json();
-                if (result.success) {
-                    const statusTd = document.getElementById(`status-${id}`);
-                    statusTd.innerHTML = '<span class="badge bg-success bg-opacity-10 text-success border-0 px-3 py-1">Đã duyệt</span>';
-                    const approveBtn = document.querySelector(`button[onclick="approveReview(${id})"]`);
-                    if (approveBtn) approveBtn.remove();
+    async function toggleVisibility(id) {
+        try {
+            const response = await fetch(`/admin/reviews/toggle/${id}`, { method: 'POST' });
+            const result = await response.json();
+            if (result.success) {
+                const statusTd = document.getElementById(`status-${id}`);
+                const btn = document.getElementById(`toggle-btn-${id}`);
+                const isNowVisible = statusTd.innerText.includes('Đã ẩn'); // If it was hidden, it is now visible
+                
+                if (isNowVisible) {
+                    statusTd.innerHTML = '<span class="badge bg-success bg-opacity-10 text-success border-0 px-3 py-1">Đang hiển thị</span>';
+                    btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    btn.title = 'Ẩn đánh giá';
                 } else {
-                    alert('Lỗi: ' + result.message);
+                    statusTd.innerHTML = '<span class="badge bg-danger bg-opacity-10 text-danger border-0 px-3 py-1">Đã ẩn</span>';
+                    btn.innerHTML = '<i class="fas fa-eye"></i>';
+                    btn.title = 'Hiện đánh giá';
                 }
-            } catch (error) {
-                console.error('Approve error', error);
-                alert('Có lỗi xảy ra!');
+            } else {
+                alert('Lỗi: ' + result.message);
             }
+        } catch (error) {
+            console.error('Toggle visibility error', error);
+            alert('Có lỗi xảy ra!');
         }
     }
 
@@ -131,7 +136,8 @@
                 const response = await fetch(`/admin/reviews/${id}`, { method: 'DELETE' });
                 const result = await response.json();
                 if (result.success) {
-                    document.getElementById(`review-row-${id}`).remove();
+                    const row = document.getElementById(`review-row-${id}`);
+                    if (row) row.remove();
                 } else {
                     alert('Lỗi: ' + result.message);
                 }

@@ -64,7 +64,7 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 ### 2.8. Nội dung & Truyền thông (Giai đoạn 7)
 - [x] Banner Management (S30 — Slider dynamic)
 - [x] Blog / News Management (S31 — Quill Editor, Public list/detail)
-- [x] Product Reviews (S32 — Approval logic, Public submit stars)
+- [x] Product Reviews (S32 — Default visibility 100%, Admin Hide/Show toggle, User info pre-fill)
 - [x] Static Pages (S33 — FAQ, Policies, About, Settings model)
 
 ### 2.9. Tối ưu & Nâng cao (Giai đoạn 8)

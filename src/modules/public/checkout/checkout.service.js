@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const { calculateBestPrice, getActivePromotions } = require('../../../utils/promotion-helper');
 
 /**
  * Generate unique order code: WHQ-YYMMDD-XXXX
@@ -24,29 +25,20 @@ const processOrder = async (orderData, sessionCart, userId) => {
             where: { id: { in: productIds } }
         });
 
+        // 1.1 Restriction: Only Hà Nội
+        const province = (orderData.province || '').toLowerCase();
+        if (!province.includes('hà nội')) {
+            throw new Error('Hiện tại hệ thống chỉ hỗ trợ giao hàng tại khu vực Hà Nội. Vui lòng chọn địa chỉ tại Hà nội để tiếp tục.');
+        }
+
         // 1.1 Re-evaluate Coupon if provided
         let couponDiscountAmount = 0;
         let appliedCoupon = null;
-        if (orderData.coupon_code) {
-            const coupon = await tx.coupon.findUnique({
-                where: { code: orderData.coupon_code.toUpperCase() }
-            });
-
-            if (coupon && coupon.is_active) {
-                const now = new Date();
-                const isStarted = !coupon.start_at || new Date(coupon.start_at) <= now;
-                const isNotExpired = !coupon.end_at || new Date(coupon.end_at) >= now;
-                const hasUsage = !coupon.usage_limit || coupon.used_count < coupon.usage_limit;
-
-                if (isStarted && isNotExpired && hasUsage) {
-                    appliedCoupon = coupon;
-                }
-            }
-        }
-
         // 1.2 Re-evaluate Promotion if provided
         let promotionDiscountAmount = 0;
         let appliedPromotion = null;
+        
+        // If promotion_id is passed (selection by radio button)
         if (orderData.promotion_id) {
             const promo = await tx.promotionCampaign.findUnique({
                 where: { id: parseInt(orderData.promotion_id) },
@@ -63,10 +55,64 @@ const processOrder = async (orderData, sessionCart, userId) => {
                 }
             }
         }
+        
+        // --- Try to find coupon or campaign by input code ---
+        if (orderData.coupon_code) {
+            const code = orderData.coupon_code;
+            const coupon = await tx.coupon.findUnique({
+                where: { code: code.toUpperCase() }
+            });
+
+            if (coupon && coupon.is_active) {
+                const now = new Date();
+                const isStarted = !coupon.start_at || new Date(coupon.start_at) <= now;
+                const isNotExpired = !coupon.end_at || new Date(coupon.end_at) >= now;
+                const hasUsage = !coupon.usage_limit || coupon.used_count < coupon.usage_limit;
+
+                if (isStarted && isNotExpired && hasUsage) {
+                    appliedCoupon = coupon;
+                }
+            }
+            
+            // If it wasn't a coupon, maybe it was a promotion name?
+            if (!appliedCoupon) {
+                const campaigns = await tx.promotionCampaign.findMany({
+                    where: { is_active: true, apply_type: 'manual' },
+                    include: { categories: true, products: true }
+                });
+                
+                const slugify = (text) => {
+                    return text.toString().toLowerCase()
+                        .replace(/á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/g, 'a')
+                        .replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/g, 'e')
+                        .replace(/i|í|ì|ỉ|ĩ|ị/g, 'i')
+                        .replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/g, 'o')
+                        .replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/g, 'u')
+                        .replace(/ý|ỳ|ỷ|ỹ|ỵ/g, 'y')
+                        .replace(/đ/g, 'd')
+                        .replace(/\s+/g, '')
+                        .replace(/[^\w-]+/g, '');
+                };
+
+                const searchCode = slugify(code);
+                const foundPromo = campaigns.find(p => slugify(p.name) === searchCode);
+                
+                // If it matched a campaign name AND no campaign was already selected by radio buttons
+                if (foundPromo && !appliedPromotion) {
+                    const now = new Date();
+                    const isStarted = !foundPromo.start_at || new Date(foundPromo.start_at) <= now;
+                    const isNotExpired = !foundPromo.end_at || new Date(foundPromo.end_at) >= now;
+                    if (isStarted && isNotExpired) {
+                        appliedPromotion = foundPromo;
+                    }
+                }
+            }
+        }
 
         const orderItemsParams = [];
         let subtotalAmount = 0;
         let promoEligibleAmount = 0;
+        const activePromotions = await getActivePromotions();
 
         for (const cartItem of sessionCart) {
             const product = products.find(p => p.id === parseInt(cartItem.product_id));
@@ -74,7 +120,8 @@ const processOrder = async (orderData, sessionCart, userId) => {
             if (product.status !== 'published') throw new Error(`Sản phẩm ${product.name} đang ngừng bán.`);
             if (product.stock_quantity < cartItem.quantity) throw new Error(`Sản phẩm ${product.name} không đủ tồn kho.`);
 
-            const activePrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.price);
+            const pricing = calculateBestPrice(product, activePromotions);
+            const activePrice = pricing.bestPrice;
             const lineTotal = activePrice * cartItem.quantity;
             subtotalAmount += lineTotal;
 
@@ -224,15 +271,18 @@ const processOrder = async (orderData, sessionCart, userId) => {
                 payment_method: orderData.payment_method || 'COD',
                 payment_status: 'pending',
                 order_status: 'pending',
-                promotion_id: appliedPromotion ? appliedPromotion.id : (appliedCoupon ? appliedCoupon.id : null),
+                // ONLY set promotion_id if it's a PromotionCampaign. 
+                // Coupons don't have a direct relation in current Order model, they are tracked via discount amount and notes.
+                promotion_id: appliedPromotion ? appliedPromotion.id : null, 
                 shipping_campaign_id: appliedShippingPromo ? appliedShippingPromo.id : null,
                 items: { create: orderItemsParams },
                 status_logs: {
                     create: {
                         new_status: 'pending',
                         note: 'Khách đặt đơn.' + 
-                              (appliedCoupon ? ` Voucher: ${appliedCoupon.code}.` : '') + 
-                              (appliedShippingPromo ? ` KM Vận chuyển: ${appliedShippingPromo.name}.` : ''),
+                               (appliedCoupon ? ` Voucher (Coupon): ${appliedCoupon.code}.` : '') + 
+                               (appliedPromotion ? ` Ưu đãi (Promo): ${appliedPromotion.name}.` : '') +
+                               (appliedShippingPromo ? ` KM Vận chuyển: ${appliedShippingPromo.name}.` : ''),
                         changed_by: 'system'
                     }
                 }

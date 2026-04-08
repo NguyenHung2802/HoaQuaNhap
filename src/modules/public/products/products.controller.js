@@ -1,4 +1,5 @@
 const db = require('../../../config/db');
+const { getActivePromotions, calculateBestPrice } = require('../../../utils/promotion-helper');
 
 /**
  * [GET] /products - Shop listing page
@@ -77,11 +78,17 @@ exports.renderShop = async (req, res, next) => {
                 where: { origin_country: { not: null }, status: 'published' }
             })
         ]);
+        
+        const activePromotions = await getActivePromotions();
+        const productsWithBestPrice = products.map(p => ({
+            ...p,
+            ...calculateBestPrice(p, activePromotions)
+        }));
 
         res.render('public/products/shop', {
             title: q ? `Tìm kiếm: "${q}"` : (category ? `Danh mục: ${category}` : 'Tất cả sản phẩm'),
             metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại WebHoaQua.',
-            products,
+            products: productsWithBestPrice,
             total,
             totalPages: Math.ceil(total / limit),
             currentPage: parseInt(page),
@@ -147,34 +154,44 @@ exports.renderDetail = async (req, res, next) => {
 
         const baseUrl = `${req.protocol}://${req.get('host')}`;
 
-        // Fetch active promotions for this product
-        const now = new Date();
-        const productPromotions = await db.promotionCampaign.findMany({
-            where: {
-                is_active: true,
-                AND: [
-                    { OR: [{ start_at: null }, { start_at: { lte: now } }] },
-                    { OR: [{ end_at: null }, { end_at: { gte: now } }] }
-                ],
-                OR: [
-                    { target_type: 'all' },
-                    { 
-                        target_type: 'category',
-                        categories: { some: { category_id: product.category_id } }
-                    },
-                    {
-                        target_type: 'product',
-                        products: { some: { product_id: product.id } }
-                    }
-                ]
-            }
+        const activePromotions = await getActivePromotions();
+        const bestPriceData = calculateBestPrice(product, activePromotions);
+
+        // Fetch promotion campaigns that apply directly (for display/list)
+        const productPromotions = activePromotions.filter(promo => {
+            if (promo.target_type === 'all') return true;
+            if (promo.target_type === 'category' && promo.categories.some(c => c.category_id === product.category_id)) return true;
+            if (promo.target_type === 'product' && promo.products.some(p => p.product_id === product.id)) return true;
+            return false;
         });
+
+        let isWishlisted = false;
+        if (req.session.user) {
+            const customer = await db.customer.findUnique({ where: { user_id: req.session.user.id } });
+            if (customer) {
+                const wishItem = await db.wishlist.findUnique({
+                    where: {
+                        customer_id_product_id: {
+                            customer_id: customer.id,
+                            product_id: product.id
+                        }
+                    }
+                });
+                isWishlisted = !!wishItem;
+            }
+        }
+
+        // Convert to plain object to ensure all fields (including description, nutritional_info) are accessible in the view
+        const productPlain = JSON.parse(JSON.stringify(product));
 
         res.render('public/products/detail', {
             title: product.name,
             metaDesc: product.short_description || `Mua ${product.name} tươi ngon tại WebHoaQua`,
-            product,
-            relatedProducts,
+            product: { ...productPlain, ...bestPriceData, isWishlisted },
+            relatedProducts: relatedProducts.map(p => ({
+                ...p,
+                ...calculateBestPrice(p, activePromotions)
+            })),
             productPromotions,
             baseUrl,
             layout: 'layouts/main'
@@ -201,13 +218,13 @@ exports.submitReview = async (req, res, next) => {
                 customer_name,
                 rating: parseInt(rating),
                 content,
-                is_approved: false // Requirement: admin must approve
+                is_approved: true // 100% visible immediately by default
             }
         });
 
         res.json({ 
             success: true, 
-            message: 'Cảm ơn bạn đã đánh giá! Phản hồi của bạn đang được duyệt và sẽ sớm hiển thị.' 
+            message: 'Cảm ơn bạn đã đánh giá sản phẩm!' 
         });
     } catch (error) {
         console.error('Submit review error:', error);

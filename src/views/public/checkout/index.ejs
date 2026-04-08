@@ -179,7 +179,17 @@
                                             </div>
                                             <div class="flex-grow-1 min-width-0">
                                                 <div class="small fw-bold text-truncate text-uppercase"><%= promo.name %></div>
-                                                <div class="x-small text-muted fw-bold">GIẢM <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.estimatedDiscount) %></div>
+                                                <div class="x-small text-muted fw-bold">
+                                                    <% if (promo.type === 'percent') { %>
+                                                        GIẢM <%= promo.value %>%
+                                                        <% if (promo.max_discount_value) { %> 
+                                                            (Tối đa <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.max_discount_value) %>)
+                                                        <% } %>
+                                                    <% } else { %>
+                                                        GIẢM <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.value) %>
+                                                    <% } %>
+                                                    - Lợi ích: <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promo.estimatedDiscount) %>
+                                                </div>
                                             </div>
                                             <div class="campaign-check">
                                                 <input type="radio" name="selected_promotion" value="<%= promo.id %>" class="form-check-input" id="promo-<%= promo.id %>">
@@ -234,6 +244,12 @@
                                 <button class="btn btn-outline-primary px-3 fw-bold" type="button" id="applyCouponBtn">Áp dụng</button>
                             </div>
                             <div id="couponMessage" class="small mt-2" style="display: none;"></div>
+                            <div id="activeCouponDiv" class="mt-2 bg-light p-2 rounded border border-success d-none">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="small fw-bold text-success"><i class="fas fa-ticket-alt"></i> <span id="appliedCouponText"></span></span>
+                                    <button type="button" class="btn btn-sm text-danger p-0" onclick="removeCoupon()"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
                             
                             <!-- Hidden inputs for form submission -->
                             <input type="hidden" name="coupon_code" id="hiddenCouponCode">
@@ -534,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Assign updateShipping to onAddressChange
-    addrHelper.options.onAddressChange = function() {
+    addrHelper.onAddressChange = function() {
         updateDeliveryAddress();
         updateShipping();
     }
@@ -544,6 +560,14 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDeliveryAddress();
         updateShipping();
     }, 1000);
+
+    // Handle Enter key on coupon input
+    couponCodeInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            applyCouponBtn.click();
+        }
+    });
 
     applyCouponBtn.addEventListener('click', async () => {
         const code = couponCodeInput.value.trim();
@@ -564,6 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 couponMessage.innerHTML = '<i class="fas fa-check-circle me-1"></i>' + data.message;
                 
                 appliedCouponText.innerText = data.coupon.code;
+                document.getElementById('activeCouponDiv').classList.remove('d-none');
                 
                 // Update hidden inputs
                 hiddenCouponCode.value = data.coupon.code;
@@ -571,6 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 couponCodeInput.classList.add('is-valid');
                 couponCodeInput.classList.remove('is-invalid');
+                couponCodeInput.value = ''; // Clear input on success
             } else {
                 couponDiscount = 0;
                 couponMessage.style.display = 'block';
@@ -579,6 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 hiddenCouponCode.value = '';
                 hiddenDiscountAmount.value = 0;
+                document.getElementById('activeCouponDiv').classList.add('d-none');
                 
                 couponCodeInput.classList.add('is-invalid');
                 couponCodeInput.classList.remove('is-valid');
@@ -592,5 +619,15 @@ document.addEventListener('DOMContentLoaded', function() {
             applyCouponBtn.innerText = 'Áp dụng';
         }
     });
+
+    window.removeCoupon = function() {
+        couponDiscount = 0;
+        hiddenCouponCode.value = '';
+        hiddenDiscountAmount.value = 0;
+        document.getElementById('activeCouponDiv').classList.add('d-none');
+        couponMessage.style.display = 'none';
+        couponCodeInput.classList.remove('is-valid');
+        updateFinalTotal();
+    };
 });
 </script>

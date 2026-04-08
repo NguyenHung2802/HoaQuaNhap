@@ -50,11 +50,17 @@ exports.renderSuccess = async (req, res) => {
         settings.forEach(s => bankConfig[s.key] = s.value);
 
         let qrUrl = null;
+        let bankDisplayName = 'Ngân hàng (VietinBank)';
+        
         if (order.payment_method === 'BANK_TRANSFER' && bankConfig.bank_id && bankConfig.bank_account_no) {
             const amount = parseInt(order.total_amount);
             const addInfo = encodeURIComponent(order.order_code);
             const accountName = encodeURIComponent(bankConfig.bank_account_name || 'WEBHOAQUA');
             qrUrl = `https://img.vietqr.io/image/${bankConfig.bank_id}-${bankConfig.bank_account_no}-compact.png?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`;
+            
+            // Map common BINs to names for better UI
+            const bankMaps = { '970415': 'VietinBank', '970405': 'Agribank', '970436': 'Vietcombank', '970418': 'BIDV' };
+            bankDisplayName = bankMaps[bankConfig.bank_id] || bankConfig.bank_id;
         }
 
         res.render('public/checkout/success', {
@@ -62,7 +68,8 @@ exports.renderSuccess = async (req, res) => {
             layout: 'layouts/main',
             order,
             qrUrl,
-            bankConfig
+            bankConfig,
+            bankDisplayName
         });
     } catch (error) {
         console.error('Render Success Error:', error);

@@ -83,19 +83,19 @@
                 <!-- Price Block -->
                 <!-- Price Block -->
                 <div class="detail-price-block">
-                    <% if (product.sale_price) { %>
+                    <% if (product.isDiscounted) { %>
                         <span class="detail-price-sale">
-                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.sale_price) %>
+                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.bestPrice) %>
                         </span>
                         <span class="detail-price-original">
-                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.originalPrice) %>
                         </span>
                         <span class="detail-discount-badge">
-                            -<%= Math.round((1 - product.sale_price/product.price)*100) %>%
+                            -<%= product.discountPercent %>%
                         </span>
                     <% } else { %>
                         <span class="detail-price-sale">
-                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.originalPrice) %>
                         </span>
                     <% } %>
                 </div>
@@ -159,8 +159,8 @@
                     </button>
                 </div>
                 <div class="mt-4 d-flex gap-3">
-                    <button class="btn btn-light border rounded-pill px-4 flex-grow-1">
-                        <i class="far fa-heart me-2 text-danger"></i>Yêu thích
+                    <button class="btn <%= product.isWishlisted ? 'btn-danger text-white' : 'btn-light border' %> rounded-pill px-4 flex-grow-1" id="wishlistBtn" onclick="toggleWishlist(<%= product.id %>)">
+                        <i class="<%= product.isWishlisted ? 'fas' : 'far' %> fa-heart me-2"></i>Yêu thích
                     </button>
                     <button class="btn btn-light border rounded-pill px-4 flex-grow-1" onclick="navigator.share({title:'<%= product.name %>',url:window.location.href})">
                         <i class="fas fa-share-alt me-2 text-muted"></i>Chia sẻ
@@ -176,8 +176,10 @@
             </div>
         </div>
 
-        <!-- ===== DESCRIPTION TABS ===== -->
-        <div class="mt-5">
+        <div class="row">
+            <div class="col-12">
+                <!-- ===== DESCRIPTION TABS ===== -->
+                <div class="mt-5">
             <ul class="nav nav-tabs detail-tabs" role="tablist">
                 <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#desc">Mô tả sản phẩm</button></li>
                 <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#specs">Thông tin dinh dưỡng</button></li>
@@ -192,7 +194,13 @@
                     <% } %>
                 </div>
                 <div class="tab-pane fade" id="specs">
-                    <p class="text-muted">Thông tin dinh dưỡng sẽ được cập nhật sớm.</p>
+                    <% if (product.nutritional_info) { %>
+                        <div class="nutritional-content">
+                            <%- product.nutritional_info.replace(/\n/g, '<br>') %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted">Thông tin dinh dưỡng đang được cập nhật.</p>
+                    <% } %>
                 </div>
                 <div class="tab-pane fade" id="reviews">
                     <div class="row g-4">
@@ -240,7 +248,8 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold">Tên của bạn*</label>
-                                            <input type="text" name="customer_name" class="form-control rounded-pill border-0 shadow-sm" required placeholder="Nhập tên của bạn...">
+                                            <input type="text" name="customer_name" class="form-control rounded-pill border-0 shadow-sm" required 
+                                                   placeholder="Nhập tên của bạn..." value="<%= user ? user.full_name : '' %>">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold">Đánh giá sao*</label>
@@ -266,6 +275,8 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
         <!-- ===== RELATED PRODUCTS ===== -->
         <% if (relatedProducts && relatedProducts.length > 0) { %>
@@ -284,7 +295,10 @@
                                 </div>
                                 <div class="fruit-card-body">
                                     <h5 class="fruit-card-name"><%= p.name %></h5>
-                                    <span class="price-main"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.sale_price || p.price) %></span>
+                                    <span class="price-main"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.bestPrice) %></span>
+                                    <% if (p.isDiscounted) { %>
+                                        <span class="small text-muted text-decoration-line-through ms-1"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.originalPrice) %></span>
+                                    <% } %>
                                 </div>
                             </a>
                         </div>
@@ -435,6 +449,66 @@
             alert('Có lỗi xảy ra!');
         }
     };
+
+    /**
+     * Wishlist Toggle Logic
+     */
+    async function toggleWishlist(productId) {
+        try {
+            const response = await fetch(`/api/wishlist/toggle/${productId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (response.status === 401) {
+                return Swal.fire({
+                    icon: 'info',
+                    title: 'Yêu cầu đăng nhập',
+                    text: 'Vui lòng đăng nhập để sử dụng tính năng yêu thích!',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đăng nhập ngay',
+                    cancelButtonText: 'Để sau',
+                    confirmButtonColor: '#2e7d32'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/auth/login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    }
+                });
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                const btn = document.getElementById('wishlistBtn');
+                const icon = btn.querySelector('i');
+                
+                if (result.status === 'added') {
+                    btn.classList.replace('btn-light', 'btn-danger');
+                    btn.classList.remove('border');
+                    btn.classList.add('text-white');
+                    icon.classList.replace('far', 'fas');
+                } else {
+                    btn.classList.replace('btn-danger', 'btn-light');
+                    btn.classList.add('border');
+                    btn.classList.remove('text-white');
+                    icon.classList.replace('fas', 'far');
+                }
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: result.message
+                });
+            }
+        } catch (err) {
+            console.error('Wishlist error:', err);
+        }
+    }
 </script>
 
 <!-- SEO Structured Data: JSON-LD -->

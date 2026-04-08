@@ -83,14 +83,37 @@ const createProduct = async (data) => {
         category_id, origin_country, unit, weight_value, 
         packing_type, price, sale_price, cost_price, 
         stock_quantity, min_stock_alert, status, 
-        is_featured, is_best_seller, images 
+        is_featured, is_best_seller, nutritional_info, images 
     } = data;
 
     return await prisma.$transaction(async (tx) => {
+        // Safety: Ensure slug and sku are unique if they were passed but already exist
+        // This is a backup for when the frontend doesn't catch it
+        let finalSlug = slug;
+        let slugExists = await tx.product.findUnique({ where: { slug: finalSlug } });
+        let slugCounter = 1;
+        while (slugExists) {
+            finalSlug = `${slug}-${slugCounter}`;
+            slugExists = await tx.product.findUnique({ where: { slug: finalSlug } });
+            slugCounter++;
+        }
+
+        let finalSku = sku;
+        let skuExists = await tx.product.findUnique({ where: { sku: finalSku } });
+        let skuCounter = 1;
+        while (skuExists) {
+            finalSku = `${sku}-${skuCounter}`;
+            skuExists = await tx.product.findUnique({ where: { sku: finalSku } });
+            skuCounter++;
+        }
+
         // 1. Create Product
         const product = await tx.product.create({
             data: {
-                name, slug, sku, short_description, description,
+                name, 
+                slug: finalSlug, 
+                sku: finalSku, 
+                short_description, description,
                 category_id: parseInt(category_id),
                 origin_country, unit,
                 weight_value: weight_value ? parseFloat(weight_value) : null,
@@ -103,6 +126,7 @@ const createProduct = async (data) => {
                 status: status || 'published',
                 is_featured: is_featured === 'true' || is_featured === true,
                 is_best_seller: is_best_seller === 'true' || is_best_seller === true,
+                nutritional_info: nutritional_info || null,
             }
         });
 
@@ -146,7 +170,7 @@ const updateProduct = async (id, data) => {
         category_id, origin_country, unit, weight_value, 
         packing_type, price, sale_price, cost_price, 
         stock_quantity, min_stock_alert, status, 
-        is_featured, is_best_seller, new_images, delete_image_ids 
+        is_featured, is_best_seller, nutritional_info, new_images, delete_image_ids 
     } = data;
 
     return await prisma.$transaction(async (tx) => {
@@ -173,6 +197,7 @@ const updateProduct = async (id, data) => {
                 status: status || 'published',
                 is_featured: is_featured === 'true' || is_featured === true,
                 is_best_seller: is_best_seller === 'true' || is_best_seller === true,
+                nutritional_info: nutritional_info,
             }
         });
 
@@ -276,11 +301,84 @@ const duplicateProduct = async (id) => {
     });
 };
 
+/**
+ * Generate a unique SKU based on a name/base SKU
+ */
+const getUniqueSkuSuggest = async (name) => {
+  // Convert name to slug as base SKU
+  const slugify = (text) => {
+      return text.toString().toLowerCase()
+          .replace(/á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/g, 'a')
+          .replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/g, 'e')
+          .replace(/i|í|ì|ỉ|ĩ|ị/g, 'i')
+          .replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/g, 'o')
+          .replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/g, 'u')
+          .replace(/ý|ỳ|ỷ|ỹ|ỵ/g, 'y')
+          .replace(/đ/g, 'd')
+          .replace(/\s+/g, '-')
+          .replace(/[^\w-]+/g, '')
+          .replace(/--+/g, '-')
+          .replace(/^-+/, '')
+          .replace(/-+$/, '');
+  };
+
+  const baseSku = slugify(name);
+  let suggestSku = baseSku;
+  let counter = 1;
+
+  // Check if SKU exists
+  let existing = await prisma.product.findUnique({ where: { sku: suggestSku } });
+  
+  while (existing) {
+      suggestSku = `${baseSku}-${counter}`;
+      existing = await prisma.product.findUnique({ where: { sku: suggestSku } });
+      counter++;
+  }
+
+  return suggestSku;
+};
+
+/**
+ * Generate a unique Slug
+ */
+const getUniqueSlugSuggest = async (name) => {
+    const slugify = (text) => {
+        return text.toString().toLowerCase()
+            .replace(/á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/g, 'a')
+            .replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/g, 'e')
+            .replace(/i|í|ì|ỉ|ĩ|ị/g, 'i')
+            .replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/g, 'o')
+            .replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/g, 'u')
+            .replace(/ý|ỳ|ỷ|ỹ|ỵ/g, 'y')
+            .replace(/đ/g, 'd')
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]+/g, '')
+            .replace(/--+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    };
+
+    const baseSlug = slugify(name);
+    let suggestSlug = baseSlug;
+    let counter = 1;
+
+    let existing = await prisma.product.findUnique({ where: { slug: suggestSlug } });
+    while (existing) {
+        suggestSlug = `${baseSlug}-${counter}`;
+        existing = await prisma.product.findUnique({ where: { slug: suggestSlug } });
+        counter++;
+    }
+
+    return suggestSlug;
+};
+
 module.exports = {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
-  duplicateProduct
+  duplicateProduct,
+  getUniqueSkuSuggest,
+  getUniqueSlugSuggest
 };

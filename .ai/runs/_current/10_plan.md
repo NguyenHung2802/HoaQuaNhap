@@ -1,99 +1,73 @@
-# Master Plan - Phase 08: Optimization & Advanced Features
+# KẾ HOẠCH NÂNG CẤP HỆ THỐNG LIÊN HỆ & THEO DÕI TRUY CẬP (PHASE 9)
 
-- Ngày: 2026-04-03
-- Phiên bản: v1
-- BA nguồn: 00_ba.md
+## 1. Phân tích Yêu cầu (Business Analysis)
 
-## 1) Goal
-Triển khai hệ thống mã giảm giá (Coupon), báo cáo doanh thu chuyên sâu (Advanced Reports), tối ưu hóa SEO và hiệu năng cho website WebHoaQua.
+### 1.1 Popup Liên Hệ Gọn Nhẹ & Thông Minh
+*   **Vấn đề hiện tại:** Trang web thiếu điểm chạm nhanh khiến khách hàng ngại tìm đến trang Liên hệ truyền thống.
+*   **Giải pháp:** 
+    *   Tạo một **Floating Icon** (Biểu tượng nổi) ở góc dưới màn hình.
+    *   Khi click sẽ mở ra một mini-form với thiết kế hiện đại, tinh gọn.
+    *   **Trường bắt buộc:** Tên, Số điện thoại, Nhu cầu (bằng dropdown gợi ý sẵn + nhập tay).
+    *   **Trường mở rộng:** Nút "Thêm thông tin" -> Click vào mới trượt xuống (accordion) hiện ô Email.
+*   **Xử lý Dữ liệu:** Khi khách hàng gửi, ngay lập tức lưu vào Database và hiển thị trên màn hình Admin. Có thể gắn thêm hệ thống gửi Email thông báo tự động (Nodemailer) cho Chủ shop để không lỡ khách.
 
-## 2) Scope
-- **In-scope**:
-    - Admin: Quản lý Coupon, Dashboard báo cáo nâng cao (Biểu đồ Chart.js, Top khách hàng, Sản phẩm bán chậm), Tiện ích nhân bản sản phẩm.
-    - Public: Áp dụng mã giảm giá tại Checkout, Lazy load ảnh, SEO Schema Product, Sitemap/Robots.
-- **Out-of-scope**: Thanh toán online, Đa ngôn ngữ, Tích điểm thành viên.
+### 1.2 Nhận thức hệ thống theo dõi nội bộ vs Bên thứ 3 (3rd Party)
+Khách hàng có hỏi về việc có nên tự làm (Natively) các form và script theo dõi giống như một số hệ thống SaaS hay không.
+*   **Quan điểm của AI:**
+    *   **A. Về Form/Popup Liên hệ:** Chúng ta **HOÀN TOÀN NÊN TỰ LÀM**. Việc nhúng mã JS của bên thứ 3 (như Tawk.to, Subiz) thường làm chậm website (tải thêm 2-3MB JS) và bị kiểm soát data. Tự code bằng Bootstrap/JS tĩnh sẽ nhanh hơn gấp 10 lần, nhẹ website và Database hoàn toàn thuộc quyền sở hữu của bạn.
+    *   **B. Về Tracking Lượng Truy Cập / Click / Real-time:** 
+        *   **Tự code:** Có thể làm được (ví dụ đếm số lượt xem chi tiết từng mã sản phẩm, số lần click vào nút mua). **Nhược điểm nặng nề:** Nếu website bạn có 10,000 lượt truy cập/tháng, database của bạn sẽ bị "phình to" rác log truy cập cực kì nặng, làm chậm toàn bộ thao tác mua bán.
+        *   **Sử dụng Google Analytics 4 (GA4):** Đây là hệ thống chuyên dụng, miễn phí từ Google. GA4 cung cấp Real-time (số người đang online), vị trí địa lý, độ tuổi, tỷ lệ thoát trang.
+*   **=> Quyết định:** 
+    1. **Tự lập trình** Toàn bộ giao diện Popup, Form, Lưu trữ thông tin khách hàng tiềm năng nội bộ.
+    2. **Tự lập trình** đếm lượt xem (View) tĩnh ở mức độ "Lượt Clicks cho Sản Phẩm" để tính độ Hot.
+    3. **Tích hợp Google Analytics 4** cho việc báo cáo "Lượng người hiện tại đang ở trên web" và biểu đồ truy cập tổng thể để tối ưu Server.
 
-## 3) Constraints & Assumptions
-- **Constraints**: Sử dụng Chart.js (CDN hoặc NPM), EJS cho giao diện, Prisma cho query dữ liệu.
-- **Assumptions**: 
-    - Database hiện tại đủ để truy vấn doanh thu theo ngày/tháng.
-    - Các ảnh sản phẩm đã lưu trên Cloudinary hỗ trợ dynamic transformation.
-- **Questions**: Không có câu hỏi quan trọng tại thời điểm này.
+---
 
-## 4) Recommended Approach
-- Triển khai **Vertical Slices** để đảm bảo mỗi tính năng đều chạy được từ DB đến UI trước khi sang tính năng khác.
-- Dùng **Prisma Transactions** khi áp dụng Coupon để tránh race condition về lượt dùng.
-- Dùng **Middleware** hoặc service riêng để gen Sitemap/Robots định kỳ hoặc on-demand.
+## 2. Kế hoạch triển khai Kỹ thuật (Implementation Plan)
 
-## 5) Slice Plan
+### Slice 1: Database & Backend Core (Quản trị Lead)
+*   **Mục tiêu:** Tạo kho lưu trữ thông tin liên hệ.
+*   **Công việc:**
+    1.  Cập nhật file `schema.prisma`: Thêm model `ContactRequest`.
+        ```prisma
+        model ContactRequest {
+            id          Int      @id @default(autoincrement())
+            name        String
+            phone       String
+            need        String   // Gợi ý nhu cầu mua
+            email       String?  // Optional
+            status      String   @default("new") // new, processing, resolved
+            source_url  String?  // Khách đang đứng ở trang nào khi gửi
+            created_at  DateTime @default(now())
+        }
+        ```
+    2.  Tạo Controller & Route: `POST /api/contacts` để nhận dữ liệu từ Frontend AJAX.
+    3.  Tạo trang Quản trị trong Admin (`/admin/contacts`) để bạn xem thông tin khách, gọi điện và chuyển trạng thái "Đã liên hệ".
 
-```
-SLICE  GOAL                              DELIVERABLES                     DoD (testable)                 VERIFY (lệnh)                     CHECKPOINT
----    ---                               ---                              ---                             ---                               ---
-S34    Admin: Quản lý Coupon             CRUD UI + Model Coupon           Coupon tạo mới thành công        npm run dev + Manual test         Sau khi pass
-S35    Public: Áp dụng Coupon            Checkout Logic + Apply API       Giảm giá đúng khi đặt hàng      npm run dev + Manual test         Sau khi pass
-S36    Admin: Báo cáo Doanh thu          Revenue Charts (Chart.js)        Hiển thị biểu đồ chính xác      npm run dev + Manual test         Sau khi pass
-S37    Admin: Báo cáo KH & SP            Top Customers + Slow Products    Dữ liệu list chính xác          npm run dev + Manual test         Sau khi pass
-S38    SEO & Performance                 Sitemap/Schema/Lazy load         Sitemap.xml ok, Schema ok       npm run dev + Page Speed/SEO tool Sau khi pass
-S39    Admin Utils: Duplicate SP         Duplicate button in Admin        Clone SP với 1 click            npm run dev + Manual test         Sau khi pass
-```
+### Slice 2: Frontend Interactive Popup & Form
+*   **Mục tiêu:** Trải nghiệm người dùng mượt mà, tiện lợi.
+*   **Công việc:**
+    1.  Hiệu chỉnh HTML/CSS cho **Floating Message Action Button** (Nút nổi).
+    2.  Lập trình Popup UI:
+        *   Ô tên, sđt, text/dropdown nhu cầu.
+        *   Nút "Nhập Email (Tuỳ chọn)" dạng ẩn/hiện.
+    3.  Javascript AJAX: Submit form ngầm, tắt popup và hiện thông báo cảm ơn (sweetalert/toast) mà **không tải lại trang**.
+    4.  *(Tuỳ chọn mở rộng định thời)* Gắn vào webhook chat Telegram hoặc Email (để điện thoại bạn rung lên ngay khi có người điền form).
 
-## 6) Detailed Implementation Checklist
+### Slice 3: Hệ thống Analytics Cơ bản & Tích hợp GA
+*   **Mục tiêu:** Theo dõi dữ liệu khách hàng.
+*   **Công việc:**
+    1.  Trong Admin Dashboard: Hiển thị thống kê nhanh "Số lượng Yêu cầu liên hệ mới trong ngày".
+    2.  Bổ sung chức năng đếm view ảo (Fake Views/Real Views tăng dần) trên danh sách sản phẩm.
+    3.  Cấu hình Google Analytics Script.
 
-### Slice S34: Admin Coupon Management
-- [ ] Implement `coupons.service.js` (getAll, create, update, delete).
-- [ ] Implement `coupons.controller.js` (render views, handle post).
-- [ ] Create views: `src/views/admin/coupons/index.ejs`, `add.ejs`, `edit.ejs`.
-- [ ] Update admin sidebar to include Coupons.
+### Slice 4: Hệ thống Cảnh báo Thời gian thực (Notifications)
+*   **Mục tiêu:** Tăng tốc độ Rep khách (Lead Response Time) thông qua thông báo đa kênh miễn phí.
+*   **Công việc (Chạy ngầm - Background Tasks):**
+    1.  Tích hợp `Nodemailer`: Gửi báo cáo thông tin Liên hệ (Tên, SĐT, Nhu cầu) về Admin Email ngay khi khách điền form.
+    2.  Tích hợp logic gọi API API Telegram Bot: Bắn Notification ngay lập tức về điện thoại của chủ web/nhóm sale.
 
-### Slice S35: Public Coupon Application
-- [ ] Implement `applyCoupon` API in `src/modules/coupons/coupons.controller.js`.
-- [ ] Update Checkout view with coupon input field.
-- [ ] Update Order logic to handle `discount_amount` and `coupon_code`.
-- [ ] Handle validation: Expired, Min Order, Max Usage.
-
-### Slice S36: Admin Revenue Reports
-- [ ] Implement `reports.service.js` to aggregate revenue data (Daily/Weekly/Monthly).
-- [ ] Integrate Chart.js in `src/views/admin/reports/revenue.ejs`.
-- [ ] Create route for reports dashboard.
-
-### Slice S37: Admin Customer & Product Insights
-- [ ] Implement query for Top Customers (by total_spent).
-- [ ] Implement query for Slow-moving Products (sales = 0 or low in period).
-- [ ] Create view `src/views/admin/reports/insights.ejs`.
-
-### Slice S38: SEO & Performance
-- [ ] Implement `sitemap` generator (dynamic route `/sitemap.xml`).
-- [ ] Create static `public/robots.txt`.
-- [ ] Add JSON-LD Schema.org to `product_detail.ejs`.
-- [ ] Implement Lazy loading for all `<img>` tags in site.
-- [ ] Update Cloudinary URLs to use quality auto and webp format.
-
-### Slice S39: Admin Duplicate Product
-- [ ] Add "Duplicate" button in Product Listing.
-- [ ] Implement logic in `products.controller.js` to clone record and images.
-
-## 7) Data & Migration Plan
-- Schema `Coupon` đã có. Cần đảm bảo `Order` có đủ field `discount_amount` và `coupon_code`.
-- Chạy `npx prisma generate` sau khi verify schema.
-
-## 8) Verification Plan
-- Manual testing từng luồng Admin/Public.
-- Kiểm tra query SQL/Prisma có tối ưu không (tránh N+1 khi báo cáo).
-
-## 9) Risks & Mitigations
-- **Performance**: Query báo cáo trên dữ liệu lớn có thể chậm -> Suggest thêm index cho `created_at` của `Order`.
-- **Logic**: Áp dụng mã giảm giá chồng chéo -> Quy định chỉ dùng 1 mã/đơn.
-
-## 12) DEEP THINKING RESULTS
-### A) Phản biện kỹ thuật:
-1. **Dùng Redis cho cache?**: Hiện tại dữ liệu chưa quá lớn, Prisma query trực tiếp vẫn ổn. Sẽ đề xuất nếu cần thiết ở Phase 9.
-2. **Duplicate Product**: Cần lưu ý không clone slug (slugify lại từ name + "-copy" hoặc random string để tránh duplicate key constraint).
-3. **Sitemap**: Nên cache sitemap vì nó không thay đổi liên tục, tiết kiệm tài nguyên DB.
-
-### B) Đề xuất chủ động:
-- Triển khai **Email Notification** (từ Phase 5) nhắc khách hàng về coupon sắp hết hạn (nếu có hệ thống email).
-- Thêm **Auto-alt text** cho ảnh từ Product Name để SEO tốt hơn.
-
-## 11) Next Action
-- Chờ USER xác nhận Master Plan và phân chia S34-S39.
+---
+**Trạng thái mong đợi:** Kế hoạch đã chốt. Chuẩn bị tiến hành Slice 1.

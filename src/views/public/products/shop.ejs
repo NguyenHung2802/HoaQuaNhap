@@ -138,6 +138,9 @@
                                         <% } %>
                                         <% if (p.is_best_seller) { %><span class="fruit-tag hot">Bán chạy 🔥</span><% } %>
                                         <% if (p.is_featured && !p.is_best_seller) { %><span class="fruit-tag new">Nổi bật ✨</span><% } %>
+                                        <% if (p.discountPercent > 0) { %>
+                                            <span class="fruit-tag discount">-<%= p.discountPercent %>%</span>
+                                        <% } %>
                                     </div>
                                     <div class="fruit-card-body">
                                         <% if (p.category) { %>
@@ -145,11 +148,13 @@
                                         <% } %>
                                         <h5 class="fruit-card-name"><%= p.name %></h5>
                                         <div class="fruit-card-price-wrap">
-                                            <span class="price-main">
-                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.sale_price || p.price) %>
+                                            <span class="price-main text-accent fw-bold">
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.bestPrice) %>
                                             </span>
-                                            <% if (p.sale_price) { %>
-                                                <span class="price-old"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price) %></span>
+                                            <% if (p.isDiscounted) { %>
+                                                <span class="price-old text-muted text-decoration-line-through small ms-2">
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.originalPrice) %>
+                                                </span>
                                             <% } %>
                                         </div>
                                         <p class="fruit-card-unit"><%= p.unit %> · <%= p.origin_country || '' %></p>
@@ -227,6 +232,7 @@
 .fruit-tag { position: absolute; top: 10px; left: 10px; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
 .fruit-tag.hot { background: #fee2e2; color: #dc2626; }
 .fruit-tag.new { background: #e0f2fe; color: #0369a1; }
+.fruit-tag.discount { background: var(--brand-accent); color: #fff; top: 10px; right: 10px; left: auto; }
 .fruit-card-body { padding: 16px; }
 .fruit-card-cat { font-size: 0.75rem; color: var(--brand-accent); font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
 .fruit-card-name { font-family: var(--font-heading); font-size: 0.95rem; color: var(--brand-primary); margin-bottom: 8px; line-height: 1.3; }

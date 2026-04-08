@@ -2,7 +2,7 @@
     <div class="container">
         <!-- Brand -->
         <a class="navbar-brand" href="/">
-            <i class="fas fa-leaf me-2 text-accent"></i>WebHoaQua
+            <img src="/images/logo_haianh_2.png" alt="Hải Anh Fruit" class="logo-main">
         </a>
 
         <!-- Mobile Toggle -->
@@ -69,6 +69,7 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2 rounded-4">
                             <li><a class="dropdown-item" href="/profile"><i class="fas fa-address-card me-2 text-muted"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="/wishlist"><i class="fas fa-heart me-2 text-danger"></i>Yêu thích</a></li>
                             <li><a class="dropdown-item" href="/orders"><i class="fas fa-box me-2 text-muted"></i>Đơn hàng</a></li>
                             <% if (user.role === 'admin') { %>
                                 <li><hr class="dropdown-divider"></li>

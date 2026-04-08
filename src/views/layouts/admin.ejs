@@ -77,8 +77,9 @@
     <div id="wrapper">
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
-            <div class="sidebar-heading">
-                <i class="fas fa-leaf me-2"></i>WebHoaQua Admin
+            <div class="sidebar-heading text-center py-4">
+                <img src="/images/logo_haianh_2.png" alt="Hải Anh Fruit" class="rounded-circle bg-white p-1" width="100">
+                <div class="mt-2 small" style="font-size: 0.8rem; opacity: 0.8;">Admin Dashboard</div>
             </div>
             <div class="list-group list-group-flush mt-3">
                 <a href="/admin" class="list-group-item list-group-item-action <%= req.originalUrl === '/admin' ? 'active' : '' %>">
@@ -110,6 +111,9 @@
                 </a>
                 <a href="/admin/customers" class="list-group-item list-group-item-action <%= req.originalUrl.startsWith('/admin/customers') ? 'active' : '' %>">
                     <i class="fas fa-users me-2"></i>Khách hàng
+                </a>
+                <a href="/admin/contacts" class="list-group-item list-group-item-action <%= req.originalUrl.startsWith('/admin/contacts') ? 'active' : '' %>">
+                    <i class="fas fa-headset me-2"></i>Yêu cầu liên hệ <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">Mới</span>
                 </a>
                 <div class="px-3 py-2 small text-uppercase text-light opacity-75 mt-2 fw-bold" style="font-size:0.7rem; letter-spacing:1px;">Truyền thông</div>
                 <a href="/admin/banners" class="list-group-item list-group-item-action <%= req.originalUrl.startsWith('/admin/banners') ? 'active' : '' %>">
@@ -147,14 +151,14 @@
             <div class="container-fluid p-4">
                 <!-- Flash Messages -->
                 <% if (success_msg && success_msg.length > 0) { %>
-                    <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert">
+                    <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm auto-dismiss" role="alert">
                         <i class="fas fa-check-circle me-2"></i><%= success_msg %>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 <% } %>
 
                 <% if (error_msg && error_msg.length > 0) { %>
-                    <div class="alert alert-danger alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert">
+                    <div class="alert alert-danger alert-dismissible fade show mb-4 border-0 shadow-sm auto-dismiss" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i><%= error_msg %>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -169,5 +173,21 @@
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto close alerts
+            const alerts = document.querySelectorAll('.alert.auto-dismiss');
+            alerts.forEach(function(alertElement) {
+                setTimeout(function() {
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
+                        const alert = new bootstrap.Alert(alertElement);
+                        alert.close();
+                    } else {
+                        alertElement.style.display = 'none';
+                    }
+                }, 2000);
+            });
+        });
+    </script>
 </body>
 </html>

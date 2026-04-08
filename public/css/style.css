@@ -99,10 +99,21 @@ a:hover {
 }
 
 .navbar-brand {
-    font-family: var(--font-heading);
-    font-weight: 800;
-    color: var(--brand-primary) !important;
-    font-size: 1.8rem;
+    padding: 0;
+    line-height: 0;
+}
+
+.logo-main {
+    height: 110px; /* Highly prominent but balanced */
+    width: auto;
+    object-fit: contain;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: -20px;
+    margin-bottom: -20px;
+}
+
+.logo-main:hover {
+    transform: scale(1.04) translateY(2px);
 }
 
 .nav-link {

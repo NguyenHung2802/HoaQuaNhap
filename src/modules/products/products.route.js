@@ -18,6 +18,12 @@ router.get('/edit/:id', productsController.renderEditForm);
 // [POST] /admin/products/edit/:id
 router.post('/edit/:id', upload.array('images', 5), productsController.update);
 
+// [GET] /admin/products/sku-suggest
+router.get('/sku-suggest', productsController.getSkuSuggest);
+
+// [GET] /admin/products/slug-suggest
+router.get('/slug-suggest', productsController.getSlugSuggest);
+
 // [POST] /admin/products/duplicate/:id
 router.post('/duplicate/:id', productsController.duplicate);
 

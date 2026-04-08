@@ -16,6 +16,7 @@ const couponsRoute = require('../modules/coupons/coupons.route');
 const promotionsRoute = require('../modules/promotions/promotions.route');
 const customersRoute = require('../modules/customers/customers.route');
 const reportsRoute = require('../modules/reports/reports.route');
+const contactsRoute = require('../modules/contacts/contacts.route');
 
 // [GET] /admin/login (Redirect to unified login)
 router.get('/login', (req, res) => res.redirect('/auth/login'));
@@ -42,5 +43,6 @@ router.use('/promotions', isAdmin, promotionsRoute);
 router.use('/shipping-campaigns', isAdmin, shippingCampaignsRoute);
 router.use('/customers', isAdmin, customersRoute);
 router.use('/reports', isAdmin, reportsRoute);
+router.use('/contacts', isAdmin, contactsRoute);
 
 module.exports = router;

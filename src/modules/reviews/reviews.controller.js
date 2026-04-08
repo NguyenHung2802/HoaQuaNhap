@@ -33,6 +33,25 @@ const renderList = async (req, res, next) => {
 };
 
 /**
+ * [POST] /admin/reviews/toggle/:id
+ */
+const toggleVisibility = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id);
+        const review = await prisma.review.findUnique({ where: { id } });
+        if (!review) return res.json({ success: false, message: 'Không tìm thấy đánh giá' });
+
+        await prisma.review.update({
+            where: { id },
+            data: { is_approved: !review.is_approved }
+        });
+        res.json({ success: true, message: 'Đã cập nhật trạng thái hiển thị!' });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+/**
  * [POST] /admin/reviews/approve/:id
  */
 const approveReview = async (req, res, next) => {
@@ -64,5 +83,6 @@ const deleteReview = async (req, res, next) => {
 module.exports = {
     renderList,
     approveReview,
+    toggleVisibility,
     deleteReview
 };

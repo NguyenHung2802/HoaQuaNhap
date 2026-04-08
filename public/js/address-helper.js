@@ -59,7 +59,11 @@ class AddressHelper {
             const currentValue = this.provinceSelect.dataset.selected;
 
             this.clearSelect(this.provinceSelect, 'Chọn Tỉnh/Thành phố');
-            data.forEach(p => {
+            
+            // Only Hà Nội is supported as per user request
+            const supportedProvinces = data.filter(p => p.name.includes('Hà Nội') || p.code == 1);
+            
+            supportedProvinces.forEach(p => {
                 const option = new Option(p.name, p.name);
                 option.dataset.code = p.code;
                 if (p.name === currentValue) option.selected = true;
