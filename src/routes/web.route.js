@@ -61,8 +61,10 @@ router.post('/contact/submit', async (req, res) => {
 });
 router.get('/about', (req, res, next) => { req.params.key = 'about_us'; pagesController.renderPage(req, res, next); });
 router.get('/faq', (req, res, next) => { req.params.key = 'faq'; pagesController.renderPage(req, res, next); });
-router.get('/policy', (req, res, next) => { req.params.key = 'shipping_policy'; pagesController.renderPage(req, res, next); });
-router.get('/privacy', (req, res, next) => { req.params.key = 'privacy_policy'; pagesController.renderPage(req, res, next); });
+router.get('/policy', (req, res, next) => { req.params.key = 'policy'; pagesController.renderPage(req, res, next); });
+router.get('/privacy', (req, res, next) => { req.params.key = 'policy'; pagesController.renderPage(req, res, next); });
+router.get('/shipping', (req, res, next) => { req.params.key = 'shipping_policy'; pagesController.renderPage(req, res, next); });
+router.get('/return', (req, res, next) => { req.params.key = 'return_policy'; pagesController.renderPage(req, res, next); });
 router.get('/page/:key', pagesController.renderPage);
 
 // Product Reviews

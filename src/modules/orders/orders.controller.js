@@ -1,4 +1,5 @@
 const ordersService = require('./orders.service');
+const { sendOrderNotificationEmail, sendOrderTelegramNotification } = require('../../utils/order-notification');
 
 /**
  * Xử lý đặt hàng nhanh cho Guest
@@ -15,6 +16,21 @@ exports.quickCheckout = async (req, res) => {
         const order = await ordersService.createQuickOrder({ 
             full_name, phone, product_id, quantity: parseInt(quantity) || 1 
         });
+
+        // 🔔 Gửi thông báo đơn hàng nhanh (async, không block)
+        const { PrismaClient: _P } = require('@prisma/client');
+        const _pq = new _P();
+        _pq.order.findUnique({
+            where: { id: order.id },
+            include: { items: { select: { product_name_snapshot: true, quantity: true, price_snapshot: true } } }
+        }).then(fullOrder => {
+            if (fullOrder) {
+                Promise.allSettled([
+                    sendOrderNotificationEmail(fullOrder),
+                    sendOrderTelegramNotification(fullOrder)
+                ]);
+            }
+        }).catch(err => console.error('[Notify] Lỗi quick checkout notify:', err.message));
 
         req.flash('success_msg', 'Đặt hàng thành công! Đội ngũ tư vấn sẽ liên hệ với bạn trong vòng 15 phút.');
         res.redirect(`/checkout/success/${order.order_code}`);

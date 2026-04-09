@@ -93,9 +93,9 @@ a:hover {
 
 /* Navbar Customization */
 .navbar {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-color);
+    background: #ffffff !important;
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05); /* Added subtle shadow for depth since blur is gone */
 }
 
 .navbar-brand {
@@ -104,12 +104,11 @@ a:hover {
 }
 
 .logo-main {
-    height: 110px; /* Highly prominent but balanced */
+    height: 65px; /* Contained within navbar */
     width: auto;
     object-fit: contain;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-top: -20px;
-    margin-bottom: -20px;
+    margin: 5px 0;
 }
 
 .logo-main:hover {

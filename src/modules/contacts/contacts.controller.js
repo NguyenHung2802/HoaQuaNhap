@@ -25,9 +25,9 @@ const sendContactNotificationEmail = async (contact) => {
         });
 
         const mailOptions = {
-            from: `"WebHoaQua" <${mailUser}>`,
-            to: mailUser, // Gửi về chính mình hoặc đổi thành mảng email nhân sự
-            subject: `[WebHoaQua] Khách Cần Tư Vấn Gấp: ${contact.phone}`,
+            from: `"Hải Anh Fruit" <${mailUser}>`,
+            to: mailUser,
+            subject: `[Hải Anh Fruit] Khách Cần Tư Vấn Gấp: ${contact.phone}`,
             html: `
                 <h2>Có khách hàng mới yêu cầu tư vấn!</h2>
                 <ul>

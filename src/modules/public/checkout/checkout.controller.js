@@ -1,6 +1,7 @@
 const cartService = require('../cart/cart.service');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const { sendOrderNotificationEmail, sendOrderTelegramNotification } = require('../../../utils/order-notification');
 
 /**
  * [GET] /checkout
@@ -98,6 +99,24 @@ const placeOrder = async (req, res, next) => {
 
         // Clear cart session
         req.session.cart = [];
+
+        // 🔔 Gửi thông báo đơn hàng mới (async, không block)
+        // Lấy lại order đầy đủ với items để thông báo
+        prisma.order.findUnique({
+            where: { id: order.id },
+            include: {
+                items: {
+                    select: { product_name_snapshot: true, quantity: true, price_snapshot: true }
+                }
+            }
+        }).then(fullOrder => {
+            if (fullOrder) {
+                Promise.allSettled([
+                    sendOrderNotificationEmail(fullOrder),
+                    sendOrderTelegramNotification(fullOrder)
+                ]);
+            }
+        }).catch(err => console.error('[Notify] Lỗi fetch order để thông báo:', err.message));
 
         // Flash message
         req.flash('success_msg', 'Đặt hàng thành công!');
