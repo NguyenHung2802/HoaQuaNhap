@@ -31,12 +31,19 @@ app.use(cookieParser());
 // Static files
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Prisma setup
+const { PrismaClient } = require('@prisma/client');
+const _prisma = new PrismaClient();
+
 // Session configuration
 app.use(session({
     secret: process.env.SESSION_SECRET || 'secret-key',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    }
 }));
 
 // Flash messages
@@ -49,15 +56,13 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/main'); // Default layout for public site
 
 // Global variables for views
-const { PrismaClient } = require('@prisma/client');
-const _prisma = new PrismaClient();
 app.use(async (req, res, next) => {
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
     res.locals.user = req.session.user || null;
     res.locals.req = req;
-    
+
     // Global Cart Item Count
     const sessionCart = req.session.cart || [];
     res.locals.cartItemsCount = sessionCart.reduce((total, item) => total + parseInt(item.quantity), 0);

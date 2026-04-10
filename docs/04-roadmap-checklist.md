@@ -18,7 +18,7 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 
 ### 2.1. Chuẩn bị
 - [x] Chốt tên dự án (WebHoaQua)
-- [ ] Chốt color palette thương hiệu (Green/Yellow)
+- [x] Chốt color palette thương hiệu (Green/Yellow)
 - [x] Chốt cấu trúc dữ liệu (Prisma schema)
 - [x] Chốt kiến trúc Node.js/Express
 
