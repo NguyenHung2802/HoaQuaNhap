@@ -16,6 +16,7 @@ Tất cả các lệnh này có thể gõ trực tiếp qua `npm run`.
 
 ### 2. Xem Nhật ký (Logs)
 - `npm run pm2:logs` : Xem toàn bộ log đang chạy (cả 2 phiên bản).
+- `npm run pm2:clean` : **Dọn sạch nhật ký** (Xóa trắng log trong PM2 và xóa tệp tin vật lý trong thư mục `logs/`).
 - Bạn có thể vào trực tiếp thư mục `logs/` ở thư mục gốc của dự án để tải file:
   - `pm2-out-dev.log` : Nhật ký hoạt động chung của DEV.
   - `pm2-error-dev.log` : Báo lỗi khẩn cấp (Crash) của DEV.

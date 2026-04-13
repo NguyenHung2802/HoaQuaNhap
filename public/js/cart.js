@@ -124,13 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function updateCartBadge(count) {
-        const badge = document.getElementById('nav-cart-badge');
-        if (badge) {
+        const badges = document.querySelectorAll('.cart-badge');
+        badges.forEach(badge => {
             badge.innerText = count;
             badge.classList.add('animate__animated', 'animate__rubberBand');
             setTimeout(() => {
                 badge.classList.remove('animate__animated', 'animate__rubberBand');
             }, 1000);
-        }
+        });
     }
 });

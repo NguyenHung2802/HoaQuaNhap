@@ -14,7 +14,7 @@
     <div class="container">
         <div class="row g-5">
             <!-- ===== SIDEBAR ===== -->
-            <div class="col-lg-3">
+            <div class="col-lg-3" data-aos="fade-right">
                 <div class="shop-sidebar">
                     <form action="/products" method="GET" id="filterForm">
                         <!-- Search -->
@@ -108,7 +108,7 @@
             <!-- ===== PRODUCT GRID ===== -->
             <div class="col-lg-9">
                 <!-- Toolbar -->
-                <div class="shop-toolbar d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div class="shop-toolbar d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3" data-aos="fade-down">
                     <div class="text-muted small">
                         Hiển thị <strong><%= products.length %></strong> / <strong><%= total %></strong> sản phẩm
                         <% if (filters.q) { %> cho "<strong><%= filters.q %></strong>"<% } %>
@@ -127,8 +127,8 @@
                 <!-- Grid -->
                 <% if (products.length > 0) { %>
                     <div class="row row-cols-2 row-cols-md-3 g-4">
-                        <% products.forEach(p => { %>
-                            <div class="col">
+                        <% products.forEach((p, i) => { %>
+                            <div class="col" data-aos="fade-up" data-aos-delay="<%= i * 50 %>">
                                 <a href="/product/<%= p.slug %>" class="fruit-card d-block text-decoration-none h-100">
                                     <div class="fruit-card-img-wrap">
                                         <% if (p.images && p.images.length > 0) { %>

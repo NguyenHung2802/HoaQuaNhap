@@ -1,0 +1,22 @@
+<nav class="app-bottom-nav d-md-none border-top">
+    <a href="/" class="nav-item <%= typeof req !== 'undefined' && req.originalUrl === '/' ? 'active' : '' %>">
+        <i class="fas fa-home"></i>
+        <span>Trang chủ</span>
+    </a>
+    <a href="/products" class="nav-item <%= typeof req !== 'undefined' && req.originalUrl.startsWith('/products') ? 'active' : '' %>">
+        <i class="fas fa-store"></i>
+        <span>Sản phẩm</span>
+    </a>
+    <a href="/cart" class="nav-item position-relative <%= typeof req !== 'undefined' && req.originalUrl === '/cart' ? 'active' : '' %>">
+        <i class="fas fa-shopping-basket"></i>
+        <span>Giỏ hàng</span>
+        <span class="cart-badge"><%= typeof cartItemsCount !== 'undefined' ? cartItemsCount : 0 %></span>
+    </a>
+    <a href="<%= typeof user !== 'undefined' && user ? '/profile' : '/auth/login' %>" class="nav-item <%= typeof req !== 'undefined' && (req.originalUrl === '/profile' || req.originalUrl.startsWith('/auth')) ? 'active' : '' %>">
+        <i class="fas <%= typeof user !== 'undefined' && user ? 'fa-user' : 'fa-sign-in-alt' %>"></i>
+        <span><%= typeof user !== 'undefined' && user ? 'Tài khoản' : 'Đăng nhập' %></span>
+    </a>
+</nav>
+
+<!-- Spacer div to prevent content hidden behind nav -->
+<div class="bottom-nav-spacer d-md-none"></div>

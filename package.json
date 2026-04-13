@@ -11,6 +11,7 @@
     "pm2:stop": "pm2 stop all",
     "pm2:restart": "pm2 restart all",
     "pm2:logs": "pm2 logs",
+    "pm2:clean": "npx pm2 flush && del /f /q logs\\*.log",
     "pm2:kill": "pm2 delete all",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"

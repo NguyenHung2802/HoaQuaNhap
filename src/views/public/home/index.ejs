@@ -55,7 +55,7 @@
 <!-- ===== CATEGORIES CIRCLES ===== -->
 <section class="section-padding" id="categories">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5" data-aos="fade-up">
             <p class="section-eyebrow">Đa dạng lựa chọn</p>
             <h2 class="section-title">Khám Phá Thiên Đường<br>Trái Cây</h2>
         </div>
@@ -63,7 +63,7 @@
             <% const catIcons = ['🍎','🍇','🍓','🍊','🍋','🍌','🥝','🍑']; %>
             <% if (categories && categories.length > 0) { %>
                 <% categories.forEach((cat, i) => { %>
-                    <div class="col-4 col-sm-3 col-md-2">
+                    <div class="col-4 col-sm-3 col-md-2" data-aos="zoom-in" data-aos-delay="<%= i * 50 %>">
                         <a href="/products?category=<%= cat.slug %>" class="cat-circle-item">
                             <div class="cat-circle-img">
                                 <% if (cat.image_url) { %>
@@ -95,20 +95,20 @@
 <!-- ===== FEATURED PRODUCTS ===== -->
 <section class="section-padding bg-light-grey">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-end mb-5">
+        <div class="d-flex justify-content-between align-items-end mb-5" data-aos="fade-right">
             <div>
                 <p class="section-eyebrow">Lựa chọn hôm nay</p>
                 <h2 class="section-title mb-0">Sản Phẩm Yêu Thích<br>Trong Mùa</h2>
             </div>
-            <a href="/products" class="btn btn-outline-primary rounded-pill px-4 d-none d-md-block">
+            <a href="/products" class="btn btn-outline-primary rounded-pill px-4 d-none d-md-block" data-aos="fade-left">
                 Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
             </a>
         </div>
         <div class="row g-4">
             <% const allProducts = [...(featuredProducts || []), ...(bestSellers || [])].slice(0, 4); %>
             <% if (allProducts.length > 0) { %>
-                <% allProducts.forEach(p => { %>
-                    <div class="col-6 col-md-3">
+                <% allProducts.forEach((p, i) => { %>
+                    <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="<%= i * 100 %>">
                         <a href="/product/<%= p.slug %>" class="fruit-card d-block text-decoration-none">
                             <div class="fruit-card-img-wrap">
                                 <% if (p.images && p.images.length > 0) { %>
@@ -160,7 +160,7 @@
 <!-- ===== PROMO BANNER ===== -->
 <section class="promo-banner-section">
     <div class="container">
-        <div class="promo-banner-card">
+        <div class="promo-banner-card" data-aos="flip-up">
             <div class="row align-items-center">
                 <div class="col-lg-7">
                     <p class="promo-eyebrow">Ưu đãi đặc biệt</p>
@@ -189,7 +189,7 @@
 <section class="section-padding">
     <div class="container">
         <div class="row align-items-center g-5">
-            <div class="col-lg-5">
+            <div class="col-lg-5" data-aos="fade-right">
                 <p class="section-eyebrow">Tại sao chọn chúng tôi?</p>
                 <h2 class="section-title">Lý Do Người Tiêu Dùng<br>Yêu Thích</h2>
                 <p class="text-muted mt-3 mb-4">Cam kết mang đến những trái cây thuần khiết nhất từ các vùng nguyên sản. Chất lượng là ưu tiên hàng đầu.</p>
@@ -202,8 +202,8 @@
                         { icon: 'fas fa-snowflake', title: 'Bảo Quản Tươi Ngon', desc: 'Quy trình bảo quản lạnh chuẩn quốc tế từ khâu thu hoạch đến tay bạn.', color: '#e3f2fd' },
                         { icon: 'fas fa-award', title: 'Chứng Nhận Chất Lượng', desc: 'Toàn bộ sản phẩm có giấy kiểm định nhập khẩu, đảm bảo an toàn thực phẩm.', color: '#fff8e1' },
                         { icon: 'fas fa-truck', title: 'Giao Hàng Tận Nơi', desc: 'Hệ thống giao hàng nhanh, đảm bảo trái cây đến tay bạn trong tình trạng tốt nhất.', color: '#fce4ec' }
-                    ].forEach(item => { %>
-                        <div class="col-6">
+                    ].forEach((item, index) => { %>
+                        <div class="col-6" data-aos="fade-up" data-aos-delay="<%= index * 100 %>">
                             <div class="why-card" style="background: <%= item.color %>;">
                                 <div class="why-icon"><i class="<%= item.icon %>"></i></div>
                                 <h6 class="why-title"><%= item.title %></h6>
@@ -220,7 +220,7 @@
 <!-- ===== TESTIMONIALS ===== -->
 <section class="section-padding testimonials-section">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5" data-aos="fade-up">
             <p class="section-eyebrow">Khách hàng nói gì?</p>
             <h2 class="section-title">"Trải nghiệm trái cây đến tận<br>ngưỡng chất lượng"</h2>
         </div>
@@ -229,8 +229,8 @@
                 { name: 'Trần Thị Mai', role: 'Nội trợ, TP.HCM', text: 'Mình đã mua táo Envy và nho Shine Muscat nhiều lần. Trái cây luôn tươi, giòn ngọt hơn hẳn siêu thị!', stars: 5 },
                 { name: 'Nguyễn Văn Hùng', role: 'Doanh nhân, Hà Nội', text: 'Tôi thường tặng hộp quà trái cây nhập khẩu cho đối tác. Cách đóng gói rất sang trọng, đối tác luôn ấn tượng.', stars: 5 },
                 { name: 'Lê Thu Hà', role: 'Mẹ 2 con, Đà Nẵng', text: 'Con tôi rất thích dâu tây Seolhyang từ đây. Dâu to, ngọt, không chua như nơi khác.', stars: 5 }
-            ].forEach(r => { %>
-                <div class="col-md-4">
+            ].forEach((r, i) => { %>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="<%= i * 150 %>">
                     <div class="testimonial-card">
                         <div class="d-flex gap-1 mb-3">
                             <% for(let s=0; s<r.stars; s++) { %><i class="fas fa-star text-warning"></i><% } %>
@@ -255,16 +255,16 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-end mb-5">
             <div>
-                <p class="section-eyebrow">Góc kiến thức</p>
-                <h2 class="section-title mb-0">Kiến Thức Trái Cây</h2>
+                <p class="section-eyebrow" data-aos="fade-right">Góc kiến thức</p>
+                <h2 class="section-title mb-0" data-aos="fade-right" data-aos-delay="100">Kiến Thức Trái Cây</h2>
             </div>
             <a href="/blog" class="btn btn-outline-primary rounded-pill px-4 d-none d-md-block">Xem tất cả</a>
         </div>
         <div class="row g-4">
         <div class="row g-4">
             <% if (latestBlogs && latestBlogs.length > 0) { %>
-                <% latestBlogs.forEach(b => { %>
-                    <div class="col-md-4">
+                <% latestBlogs.forEach((b, i) => { %>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="<%= i * 150 %>">
                         <a href="/blog/<%= b.slug %>" class="blog-card d-block h-100">
                             <div class="blog-img-wrap">
                                 <img src="<%= b.thumbnail_url || 'https://via.placeholder.com/600x400?text=News' %>" alt="<%= b.title %>" loading="lazy">

@@ -23,7 +23,7 @@
         <div class="row g-5 align-items-start">
 
             <!-- Gallery (Left) -->
-            <div class="col-lg-6">
+            <div class="col-lg-6" data-aos="fade-right">
                 <div class="product-gallery">
                     <!-- Main Swiper -->
                     <div class="swiper mainSwiper mb-3 rounded-4 overflow-hidden" style="background:#f4f7f3;">
@@ -64,7 +64,7 @@
             </div>
 
             <!-- Product Info (Right) -->
-            <div class="col-lg-6">
+            <div class="col-lg-6" data-aos="fade-left">
                 <% if (product.category) { %>
                     <a href="/products?category=<%= product.category.slug %>" class="detail-cat-badge">
                         <%= product.category.name %>
@@ -283,8 +283,8 @@
             <div class="mt-5 pt-4">
                 <h3 class="section-title mb-4">Sản phẩm liên quan</h3>
                 <div class="row row-cols-2 row-cols-md-4 g-4">
-                    <% relatedProducts.forEach(p => { %>
-                        <div class="col">
+                    <% relatedProducts.forEach((p, i) => { %>
+                        <div class="col" data-aos="fade-up" data-aos-delay="<%= i * 100 %>">
                             <a href="/product/<%= p.slug %>" class="fruit-card d-block text-decoration-none">
                                 <div class="fruit-card-img-wrap">
                                     <% if (p.images && p.images.length > 0) { %>

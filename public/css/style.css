@@ -143,13 +143,14 @@ a:hover {
     border: 1px solid var(--border-color);
     border-radius: 20px;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     background: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
 
 .fruit-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    transform: scale(1.02) translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08); /* Soft diffuse shadow */
 }
 
 .fruit-card img {
@@ -216,4 +217,64 @@ a:hover {
     margin: 2rem auto; 
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+/* Mobile Bottom Navigation */
+.app-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+    display: none;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 1040;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.app-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin: 0;
+    text-decoration: none;
+}
+
+.app-bottom-nav .nav-item i {
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+    transition: all 0.3s ease;
+}
+
+.app-bottom-nav .nav-item.active,
+.app-bottom-nav .nav-item:hover {
+    color: var(--brand-accent);
+}
+
+.app-bottom-nav .nav-item.active i,
+.app-bottom-nav .nav-item:hover i {
+    transform: translateY(-2px);
+}
+
+.bottom-nav-spacer {
+    height: 65px;
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    .app-bottom-nav {
+        display: flex !important;
+    }
+    .bottom-nav-spacer {
+        display: block !important;
+    }
+    .footer-dark {
+        padding-bottom: 80px; /* Thêm khoảng trống ở footer */
+    }
 }

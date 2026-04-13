@@ -78,6 +78,11 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 - [x] Tính năng Nhân bản sản phẩm (S39: Duplicate)
 - [x] Chiến dịch khuyến mãi (S40-S43: Admin CRUD, Public Checkout Apply, Product Detail Display)
 - [x] Quản lý Khách hàng (S44: Admin List/Detail/Edit/Delete, Stats, Order History, Public Profile & Address CRUD)
+### 2.10. Nâng cấp Visual & UI/UX (Phase A)
+- [x] Hiệu ứng cuộn AOS (Animate On Scroll) cho toàn bộ public site.
+- [x] Chuyển đổi toàn bộ Flash Messages sang SweetAlert2 Toast chuyên nghiệp.
+- [x] Tối ưu CSS Hover, Shadows và Micro-interactions cho thẻ sản phẩm.
+- [x] Triển khai Mobile Bottom Navigation Bar chuẩn ứng dụng di động.
 - [ ] Production deployment (Linux/VPS/Docker) (Giai đoạn 9)
 ---
 > [!TIP]
