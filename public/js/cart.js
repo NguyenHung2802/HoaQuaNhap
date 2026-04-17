@@ -2,8 +2,6 @@
  * Cart interaction logic
  */
 document.addEventListener('DOMContentLoaded', () => {
-
-    // Global Toast setup
     const Toast = Swal.mixin({
         toast: true,
         position: 'bottom-end',
@@ -11,12 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
         timer: 2500,
         timerProgressBar: true,
         didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
         }
     });
 
-    // Expose functions globally for inline handlers
     window.addToCart = async function(productId, quantity = 1) {
         try {
             const res = await fetch('/cart/add', {
@@ -34,12 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon: 'success',
                     title: 'Đã thêm sản phẩm vào giỏ!'
                 });
-            } else {
-                Toast.fire({
-                    icon: 'error',
-                    title: data.message || 'Có lỗi xảy ra'
-                });
+
+                if (window.location.pathname === '/cart') {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 300);
+                }
+
+                return;
             }
+
+            Toast.fire({
+                icon: 'error',
+                title: data.message || 'Có lỗi xảy ra'
+            });
         } catch (error) {
             console.error(error);
             Toast.fire({
@@ -53,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newQty <= 0) {
             return window.removeCartItem(productId);
         }
-        
+
         try {
             const res = await fetch('/cart/update', {
                 method: 'POST',
@@ -65,14 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await res.json();
             if (data.success) {
-                // Reload to recalculate totals
                 window.location.reload();
-            } else {
-                Toast.fire({
-                    icon: 'error',
-                    title: data.message || 'Thao tác thất bại'
-                });
+                return;
             }
+
+            Toast.fire({
+                icon: 'error',
+                title: data.message || 'Thao tác thất bại'
+            });
         } catch (error) {
             console.error(error);
             Toast.fire({
@@ -85,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.removeCartItem = async function(productId) {
         Swal.fire({
             title: 'Xóa khỏi giỏ?',
-            text: "Sản phẩm sẽ bị loại bỏ khỏi giỏ hàng của bạn.",
+            text: 'Sản phẩm sẽ bị loại bỏ khỏi giỏ hàng của bạn.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#4caf50',
@@ -93,39 +98,42 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmButtonText: 'Đồng ý',
             cancelButtonText: 'Hủy'
         }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const res = await fetch('/cart/remove', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ product_id: productId })
-                    });
-
-                    const data = await res.json();
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        Toast.fire({
-                            icon: 'error',
-                            title: data.message || 'Thao tác thất bại'
-                        });
-                    }
-                } catch (error) {
-                    console.error(error);
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Lỗi mạng'
-                    });
-                }
+            if (!result.isConfirmed) {
+                return;
             }
-        })
+
+            try {
+                const res = await fetch('/cart/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ product_id: productId })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                    return;
+                }
+
+                Toast.fire({
+                    icon: 'error',
+                    title: data.message || 'Thao tác thất bại'
+                });
+            } catch (error) {
+                console.error(error);
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Lỗi mạng'
+                });
+            }
+        });
     };
 
     function updateCartBadge(count) {
         const badges = document.querySelectorAll('.cart-badge');
-        badges.forEach(badge => {
+        badges.forEach((badge) => {
             badge.innerText = count;
             badge.classList.add('animate__animated', 'animate__rubberBand');
             setTimeout(() => {

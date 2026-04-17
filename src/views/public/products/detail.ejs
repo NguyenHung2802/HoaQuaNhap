@@ -281,26 +281,56 @@
         <!-- ===== RELATED PRODUCTS ===== -->
         <% if (relatedProducts && relatedProducts.length > 0) { %>
             <div class="mt-5 pt-4">
-                <h3 class="section-title mb-4">Sản phẩm liên quan</h3>
-                <div class="row row-cols-2 row-cols-md-4 g-4">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <h3 class="section-title mb-0">Sản phẩm liên quan</h3>
+                    <a href="/products?category=<%= product.category ? product.category.slug : '' %>" 
+                       class="btn btn-outline-primary btn-sm rounded-pill px-4">
+                        Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="row row-cols-2 row-cols-md-3 g-4">
                     <% relatedProducts.forEach((p, i) => { %>
-                        <div class="col" data-aos="fade-up" data-aos-delay="<%= i * 100 %>">
-                            <a href="/product/<%= p.slug %>" class="fruit-card d-block text-decoration-none">
-                                <div class="fruit-card-img-wrap">
-                                    <% if (p.images && p.images.length > 0) { %>
-                                        <img src="<%= p.images[0].image_url %>" alt="<%= p.name %>" loading="lazy">
-                                    <% } else { %>
-                                        <div class="fruit-card-placeholder">🍎</div>
-                                    <% } %>
+                        <div class="col" data-aos="fade-up" data-aos-delay="<%= Math.min(i * 80, 400) %>">
+                            <div class="related-card h-100">
+                                <!-- Image -->
+                                <a href="/product/<%= p.slug %>" class="d-block text-decoration-none">
+                                    <div class="related-card-img-wrap">
+                                        <% if (p.images && p.images.length > 0) { %>
+                                            <img src="<%= p.images[0].image_url %>" alt="<%= p.name %>" loading="lazy">
+                                        <% } else { %>
+                                            <div class="related-card-placeholder">🍎</div>
+                                        <% } %>
+                                        <!-- Badges -->
+                                        <div class="related-card-badges">
+                                            <% if (p.isFlashSale) { %>
+                                                <span class="badge-flash">⚡ Flash Sale</span>
+                                            <% } else if (p.isDiscounted && p.discountPercent >= 5) { %>
+                                                <span class="badge-discount">-<%= p.discountPercent %>%</span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </a>
+                                <!-- Body -->
+                                <div class="related-card-body">
+                                    <a href="/product/<%= p.slug %>" class="text-decoration-none">
+                                        <h6 class="related-card-name"><%= p.name %></h6>
+                                    </a>
+                                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                        <span class="related-price-main">
+                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.bestPrice) %>
+                                        </span>
+                                        <% if (p.isDiscounted) { %>
+                                            <span class="related-price-old">
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.originalPrice) %>
+                                            </span>
+                                        <% } %>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm rounded-pill w-100 related-add-btn"
+                                            onclick="event.preventDefault(); addToCart(<%= p.id %>, 1)">
+                                        <i class="fas fa-basket-shopping me-1"></i>Thêm vào giỏ
+                                    </button>
                                 </div>
-                                <div class="fruit-card-body">
-                                    <h5 class="fruit-card-name"><%= p.name %></h5>
-                                    <span class="price-main"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.bestPrice) %></span>
-                                    <% if (p.isDiscounted) { %>
-                                        <span class="small text-muted text-decoration-line-through ms-1"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.originalPrice) %></span>
-                                    <% } %>
-                                </div>
-                            </a>
+                            </div>
                         </div>
                     <% }) %>
                 </div>
@@ -362,6 +392,23 @@
 .fruit-card-body { padding: 16px; }
 .fruit-card-name { font-family: var(--font-heading); font-size: 0.95rem; color: var(--brand-primary); margin-bottom: 8px; line-height: 1.3; }
 .price-main { font-weight: 700; font-size: 1rem; color: var(--brand-accent); }
+
+/* Related Products Grid */
+.related-card { border: 1px solid #eee; border-radius: 16px; overflow: hidden; background: #fff; transition: all 0.3s ease; display: flex; flex-direction: column; }
+.related-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-color: var(--brand-primary); }
+.related-card-img-wrap { position: relative; padding-top: 80%; background: #f8fafc; overflow: hidden; }
+.related-card-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.related-card:hover .related-card-img-wrap img { transform: scale(1.05); }
+.related-card-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+.related-card-badges { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.badge-flash { background: #ef4444; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 4px rgba(239,68,68,0.3); }
+.badge-discount { background: var(--brand-accent); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+.related-card-body { padding: 14px; display: flex; flex-direction: column; flex-grow: 1; }
+.related-card-name { font-family: var(--font-heading); font-size: 0.95rem; color: var(--brand-primary); margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em; }
+.related-price-main { font-weight: 800; font-size: 1.05rem; color: var(--brand-accent); }
+.related-price-old { font-size: 0.8rem; text-decoration: line-through; color: #9ca3af; }
+.related-add-btn { margin-top: auto; font-weight: 600; padding: 6px 0; border-width: 2px; }
+.related-add-btn:hover { background: var(--brand-primary); color: #fff; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
@@ -528,7 +575,7 @@
     "@type": "Offer",
     "url": "<%= baseUrl %>/product/<%= product.slug %>",
     "priceCurrency": "VND",
-    "price": "<%= product.sale_price || product.price %>",
+    "price": "<%= product.bestPrice || product.price %>",
     "availability": "https://schema.org/<%= product.stock_quantity > 0 ? 'InStock' : 'OutOfStock' %>",
     "itemCondition": "https://schema.org/NewCondition"
   }

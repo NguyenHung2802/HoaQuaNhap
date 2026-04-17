@@ -6,23 +6,37 @@ const { getActivePromotions, calculateBestPrice } = require('../../../utils/prom
  */
 exports.renderHome = async (req, res, next) => {
   try {
-    // 1. Sản phẩm nổi bật (4 featured)
+    // 1. Sản phẩm nổi bật (take 8 để có dư cho dedup)
     const featuredProducts = await db.product.findMany({
       where: { is_featured: true, status: 'published' },
       include: {
         images: { where: { is_thumbnail: true }, take: 1 }
       },
-      take: 4,
+      take: 8,
       orderBy: { created_at: 'desc' }
     });
 
-    // 2. Sản phẩm bán chạy (4 best_seller)
+    // 2. Sản phẩm bán chạy (take 8 để có dư cho dedup)
     const bestSellers = await db.product.findMany({
       where: { is_best_seller: true, status: 'published' },
       include: {
         images: { where: { is_thumbnail: true }, take: 1 }
       },
-      take: 4,
+      take: 8,
+      orderBy: { created_at: 'desc' }
+    });
+
+    // 2.5 Sản phẩm Flash Sale
+    const flashSaleProducts = await db.product.findMany({
+      where: { 
+        is_flash_sale: true, 
+        status: 'published',
+        flash_sale_end: { gt: new Date() }
+      },
+      include: {
+        images: { where: { is_thumbnail: true }, take: 1 }
+      },
+      take: 8,
       orderBy: { created_at: 'desc' }
     });
 
@@ -56,6 +70,7 @@ exports.renderHome = async (req, res, next) => {
       metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại WebHoaQua — Tươi ngon, đảm bảo chất lượng, giao hàng tận nơi.',
       featuredProducts: featuredProducts.map(mapWithBestPrice),
       bestSellers: bestSellers.map(mapWithBestPrice),
+      flashSaleProducts: flashSaleProducts.map(mapWithBestPrice),
       categories,
       banners,
       latestBlogs,
@@ -68,7 +83,10 @@ exports.renderHome = async (req, res, next) => {
       metaDesc: '',
       featuredProducts: [],
       bestSellers: [],
+      flashSaleProducts: [],
       categories: [],
+      banners: [],
+      latestBlogs: [],
       layout: 'layouts/main'
     });
   }

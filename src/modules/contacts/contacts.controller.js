@@ -56,7 +56,7 @@ const sendTelegramNotification = (contact) => {
     return new Promise((resolve) => {
         try {
             const botToken = process.env.TELEGRAM_BOT_TOKEN;
-            const chatId = process.env.TELEGRAM_CHAT_ID;
+            const chatId = process.env.TELEGRAM_CHAT_GROUP_ID || process.env.TELEGRAM_CHAT_ID;
 
             if (!botToken || !chatId || botToken.includes('123456789')) {
                 console.log('[Telegram] Chưa cấu hình thật, bỏ qua.');

@@ -1,5 +1,9 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 const ordersService = require('./orders.service');
 const { sendOrderNotificationEmail, sendOrderTelegramNotification } = require('../../utils/order-notification');
+const loyaltyService = require('../loyalty/loyalty.service');
 
 /**
  * Xử lý đặt hàng nhanh cho Guest
@@ -18,9 +22,7 @@ exports.quickCheckout = async (req, res) => {
         });
 
         // 🔔 Gửi thông báo đơn hàng nhanh (async, không block)
-        const { PrismaClient: _P } = require('@prisma/client');
-        const _pq = new _P();
-        _pq.order.findUnique({
+        prisma.order.findUnique({
             where: { id: order.id },
             include: { items: { select: { product_name_snapshot: true, quantity: true, price_snapshot: true } } }
         }).then(fullOrder => {
@@ -93,9 +95,6 @@ exports.renderSuccess = async (req, res) => {
     }
 };
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
 /**
  * Render trang danh sách đơn hàng của khách hàng (Frontend)
  */
@@ -107,13 +106,13 @@ exports.renderMyOrders = async (req, res, next) => {
             return res.redirect('/auth/login?redirect=/orders');
         }
 
+        const orConditions = [{ customer: { user_id: user.id } }];
+        if (user.phone) {
+            orConditions.push({ customer_phone: user.phone });
+        }
+
         const orders = await prisma.order.findMany({
-            where: {
-                OR: [
-                    { customer: { user_id: user.id } },
-                    { customer_phone: user.phone }
-                ]
-            },
+            where: { OR: orConditions },
             include: {
                 items: {
                     include: {
@@ -136,5 +135,91 @@ exports.renderMyOrders = async (req, res, next) => {
     } catch (e) {
         console.error('Lỗi khi tải lịch sử đơn hàng:', e);
         next(e);
+    }
+};
+
+/**
+ * [GET] /track-order
+ * Render trang tra cứu đơn hàng cho Guest
+ */
+exports.renderTrackOrder = (req, res) => {
+    res.render('public/orders/track-order', {
+        title: 'Tra cứu đơn hàng',
+        layout: 'layouts/main',
+        orders: [],
+        error: null,
+        queryData: {}
+    });
+};
+
+/**
+ * [POST] /track-order
+ * Xử lý tra cứu đơn hàng theo sđt HOẶC mã đơn
+ */
+exports.processTrackOrder = async (req, res) => {
+    try {
+        const { phone, order_code } = req.body;
+
+        if (!phone && !order_code) {
+            return res.render('public/orders/track-order', {
+                title: 'Tra cứu đơn hàng',
+                layout: 'layouts/main',
+                orders: [],
+                error: 'Vui lòng nhập Mã đơn hàng hoặc Số điện thoại.',
+                queryData: { phone, order_code }
+            });
+        }
+
+        const cleanPhone = phone ? phone.trim() : '';
+        const cleanCode = order_code ? order_code.trim() : '';
+
+        let orders = [];
+
+        if (cleanCode) { // Có mã đơn hàng, ưu tiên mã đơn hàng
+            const order = await prisma.order.findFirst({
+                where: { order_code: { equals: cleanCode, mode: 'insensitive' } },
+                include: { items: { include: { product: { select: { images: { take: 1, select: { image_url: true } } } } } } }
+            });
+            if (order) orders = [order];
+        } else if (cleanPhone) { // Chỉ có SĐT
+            orders = await prisma.order.findMany({
+                where: {
+                    OR: [
+                        { customer_phone: { contains: cleanPhone } },
+                        { receiver_phone: { contains: cleanPhone } }
+                    ]
+                },
+                include: { items: { include: { product: { select: { images: { take: 1, select: { image_url: true } } } } } } },
+                orderBy: { created_at: 'desc' },
+                take: 50 // Ngăn việc tải quá nhiều đơn cũ gây chậm query
+            });
+        }
+
+        if (orders.length === 0) {
+            return res.render('public/orders/track-order', {
+                title: 'Tra cứu đơn hàng',
+                layout: 'layouts/main',
+                orders: [],
+                error: 'Không tìm thấy đơn hàng! Vui lòng kiểm tra lại thông tin đã nhập.',
+                queryData: { phone, order_code }
+            });
+        }
+
+        res.render('public/orders/track-order', {
+            title: 'Kết quả tra cứu đơn hàng',
+            layout: 'layouts/main',
+            orders,
+            error: null,
+            queryData: { phone, order_code }
+        });
+    } catch (e) {
+        console.error('Lỗi khi tra cứu đơn hàng:', e);
+        res.render('public/orders/track-order', {
+            title: 'Tra cứu đơn hàng',
+            layout: 'layouts/main',
+            orders: [],
+            error: 'Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau ít phút.',
+            queryData: req.body
+        });
     }
 };

@@ -1,0 +1,199 @@
+<!-- Breadcrumb -->
+<nav class="bg-light py-3 border-bottom">
+    <div class="container">
+        <ol class="breadcrumb mb-0 small uppercase fw-bold" style="letter-spacing: 0.05em;">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Về chúng tôi</li>
+        </ol>
+    </div>
+</nav>
+
+<!-- ===== HERO ABOUT ===== -->
+<section class="about-hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6" data-aos="fade-right">
+                <p class="section-eyebrow">Câu chuyện của chúng tôi</p>
+                <h1 class="about-hero-title">Hải Anh Fruit — <br>Tươi Ngon Từ <span class="text-accent">Tâm Huyết</span></h1>
+                <p class="about-hero-desc">
+                    Được thành lập bởi niềm đam mê với trái cây nhập khẩu chất lượng cao, Hải Anh Fruit ra đời với sứ mệnh
+                    mang những loại trái cây tươi ngon nhất từ khắp nơi trên thế giới đến tay người tiêu dùng Hà Nội —
+                    đảm bảo chất lượng, an toàn và giá cả minh bạch.
+                </p>
+                <div class="about-stats d-flex flex-wrap gap-4 mt-4">
+                    <div class="about-stat-item">
+                        <span class="about-stat-number">200+</span>
+                        <span class="about-stat-label">Loại trái cây</span>
+                    </div>
+                    <div class="about-stat-item">
+                        <span class="about-stat-number">5000+</span>
+                        <span class="about-stat-label">Khách hàng tin dùng</span>
+                    </div>
+                    <div class="about-stat-item">
+                        <span class="about-stat-number">15+</span>
+                        <span class="about-stat-label">Quốc gia nhập khẩu</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="about-img-grid">
+                    <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=700&q=80" 
+                         alt="Giỏ trái cây cao cấp" class="about-img-main rounded-4">
+                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" 
+                         alt="Trái cây nhập khẩu" class="about-img-secondary rounded-4">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== VALUES ===== -->
+<section class="section-padding bg-light-grey">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-eyebrow">Giá trị cốt lõi</p>
+            <h2 class="section-title">Chúng Tôi Cam Kết Điều Gì?</h2>
+        </div>
+        <div class="row g-4">
+            <% [
+                {
+                    icon: 'fas fa-leaf',
+                    color: '#e8f5e9',
+                    title: 'Chất lượng tuyệt đối',
+                    desc: 'Mỗi lô hàng đều được kiểm tra nghiêm ngặt về độ chín, độ tươi và an toàn thực phẩm trước khi đến tay khách hàng. Chúng tôi cộng tác trực tiếp với các vườn cây uy tín tại Hàn Quốc, Nhật Bản, Mỹ, Úc, New Zealand.'
+                },
+                {
+                    icon: 'fas fa-file-certificate',
+                    color: '#fff8e1',
+                    title: 'Minh bạch nguồn gốc',
+                    desc: 'Toàn bộ sản phẩm tại Hải Anh Fruit đều có giấy tờ kiểm định nhập khẩu, tem kiểm dịch đầy đủ, xuất xứ rõ ràng. Quý khách hoàn toàn có thể yêu cầu xem giấy tờ nguồn gốc sản phẩm.'
+                },
+                {
+                    icon: 'fas fa-snowflake',
+                    color: '#e3f2fd',
+                    title: 'Bảo quản chuẩn quốc tế',
+                    desc: 'Hệ thống kho lạnh và vận chuyển nhiệt độ kiểm soát đảm bảo trái cây giữ được độ tươi ngon tối đa từ lúc nhập khẩu đến tay người tiêu dùng tại Hà Nội.'
+                },
+                {
+                    icon: 'fas fa-handshake',
+                    color: '#fce4ec',
+                    title: 'Dịch vụ tận tâm',
+                    desc: 'Đội ngũ tư vấn luôn sẵn sàng hỗ trợ từ 8:00 đến 21:00 mỗi ngày. Chúng tôi hỗ trợ giao hàng nội thành Hà Nội trong ngày, bao gồm các quận Hoàn Kiếm, Ba Đình, Tây Hồ, Cầu Giấy, Đống Đa, Từ Liêm và nhiều khu vực khác.'
+                }
+            ].forEach((v, i) => { %>
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="<%= i * 100 %>">
+                    <div class="value-card" style="background: <%= v.color %>;">
+                        <div class="value-icon"><i class="<%= v.icon %>"></i></div>
+                        <h4 class="value-title"><%= v.title %></h4>
+                        <p class="value-desc"><%= v.desc %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ===== STORY ===== -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-5" data-aos="fade-right">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=700&q=80" 
+                     alt="Cửa hàng trái cây Hải Anh" class="rounded-4 w-100" style="max-height: 460px; object-fit: cover;">
+            </div>
+            <div class="col-lg-7" data-aos="fade-left">
+                <p class="section-eyebrow">Hành trình của chúng tôi</p>
+                <h2 class="section-title">Từ Niềm Đam Mê<br>Đến Thương Hiệu</h2>
+                <p class="text-muted mt-3 lh-lg">
+                    Hải Anh Fruit được thành lập bởi những người yêu trái cây, với xuất phát điểm là mong muốn
+                    mang đến cho gia đình Hà Nội những loại trái cây thực sự tươi ngon, an toàn — không phải
+                    những trái cây bảo quản hóa chất hay xuất xứ không rõ ràng.
+                </p>
+                <p class="text-muted lh-lg">
+                    Trải qua nhiều năm phát triển, chúng tôi đã xây dựng được mạng lưới nhà cung cấp uy tín
+                    tại hơn 15 quốc gia, cùng hệ thống giao hàng chuyên nghiệp phục vụ toàn bộ khu vực Hà Nội
+                    và các vùng lân cận như Hà Đông, Đông Anh, Gia Lâm.
+                </p>
+                <div class="d-flex gap-3 mt-4 flex-wrap">
+                    <a href="/products" class="btn btn-primary rounded-pill px-4">Xem sản phẩm</a>
+                    <a href="/contact" class="btn btn-outline-success rounded-pill px-4">Liên hệ chúng tôi</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONTACT INFO ===== -->
+<section class="section-padding bg-light-grey">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-eyebrow">Đến thăm chúng tôi</p>
+            <h2 class="section-title">Thông Tin Liên Hệ</h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4" data-aos="fade-up">
+                <div class="contact-info-card text-center">
+                    <div class="contact-info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h5>Địa chỉ cửa hàng</h5>
+                    <p class="text-muted">N05 Ecohome 3, Đông Ngạc,<br>Bắc Từ Liêm, Hà Nội</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="contact-info-card text-center">
+                    <div class="contact-info-icon"><i class="fas fa-phone-alt"></i></div>
+                    <h5>Hotline</h5>
+                    <p class="text-muted"><a href="tel:0364672920" class="text-decoration-none">0364 672 920</a><br>
+                    <small>Phục vụ: 8:00 – 21:00 hàng ngày</small></p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="contact-info-card text-center">
+                    <div class="contact-info-icon"><i class="fas fa-envelope"></i></div>
+                    <h5>Email hỗ trợ</h5>
+                    <p class="text-muted"><a href="mailto:cskhhaianhfruit.vn@gmail.com" class="text-decoration-none">cskhhaianhfruit.vn@gmail.com</a><br>
+                    <small>Phản hồi trong vòng 2 giờ</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.section-eyebrow { color: var(--brand-accent); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-heading); font-size: clamp(1.8rem, 3vw, 2.5rem); color: var(--brand-primary); line-height: 1.2; }
+.bg-light-grey { background: #f4f7f3; }
+.section-padding { padding: 72px 0; }
+.text-accent { color: var(--brand-accent); }
+
+/* About Hero */
+.about-hero-section { padding: 80px 0; background: #fff; }
+.about-hero-title { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3rem); color: var(--brand-primary); line-height: 1.15; margin-bottom: 1.2rem; }
+.about-hero-desc { color: var(--text-muted); line-height: 1.8; font-size: 1.05rem; }
+.about-stats { gap: 2rem; }
+.about-stat-item { display: flex; flex-direction: column; }
+.about-stat-number { font-size: 2rem; font-weight: 800; color: var(--brand-accent); line-height: 1; }
+.about-stat-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+
+/* About Image Grid */
+.about-img-grid { position: relative; }
+.about-img-main { width: 100%; max-height: 400px; object-fit: cover; }
+.about-img-secondary { position: absolute; bottom: -24px; right: -16px; width: 45%; max-height: 200px; object-fit: cover; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+
+/* Values */
+.value-card { border-radius: 20px; padding: 32px; height: 100%; transition: transform 0.3s ease; }
+.value-card:hover { transform: translateY(-5px); }
+.value-icon { font-size: 2rem; color: var(--brand-primary); margin-bottom: 16px; }
+.value-title { font-family: var(--font-heading); font-size: 1.2rem; color: var(--brand-primary); margin-bottom: 12px; }
+.value-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; margin: 0; }
+
+/* Contact Info Card */
+.contact-info-card { background: #fff; border-radius: 16px; padding: 32px 24px; border: 1px solid #eee; height: 100%; transition: all 0.3s ease; }
+.contact-info-card:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.08); transform: translateY(-4px); }
+.contact-info-icon { font-size: 1.8rem; color: var(--brand-accent); margin-bottom: 16px; }
+.contact-info-card h5 { font-weight: 700; color: var(--brand-primary); margin-bottom: 12px; }
+
+@media (max-width: 768px) {
+    .about-img-secondary { display: none; }
+    .about-hero-section { padding: 48px 0; }
+}
+</style>

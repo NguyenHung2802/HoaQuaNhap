@@ -129,7 +129,7 @@ const sendOrderTelegramNotification = (order) => {
     return new Promise((resolve) => {
         try {
             const botToken = process.env.TELEGRAM_BOT_TOKEN;
-            const chatId = process.env.TELEGRAM_CHAT_ID;
+            const chatId = process.env.TELEGRAM_CHAT_GROUP_ID || process.env.TELEGRAM_CHAT_ID;
 
             console.log(`[Telegram] Bắt đầu gửi cho đơn #${order.order_code}, chatId: ${chatId}`);
 

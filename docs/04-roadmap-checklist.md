@@ -84,6 +84,24 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 - [x] Tối ưu CSS Hover, Shadows và Micro-interactions cho thẻ sản phẩm.
 - [x] Triển khai Mobile Bottom Navigation Bar chuẩn ứng dụng di động.
 - [ ] Production deployment (Linux/VPS/Docker) (Giai đoạn 9)
+### 2.11. Homepage Revamp & Content Authenticity (Phase 10 — 2026-04-13)
+- [x] **Hero Section:** Thay 1 ảnh fallback xấu → 3 slides động với ảnh trái cây, giỏ quà, rau quả từ Unsplash.
+- [x] **Trust Bar:** Thêm thanh badge "Nhập khẩu chính hãng / Giao nội thành HN trong ngày / Đổi trả 24h / CSKH 8-21h".
+- [x] **Sản phẩm Yêu Thích:** Fix dedup logic (Map theo ID, ưu tiên best_seller > featured, pool tăng lên 8).
+- [x] **Combo Section:** Redesign hoàn toàn → 4 cards responsive (Buổi Sáng, Quà Biếu, Mùa Hè, Gia Đình), mỗi card link đến filter phù hợp.
+- [x] **Testimonials:** Thay địa danh TP.HCM, Đà Nẵng → Cầu Giấy / Hoàn Kiếm / Tây Hồ (Hà Nội).
+- [x] **Trang About:** Tạo nội dung đầy đủ — câu chuyện thương hiệu, giá trị cốt lõi, số liệu, CTA. Địa danh Hà Nội chuẩn.
+- [x] **Trang Shipping Policy:** Tạo nội dung đầy đủ — bảng phí, khu vực giao hàng (chỉ Hà Nội), thời gian, chính sách đổi trả.
+- [x] **Routes:** `/about` và `/shipping` render trực tiếp từ EJS (không phụ thuộc DB setting).
+
+### 2.12. Nâng cấp Chuyên sâu & Cơ chế giữ chân khách hàng (Phase 11)
+- [ ] Tham chiếu Master Plan chi tiết trong `.ai/runs/_current/11_plan.md`
+- [x] Hoàn thiện Phase 9 UI: Frontend Contact Popup
+- [x] Tính năng Tra cứu Đơn hàng cho Khách vãng lai (Guest Tracking)
+- [x] Plugin Flash Sale Khung Giờ Vàng
+- [ ] Thuật toán Gợi ý Sản phẩm Liên Quan / Mua Cùng (Cross-Selling - đã sửa hiển thị campaign ship trong cart và reload giỏ khi thêm từ block gợi ý)
+- [ ] Membership & Loyalty Points (Tích điểm Quả Dâu - đã xong schema, cộng/trừ điểm trong checkout và hiển thị điểm ở checkout/profile)
+- [ ] Worker Sao lưu Cơ sở Dữ liệu (Auto Backup Database)
 ---
 > [!TIP]
 > Hãy luôn cập nhật checklist sau mỗi Giai đoạn hoàn thành thành công và được test kỹ lưỡng.

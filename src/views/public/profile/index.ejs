@@ -57,6 +57,17 @@
                             <h4 class="fw-bold mb-4 font-serif text-brand">Hồ sơ cá nhân</h4>
                             <p class="text-muted mb-5 small">Quản lý các thông tin cá nhân cơ bản để bảo mật tài khoản và thuận tiện khi mua sắm.</p>
                             
+                            <div class="reward-points-box rounded-4 p-4 mb-4 d-flex align-items-center justify-content-between gap-3">
+                                <div>
+                                    <div class="small text-uppercase fw-bold text-muted mb-1">Điểm Quả Dâu</div>
+                                    <div class="h4 mb-1 text-brand fw-bold"><%= profile.reward_points || 0 %> điểm</div>
+                                    <div class="small text-muted">1 điểm đổi được 1.000đ khi thanh toán.</div>
+                                </div>
+                                <div class="reward-points-icon">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                            </div>
+
                             <form action="/profile/update" method="POST" id="profile-form">
                                 <div class="row g-4">
                                     <div class="col-md-6">
@@ -221,6 +232,8 @@
     .btn-outline-accent:hover { background: #2e7d32; color: #fff; }
     .border-dashed { border: 1px dashed #ddd; transition: border-color 0.3s; }
     .address-item:hover { border-color: #2e7d32; }
+    .reward-points-box { background: linear-gradient(135deg, #fff8e1 0%, #fffdf5 100%); border: 1px solid #f1c40f; }
+    .reward-points-icon { width: 56px; height: 56px; border-radius: 50%; background: rgba(241, 196, 15, 0.16); color: #b7791f; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
     
     .avatar-wrapper { width: 100px; height: 100px; }
     .avatar-edit-btn {

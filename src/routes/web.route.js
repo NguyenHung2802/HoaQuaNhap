@@ -59,11 +59,11 @@ router.post('/contact/submit', async (req, res) => {
         res.status(500).json({ success: false, message: 'Đã có lỗi xảy ra, vui lòng thử lại sau.' });
     }
 });
-router.get('/about', (req, res, next) => { req.params.key = 'about_us'; pagesController.renderPage(req, res, next); });
+router.get('/about', (req, res) => res.render('public/pages/about', { title: 'Về chúng tôi — Hải Anh Fruit', layout: 'layouts/main' }));
 router.get('/faq', (req, res, next) => { req.params.key = 'faq'; pagesController.renderPage(req, res, next); });
 router.get('/policy', (req, res, next) => { req.params.key = 'policy'; pagesController.renderPage(req, res, next); });
 router.get('/privacy', (req, res, next) => { req.params.key = 'policy'; pagesController.renderPage(req, res, next); });
-router.get('/shipping', (req, res, next) => { req.params.key = 'shipping_policy'; pagesController.renderPage(req, res, next); });
+router.get('/shipping', (req, res) => res.render('public/pages/policy-shipping', { title: 'Chính sách vận chuyển — Hải Anh Fruit', layout: 'layouts/main' }));
 router.get('/return', (req, res, next) => { req.params.key = 'return_policy'; pagesController.renderPage(req, res, next); });
 router.get('/page/:key', pagesController.renderPage);
 
@@ -73,6 +73,10 @@ router.post('/product/:id/review', publicProductsController.submitReview);
 // Cart & Checkout Pages
 router.use('/cart', cartRoutes);
 router.use('/checkout', checkoutRoutes);
+
+// Track Order
+router.get('/track-order', ordersController.renderTrackOrder);
+router.post('/track-order', ordersController.processTrackOrder);
 
 // Checkout Success
 router.get('/checkout/success/:orderCode', ordersController.renderSuccess);

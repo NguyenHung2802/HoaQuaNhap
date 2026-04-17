@@ -1,5 +1,6 @@
 const db = require('../../../config/db');
 const cloudinary = require('../../../config/cloudinary');
+const loyaltyService = require('../../loyalty/loyalty.service');
 
 /**
  * Render trang Hồ sơ cá nhân
@@ -26,6 +27,8 @@ exports.renderProfile = async (req, res) => {
             req.flash('error_msg', 'Không tìm thấy thông tin tài khoản.');
             return res.redirect('/');
         }
+
+        user.reward_points = await loyaltyService.getUserRewardPoints(userId, db);
 
         res.render('public/profile/index', {
             title: 'Hồ sơ cá nhân',
@@ -81,6 +84,7 @@ exports.updateProfile = async (req, res) => {
             // Cập nhật lại session
             req.session.user.full_name = updatedUser.full_name;
             req.session.user.email = updatedUser.email;
+            req.session.user.phone = updatedUser.phone;
         });
 
         req.flash('success_msg', 'Cập nhật hồ sơ thành công!');

@@ -19,12 +19,14 @@ model User {
   avatar_url    String?
   role          String    @default("customer") // admin, customer, editor
   status        String    @default("active") // active, inactive, locked
+  reward_points Int       @default(0)
   last_login_at DateTime?
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
 
-  blog_posts BlogPost[]
-  customer   Customer?
+  blog_posts     BlogPost[]
+  customer       Customer?
+  point_histories PointHistory[]
 }
 
 model Category {
@@ -63,6 +65,9 @@ model Product {
   status            String    @default("published") // published, draft, out_of_stock
   is_featured       Boolean   @default(false)
   is_best_seller    Boolean   @default(false)
+  is_flash_sale     Boolean   @default(false)
+  flash_sale_price  Decimal?  @db.Decimal(10, 2)
+  flash_sale_end    DateTime?
   nutritional_info  String?   @db.Text
   published_at      DateTime?
   created_at        DateTime  @default(now())
@@ -193,7 +198,21 @@ model Order {
   promotion         PromotionCampaign? @relation(fields: [promotion_id], references: [id])
   shipping_campaign ShippingCampaign?  @relation(fields: [shipping_campaign_id], references: [id])
   items             OrderItem[]
+  point_histories   PointHistory[]
   status_logs       OrderStatusLog[]
+}
+
+model PointHistory {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  order_id   Int?
+  type       String   // earn, redeem, manual_adjust
+  points     Int
+  note       String?
+  created_at DateTime @default(now())
+
+  user  User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [order_id], references: [id], onDelete: SetNull)
 }
 
 model OrderItem {

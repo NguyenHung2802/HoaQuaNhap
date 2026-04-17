@@ -83,7 +83,7 @@ const createProduct = async (data) => {
         category_id, origin_country, unit, weight_value, 
         packing_type, price, sale_price, cost_price, 
         stock_quantity, min_stock_alert, status, 
-        is_featured, is_best_seller, nutritional_info, images 
+        is_featured, is_best_seller, is_flash_sale, flash_sale_price, flash_sale_end, nutritional_info, images 
     } = data;
 
     return await prisma.$transaction(async (tx) => {
@@ -126,6 +126,9 @@ const createProduct = async (data) => {
                 status: status || 'published',
                 is_featured: is_featured === 'true' || is_featured === true,
                 is_best_seller: is_best_seller === 'true' || is_best_seller === true,
+                is_flash_sale: is_flash_sale === 'true' || is_flash_sale === true,
+                flash_sale_price: flash_sale_price && (is_flash_sale === 'true' || is_flash_sale === true) ? parseFloat(flash_sale_price) : null,
+                flash_sale_end: flash_sale_end && (is_flash_sale === 'true' || is_flash_sale === true) ? new Date(flash_sale_end) : null,
                 nutritional_info: nutritional_info || null,
             }
         });
@@ -170,7 +173,7 @@ const updateProduct = async (id, data) => {
         category_id, origin_country, unit, weight_value, 
         packing_type, price, sale_price, cost_price, 
         stock_quantity, min_stock_alert, status, 
-        is_featured, is_best_seller, nutritional_info, new_images, delete_image_ids 
+        is_featured, is_best_seller, is_flash_sale, flash_sale_price, flash_sale_end, nutritional_info, new_images, delete_image_ids 
     } = data;
 
     return await prisma.$transaction(async (tx) => {
@@ -197,6 +200,9 @@ const updateProduct = async (id, data) => {
                 status: status || 'published',
                 is_featured: is_featured === 'true' || is_featured === true,
                 is_best_seller: is_best_seller === 'true' || is_best_seller === true,
+                is_flash_sale: is_flash_sale === 'true' || is_flash_sale === true,
+                flash_sale_price: flash_sale_price && (is_flash_sale === 'true' || is_flash_sale === true) ? parseFloat(flash_sale_price) : null,
+                flash_sale_end: flash_sale_end && (is_flash_sale === 'true' || is_flash_sale === true) ? new Date(flash_sale_end) : null,
                 nutritional_info: nutritional_info,
             }
         });

@@ -1,4 +1,9 @@
-<% if ((typeof success_msg !== 'undefined' && success_msg.length > 0) || (typeof error_msg !== 'undefined' && error_msg.length > 0) || (typeof error !== 'undefined' && error.length > 0)) { %>
+<% 
+    const _hasSuccess = typeof success_msg !== 'undefined' && Array.isArray(success_msg) && success_msg.length > 0;
+    const _hasErrMsg  = typeof error_msg   !== 'undefined' && Array.isArray(error_msg)   && error_msg.length   > 0;
+    const _hasErr     = typeof error        !== 'undefined' && Array.isArray(error)        && error.length        > 0;
+%>
+<% if (_hasSuccess || _hasErrMsg || _hasErr) { %>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const Toast = Swal.mixin({
@@ -13,21 +18,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    <% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
+    <% if (_hasSuccess) { %>
         Toast.fire({
             icon: 'success',
             title: '<%= success_msg %>'
         });
     <% } %>
 
-    <% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+    <% if (_hasErrMsg) { %>
         Toast.fire({
             icon: 'error',
             title: '<%= error_msg %>'
         });
     <% } %>
 
-    <% if (typeof error !== 'undefined' && error.length > 0) { %>
+    <% if (_hasErr) { %>
         Toast.fire({
             icon: 'error',
             title: '<%= error %>'

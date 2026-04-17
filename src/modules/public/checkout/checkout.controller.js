@@ -2,6 +2,7 @@ const cartService = require('../cart/cart.service');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { sendOrderNotificationEmail, sendOrderTelegramNotification } = require('../../../utils/order-notification');
+const loyaltyService = require('../../loyalty/loyalty.service');
 
 /**
  * [GET] /checkout
@@ -32,6 +33,7 @@ const renderCheckout = async (req, res, next) => {
 
         // ... (customer logic) ...
         let customerInfo = null;
+        let loyaltySummary = null;
         if (req.session.user) {
             customerInfo = {
                 full_name: req.session.user.full_name,
@@ -55,6 +57,8 @@ const renderCheckout = async (req, res, next) => {
                     customerInfo.address = customer.addresses[0];
                 }
             }
+
+            loyaltySummary = await loyaltyService.getCheckoutLoyaltySummary(req.session.user.id, totalAmount, prisma);
         }
 
         // Fetch active shipping campaigns
@@ -73,6 +77,7 @@ const renderCheckout = async (req, res, next) => {
             availablePromotions,
             shippingCampaigns,
             customerInfo,
+            loyaltySummary,
             layout: 'layouts/main'
         });
     } catch (error) {
@@ -96,6 +101,10 @@ const placeOrder = async (req, res, next) => {
         
         // Process order in a transaction
         const order = await checkoutService.processOrder(req.body, sessionCart, userId);
+
+        if (userId) {
+            req.session.user.reward_points = await loyaltyService.getUserRewardPoints(userId, prisma);
+        }
 
         // Clear cart session
         req.session.cart = [];

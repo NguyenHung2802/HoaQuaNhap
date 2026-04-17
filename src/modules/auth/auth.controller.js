@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const db = require('../../config/db');
+const loyaltyService = require('../loyalty/loyalty.service');
 
 /**
  * Render trang Đăng nhập (Unified)
@@ -124,11 +125,15 @@ exports.login = async (req, res) => {
         }
 
         // 4. Lưu session
+        const rewardPoints = await loyaltyService.getUserRewardPoints(user.id, db);
+
         req.session.user = {
             id: user.id,
             full_name: user.full_name,
             email: user.email,
-            role: user.role
+            phone: user.phone,
+            role: user.role,
+            reward_points: rewardPoints
         };
 
         await db.user.update({

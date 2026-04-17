@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { calculateBestPrice, getActivePromotions } = require('../../../utils/promotion-helper');
+const loyaltyService = require('../../loyalty/loyalty.service');
 
 /**
  * Generate unique order code: WHQ-YYMMDD-XXXX
@@ -183,7 +184,31 @@ const processOrder = async (orderData, sessionCart, userId) => {
             }
         }
 
-        const totalDiscount = Math.round(couponDiscountAmount + promotionDiscountAmount);
+        const baseDiscount = Math.round(couponDiscountAmount + promotionDiscountAmount);
+        let rewardPointsUsed = 0;
+        let rewardDiscountAmount = 0;
+
+        if (userId) {
+            const requestedRewardPoints = parseInt(orderData.reward_points_to_use, 10) || 0;
+            if (requestedRewardPoints > 0) {
+                const availableRewardPoints = await loyaltyService.getUserRewardPoints(userId, tx);
+                const payableBeforeReward = Math.max(0, subtotalAmount - baseDiscount);
+                const maxRewardPointsByOrder = Math.floor(payableBeforeReward / loyaltyService.POINT_VALUE_VND);
+
+                if (requestedRewardPoints > availableRewardPoints) {
+                    throw new Error('Số điểm hiện tại không đủ để áp dụng cho đơn hàng này.');
+                }
+
+                if (requestedRewardPoints > maxRewardPointsByOrder) {
+                    throw new Error('Số điểm muốn dùng vượt quá giá trị đơn hàng hiện tại.');
+                }
+
+                rewardPointsUsed = requestedRewardPoints;
+                rewardDiscountAmount = loyaltyService.calculateRedeemDiscount(rewardPointsUsed);
+            }
+        }
+
+        const totalDiscount = Math.round(baseDiscount + rewardDiscountAmount);
         
         // --- NEW: Shipping Logic (Manual Handling) ---
         let baseShippingFee = 0; // Luôn để 0 vì xử lý thủ công sau
@@ -217,6 +242,7 @@ const processOrder = async (orderData, sessionCart, userId) => {
 
         // TỔNG TIỀN: Chỉ tính tiền hàng - giảm giá hàng. KHÔNG TÍNH SHIP.
         const finalTotal = Math.max(0, subtotalAmount - totalDiscount);
+        const earnedRewardPoints = userId ? loyaltyService.calculateEarnedPoints(finalTotal) : 0;
 
         // ... (resolve customer logic) ...
         let customerId = null;
@@ -325,6 +351,24 @@ const processOrder = async (orderData, sessionCart, userId) => {
                 total_spent: { increment: finalTotal }
             }
         });
+
+        if (userId && rewardPointsUsed > 0) {
+            await loyaltyService.redeemPointsForOrder(tx, {
+                userId,
+                orderId: order.id,
+                points: rewardPointsUsed,
+                note: `Dùng điểm cho đơn hàng ${orderCode}`
+            });
+        }
+
+        if (userId && earnedRewardPoints > 0) {
+            await loyaltyService.awardPointsForOrder(tx, {
+                userId,
+                orderId: order.id,
+                points: earnedRewardPoints,
+                note: `Tích điểm từ đơn hàng ${orderCode}`
+            });
+        }
 
         return order;
     });

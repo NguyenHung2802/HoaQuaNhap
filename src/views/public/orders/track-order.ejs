@@ -1,0 +1,360 @@
+<!-- Breadcrumb -->
+<nav class="bg-light py-3 border-bottom">
+    <div class="container">
+        <ol class="breadcrumb mb-0 small uppercase fw-bold" style="letter-spacing: 0.05em;">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Tra cứu đơn hàng</li>
+        </ol>
+    </div>
+</nav>
+
+<section class="section-padding py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h2 class="display-6 fw-bold mb-3" style="font-family: var(--font-heading);">Tra cứu đơn hàng</h2>
+                    <p class="text-muted">Nhập Số điện thoại bạn đã dùng để đặt hàng và Mã đơn hàng để xem trạng thái
+                        mới nhất.</p>
+                </div>
+
+                <!-- Form tra cứu -->
+                <div class="card border-0 shadow-sm rounded-4 mb-5">
+                    <div class="card-body p-4 p-md-5">
+                        <% if (typeof error !=='undefined' && error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                            <% } %>
+
+                                <form action="/track-order" method="POST">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Số điện thoại</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light border-end-0"><i
+                                                        class="fas fa-phone text-muted"></i></span>
+                                                <input type="tel" class="form-control border-start-0 ps-0" name="phone"
+                                                    placeholder="VD: 0987654321" autofocus
+                                                    value="<%= typeof queryData !== 'undefined' ? queryData.phone : '' %>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Mã đơn hàng</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light border-end-0"><i
+                                                        class="fas fa-search text-muted"></i></span>
+                                                <input type="text" class="form-control border-start-0 ps-0"
+                                                    name="order_code" placeholder="VD: DH123456"
+                                                    value="<%= typeof queryData !== 'undefined' ? queryData.order_code : '' %>">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-4 text-center">
+                                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold"
+                                                style="letter-spacing: 0.5px;">
+                                                TIẾN HÀNH TRA CỨU <i class="fas fa-arrow-right ms-2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                    </div>
+                </div>
+
+                <!-- Kết quả tra cứu -->
+                <% if (typeof orders !=='undefined' && orders.length> 0) { %>
+                    <% orders.forEach(order=> { %>
+                        <div
+                            class="card border border-brand-light-green shadow-sm rounded-4 overflow-hidden mb-4 animate__animated animate__fadeInUp">
+                            <!-- Header Kết Quả -->
+                            <div
+                                class="card-header bg-brand-light-green border-bottom border-success-subtle p-4 text-center">
+                                <h4 class="fw-bold text-brand-primary mb-1">KIỆN HÀNG <%= order.order_code %>
+                                </h4>
+                                <p class="mb-0 text-muted small">Khách hàng: <span class="fw-semibold text-dark">
+                                        <%= order.receiver_name || order.customer_name %>
+                                    </span></p>
+                                <p class="text-muted small">Ngày đặt: <%= new
+                                        Date(order.created_at).toLocaleDateString('vi-VN') %>
+                                        <%= new Date(order.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit' ,
+                                            minute:'2-digit'}) %>
+                                </p>
+                            </div>
+
+                            <div class="card-body p-4 p-md-5">
+                                <!-- Timeline Status -->
+                                <div class="tracking-timeline mb-5 position-relative">
+                                    <% 
+                                    const statuses = [ 
+                                        { id: 'pending', label: 'Chờ xử lý', icon: 'fa-clipboard-list' }, 
+                                        { id: 'confirmed', label: 'Đã xác nhận', icon: 'fa-box-open' }, 
+                                        { id: 'processing', label: 'Đóng gói', icon: 'fa-box' }, 
+                                        { id: 'shipping', label: 'Đang giao', icon: 'fa-shipping-fast' }, 
+                                        { id: 'completed', label: 'Hoàn thành', icon: 'fa-check-circle' } 
+                                    ]; 
+                                    let currentIndex = statuses.findIndex(s=> s.id === order.order_status);
+                                    /* Handle cancelled logic */
+                                    let isCancelled = order.order_status === 'cancelled';
+                                    %>
+
+                                        <% if (isCancelled) { %>
+                                            <div
+                                                class="text-center text-danger py-4 border border-danger border-dashed rounded-3 bg-danger-subtle">
+                                                <i class="fas fa-times-circle" style="font-size: 3rem;"></i>
+                                                <h4 class="mt-3 fw-bold">ĐƠN HÀNG ĐÃ HỦY</h4>
+                                                <p class="mb-0">Đơn hàng này đã bị hủy. Vui lòng liên hệ Hotline nếu bạn cần hỗ trợ thêm.</p>
+                                            </div>
+                                            <% } else { %>
+                                                <div class="d-flex justify-content-between text-center track-steps-container">
+                                                    <% statuses.forEach((step, index)=> {
+                                                        /* Determine classes for step */
+                                                        let stepClass = 'text-muted';
+                                                        let iconClass = 'bg-light text-muted border-light-subtle';
+                                                        let barClass = 'bg-light';
+
+                                                        /* Passed steps */
+                                                        if (index < currentIndex) {
+                                                            stepClass = 'text-brand-primary fw-bold';
+                                                            iconClass = 'bg-brand-primary text-white border-brand-primary'; 
+                                                            barClass = 'bg-brand-primary'; 
+                                                        } 
+                                                        /* Current step */
+                                                        else if (index === currentIndex) {
+                                                            stepClass = 'text-accent fw-bold pulse-text';
+                                                            iconClass = 'bg-accent text-white border-accent pulse-bg'; 
+                                                        }
+                                                    %>
+                                                            <div
+                                                                class="track-step flex-fill <%= stepClass %> position-relative z-1">
+                                                                <div class="track-icon <%= iconClass %> rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 border shadow-sm"
+                                                                    style="width: 50px; height: 50px; font-size: 1.2rem; transition: all 0.3s;">
+                                                                    <i class="fas <%= step.icon %>"></i>
+                                                                </div>
+                                                                <span class="small d-block">
+                                                                    <%= step.label %>
+                                                                </span>
+                                                            </div>
+                                                            <% }); %>
+
+                                                                <!-- The background line connecting steps -->
+                                                                <div class="position-absolute top-50 start-0 translate-middle-y w-100 px-5 z-0"
+                                                                    style="margin-top: -10px;">
+                                                                    <div class="progress" style="height: 4px;">
+                                                                        <% 
+                                                                        let progressPercent=0; 
+                                                                        if (currentIndex> 0) {
+                                                                            progressPercent = (currentIndex / (statuses.length - 1)) * 100;
+                                                                        }
+                                                                        %>
+                                                                            <div class="progress-bar bg-brand-primary"
+                                                                                role="progressbar"
+                                                                                style="width: <%= progressPercent %>%"
+                                                                                aria-valuenow="<%= progressPercent %>"
+                                                                                aria-valuemin="0" aria-valuemax="100">
+                                                                            </div>
+                                                                    </div>
+                                                                </div>
+                                                </div>
+                                                <% } %>
+                                </div>
+
+                                <hr class="text-muted opacity-25">
+
+                                <!-- Delivery Info -->
+                                <div class="row mt-4 g-4">
+                                    <div class="col-md-6 border-end-md">
+                                        <h6 class="fw-bold mb-3"><i
+                                                class="fas fa-map-marker-alt text-brand-primary me-2"></i>Địa chỉ nhận
+                                            hàng</h6>
+                                        <p class="mb-1 text-dark"><strong>
+                                                <%= order.receiver_name || order.customer_name %>
+                                            </strong> (<%= order.receiver_phone || order.customer_phone %>)</p>
+                                        <p class="text-muted small">
+                                            <%= order.delivery_address %>, <%= order.ward %>, <%= order.district %>, <%=
+                                                            order.province %>
+                                        </p>
+
+                                        <% if (order.note) { %>
+                                            <div class="mt-3 p-3 bg-light rounded-3 small">
+                                                <strong class="text-dark">Ghi chú:</strong> <br>
+                                                <span class="text-muted">
+                                                    <%= order.note %>
+                                                </span>
+                                            </div>
+                                            <% } %>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold mb-3"><i
+                                                class="fas fa-shopping-bag text-brand-primary me-2"></i>Sản phẩm đặt mua
+                                        </h6>
+                                        <ul class="list-unstyled mb-0">
+                                            <% order.items.forEach(item=> { %>
+                                                <li class="d-flex align-items-center mb-3">
+                                                    <div class="flex-shrink-0">
+                                                        <img src="<%= item.product && item.product.images[0] ? item.product.images[0].image_url : '/images/placeholder.jpg' %>"
+                                                            alt="<%= item.product_name_snapshot %>"
+                                                            class="rounded border"
+                                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <h6 class="mb-0 small fw-bold">
+                                                            <%= item.product_name_snapshot %>
+                                                        </h6>
+                                                        <div class="text-muted" style="font-size: 0.8rem;">
+                                                            <%= item.quantity %> x <%= new Intl.NumberFormat('vi-VN', {
+                                                                    style: 'currency' , currency: 'VND'
+                                                                    }).format(item.price_snapshot) %>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <% }) %>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <hr class="text-muted opacity-25">
+
+                                <div class="text-end">
+                                    <p class="mb-1 text-muted">Phương thức thanh toán: <strong class="text-dark">
+                                            <%= order.payment_method==='COD' ? 'Thanh toán tiền mặt' : 'Chuyển khoản' %>
+                                        </strong></p>
+                                    <p class="mb-1 text-muted">Tổng phụ: <%= new Intl.NumberFormat('vi-VN', {
+                                            style: 'currency' , currency: 'VND' }).format(Number(order.total_amount) -
+                                            Number(order.shipping_fee || 0) + Number(order.discount_amount || 0)) %>
+                                    </p>
+                                    <% if (order.discount_amount> 0) { %>
+                                        <p class="mb-1 text-success">Giảm giá: -<%= new Intl.NumberFormat('vi-VN', {
+                                                style: 'currency' , currency: 'VND' }).format(order.discount_amount) %>
+                                        </p>
+                                        <% } %>
+                                            <% if (order.shipping_fee> 0) { %>
+                                                <p class="mb-1 text-muted">Phí ship: <%= new Intl.NumberFormat('vi-VN',
+                                                        { style: 'currency' , currency: 'VND'
+                                                        }).format(order.shipping_fee) %>
+                                                </p>
+                                                <% } %>
+                                                    <h4 class="fw-bold text-brand-primary mt-2">Tổng cộng: <%= new
+                                                            Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }).format(order.total_amount) %>
+                                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); } %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .bg-brand-accent {
+        background-color: var(--brand-accent, #4caf50);
+    }
+
+    .bg-brand-light-green {
+        background-color: var(--brand-light-green, #e8f5e9);
+    }
+
+    .text-brand-primary {
+        color: var(--brand-primary, #2e7d32);
+    }
+
+    .text-accent {
+        color: var(--brand-accent, #4caf50);
+    }
+
+    .bg-brand-primary {
+        background-color: var(--brand-primary, #2e7d32) !important;
+    }
+
+    .border-brand-primary {
+        border-color: var(--brand-primary, #2e7d32) !important;
+    }
+
+    .bg-accent {
+        background-color: var(--brand-accent, #4caf50) !important;
+    }
+
+    .border-accent {
+        border-color: var(--brand-accent, #4caf50) !important;
+    }
+
+    .track-step {
+        flex: 1;
+    }
+
+    @media (max-width: 575px) {
+        .track-steps-container {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .track-step {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+
+        .track-step .track-icon {
+            margin: 0 !important;
+            margin-right: 15px !important;
+        }
+
+        .track-steps-container .position-absolute {
+            display: none !important;
+            /* Hide horizontal connecting line on mobile */
+        }
+    }
+
+    .pulse-bg {
+        animation: pulse-border 2s infinite;
+    }
+
+    @keyframes pulse-border {
+        0% {
+            box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+        }
+    }
+
+    .pulse-text {
+        animation: pulse-color 2s infinite;
+    }
+
+    @keyframes pulse-color {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    input.form-control:focus {
+        box-shadow: none;
+        border-color: #2e7d32;
+    }
+
+    .input-group-text {
+        transition: border-color 0.15s ease-in-out;
+    }
+
+    input.form-control:focus~.input-group-text,
+    input.form-control:focus {
+        border-color: #2e7d32 !important;
+    }
+</style>

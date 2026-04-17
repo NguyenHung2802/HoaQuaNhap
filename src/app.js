@@ -99,7 +99,7 @@ app.use((req, res, next) => {
 
 // Global error handling
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('SERVER ERROR:', err); // Log the full error object
     res.status(500).render('public/pages/500', {
         title: 'Lỗi hệ thống',
         error: err,

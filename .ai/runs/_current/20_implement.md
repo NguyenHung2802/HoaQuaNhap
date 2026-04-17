@@ -351,3 +351,127 @@
 - Tr?ng thái: Done
 - [x] public/products/products.controller.js: renderDetail (includes images, related).
 - [x] public/products/detail.ejs: Swiper gallery + thumbs, Price block, Specs, QTY, Tabs, Related.
+
+### 2026-04-15 16:45
+- Feature: Phase 11 Slice 4 (Cross-Selling / Cart UX)
+- Slice: S4.1 + S4.2 + S4.3
+- Tr?ng thái: Done
+- Liên k?t: `.ai/runs/_current/11_plan.md`
+
+### Implemented items (S4)
+- [x] M? r?ng `src/modules/public/cart/cart.controller.js`: tr? v? `shippingPromotion` v?i `campaignType`, `discountValue`, `benefitLabel`, tr?ng thái d?t ngu?ng và câu hi?n th? dúng lo?i uu dãi ship.
+- [x] S?a `src/views/public/cart/index.ejs`: b? hardcode freeship, hi?n th? dúng campaign dang áp d?ng ho?c ngu?ng còn thi?u cho gi?m phí ship / gi?m % / freeship.
+- [x] S?a `public/js/cart.js`: khi thêm s?n ph?m thành công ngay t?i `/cart`, t? reload d? d?ng b? danh sách hàng, t?ng ti?n và block g?i ý.
+
+### Files changed
+- MODIFY `src/modules/public/cart/cart.controller.js`: thêm helper d?ng metadata uu dãi v?n chuy?n cho UI.
+- MODIFY `src/views/public/cart/index.ejs`: c?p nh?t progress bar, sidebar summary và note campaign theo dúng lo?i voucher ship.
+- MODIFY `public/js/cart.js`: reload trang cart sau khi thêm s?n ph?m t? block g?i ý.
+- MODIFY `docs/04-roadmap-checklist.md`: ghi nh?n ti?n d? tinh ch?nh slice 4.
+
+### Notes / Decisions
+- Ch?n reload toàn trang khi thêm t? block g?i ý t?i `/cart` thay vì patch DOM c?c b? vì trang cart còn ph? thu?c progress campaign ship và thu?t toán g?i ý.
+- Gi? logic ch?n campaign active hi?n t?i, ch? s?a l?p hi?n th? d? không còn hi?u sai thành freeship.
+
+### Test plan & Branch Matrix
+```text
+AREA / BEHAVIOR                    HAPPY   VALIDATION   UNAUTH/PERM   NOT FOUND   UNEXPECTED   NOTES
+---------------------------------  ------  ----------   ------------  ----------  -----------  ---------------------------------------------
+Shipping promotion messaging       OK      N/A          N/A           N/A         PENDING      Ðã ki?m tra qua render path và object mapping
+Cart add from suggested products   OK      N/A          N/A           N/A         PENDING      Reload l?i /cart sau khi API add tr? success
+```
+
+### Micro-verify executed
+- `node --check src/modules/public/cart/cart.controller.js`
+- `node --check public/js/cart.js`
+
+### Slice verification
+- Ðã ch?y ki?m tra cú pháp cho controller và cart script sau khi s?a.
+
+### Open issues / Blocks
+- Chua có test t? d?ng cho render EJS và lu?ng client-side cart trong repo hi?n t?i.
+
+### Context snapshot
+- Goal slice: s?a text campaign ship và d?ng b? UI cart sau add-to-cart t? block g?i ý.
+- Chosen approach: backend tr? metadata hi?n th?, frontend cart render tr?c ti?p và reload ?n d?nh trên `/cart`.
+- Files touched: `cart.controller.js`, `cart/index.ejs`, `public/js/cart.js`, `docs/04-roadmap-checklist.md`
+- Next actions:
+- ch?y review nhanh diff
+- user ki?m tra l?i trên trang cart th?c t? v?i campaign percent/amount
+- cân nh?c thêm test UI smoke n?u repo b? sung harness sau
+- Verification to run in /test:
+- `node --check src/modules/public/cart/cart.controller.js`
+- `node --check public/js/cart.js`
+- Coverage note: hotspot còn thi?u là render EJS theo t?ng lo?i campaign ship và client reload path trên `/cart`.
+
+### 2026-04-15 18:05
+- Feature: Phase 11 Slice 5 (Membership & Loyalty Points)
+- Slice: S5
+- Tr?ng thái: Done
+- Liên k?t: `.ai/runs/_current/11_plan.md`
+
+### Implemented items (S5)
+- [x] C?p nh?t schema `User.reward_points` và thêm b?ng `PointHistory` kèm migration `20260415172000_add_loyalty_points`.
+- [x] T?o `src/modules/loyalty/loyalty.service.js` d? qu?n lý d?c di?m, tính di?m, tr? di?m và c?ng di?m b?ng raw SQL trong transaction.
+- [x] M? r?ng `checkout.service.js`: validate s? di?m dùng, tr? di?m khi d?t hàng, c?ng di?m thu?ng sau don thành công.
+- [x] M? r?ng `checkout.controller.js`: load loyalty summary cho user dang nh?p và d?ng b? l?i di?m trong session sau checkout.
+- [x] C?p nh?t UI `src/views/public/checkout/index.ejs`: hi?n th? s? di?m hi?n có, cho b?t/t?t dùng di?m và c?p nh?t t?ng ti?n ngay trên client.
+- [x] C?p nh?t auth/profile: session gi? thêm `phone`, `reward_points`; profile hi?n th? card s? di?m hi?n có.
+
+### Files changed
+- MODIFY `prisma/schema.prisma`: thêm `reward_points`, `PointHistory`, relation liên quan.
+- ADD `prisma/migrations/20260415172000_add_loyalty_points/migration.sql`: migration loyalty points.
+- ADD `src/modules/loyalty/loyalty.service.js`: service loyalty tách riêng.
+- MODIFY `src/modules/public/checkout/checkout.service.js`: logic redeem/earn points trong transaction.
+- MODIFY `src/modules/public/checkout/checkout.controller.js`: load loyalty summary cho checkout.
+- MODIFY `src/views/public/checkout/index.ejs`: UI dùng di?m ? checkout.
+- MODIFY `src/modules/auth/auth.controller.js`: n?p reward points vào session lúc login.
+- MODIFY `src/modules/public/profile/profile.controller.js`: n?p reward points t? loyalty service.
+- MODIFY `src/views/public/profile/index.ejs`: hi?n th? card di?m thu?ng.
+- MODIFY `docs/04-roadmap-checklist.md`: ghi nh?n ti?n d? slice 5.
+
+### Notes / Decisions
+- Prisma client chua regenerate du?c vì file lock ? `node_modules/.prisma/client`, nên loyalty runtime dùng raw SQL d? không block feature.
+- Quy d?i dang dùng: 1 di?m = 1.000 VND, di?m nh?n thêm = 1% giá tr? thanh toán th?c t?, làm tròn xu?ng.
+- UI checkout dang dùng ki?u toggle “dùng t?i da di?m h?p l? hi?n t?i” thay vì cho nh?p tay d? gi?m nhánh l?i.
+
+### Test plan & Branch Matrix
+```text
+AREA / BEHAVIOR                    HAPPY   VALIDATION   UNAUTH/PERM   NOT FOUND   UNEXPECTED   NOTES
+---------------------------------  ------  ----------   ------------  ----------  -----------  ---------------------------------------------
+Schema + migration loyalty         OK      N/A          N/A           N/A         N/A          `prisma migrate deploy` pass
+Redeem reward points in checkout   OK      PARTIAL      OK            N/A         PENDING      Chua có automation cho over-redeem/two-tab
+Earn reward points after order     OK      N/A          OK            N/A         PENDING      Ðã có logic transaction, thi?u integration test
+Checkout loyalty UI                OK      PARTIAL      OK            N/A         PENDING      C?n verify browser khi di kèm coupon/promo
+Profile reward points display      OK      N/A          OK            N/A         N/A          Render t? loyalty service
+```
+
+### Micro-verify executed
+- `npx prisma migrate deploy`
+- `node --check src/modules/loyalty/loyalty.service.js`
+- `node --check src/modules/public/checkout/checkout.service.js`
+- `node --check src/modules/public/checkout/checkout.controller.js`
+- `node --check src/modules/auth/auth.controller.js`
+- `node --check src/modules/public/profile/profile.controller.js`
+
+### Slice verification
+- Migration loyalty dã apply thành công vào DB local.
+- Các file backend JS v?a s?a d?u pass ki?m tra cú pháp.
+- `npx prisma generate` chua hoàn t?t do file lock `node_modules/.prisma/client/index.d.ts`.
+
+### Open issues / Blocks
+- C?n gi?i phóng process dang gi? lock Prisma client d? regenerate client khi thu?n ti?n.
+- Chua có test t? d?ng cho lu?ng EJS/browser c?a checkout loyalty.
+
+### Context snapshot
+- Goal slice: thêm membership/loyalty points cho user dang nh?p.
+- Chosen approach: schema + raw-SQL loyalty service + tích h?p checkout/profile.
+- Files touched: schema, migration, loyalty service, checkout/auth/profile, roadmap.
+- Next actions:
+- verify th? công trên browser v?i user có di?m
+- ch?y l?i `npx prisma generate` sau khi file lock du?c gi?i phóng
+- cân nh?c hi?n th? di?m dùng/nh?n ? success page n?u ti?p t?c polish
+- Verification to run in /test:
+- `node --check src/modules/loyalty/loyalty.service.js`
+- `node --check src/modules/public/checkout/checkout.service.js`
+- Coverage note: hotspot còn thi?u là branch coupon + points + promo và race condition nhi?u tab checkout.

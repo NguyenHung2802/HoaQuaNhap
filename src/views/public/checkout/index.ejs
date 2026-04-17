@@ -236,6 +236,33 @@
                             </div>
                         <% } %>
 
+                        <% if (loyaltySummary) { %>
+                            <div class="loyalty-section mb-4 pb-3 border-bottom">
+                                <label class="form-label small fw-bold text-warning mb-2">
+                                    <i class="fas fa-seedling me-1"></i> Điểm Quả Dâu
+                                </label>
+                                <div class="p-3 rounded-3 border loyalty-box">
+                                    <div class="fw-bold text-dark mb-1">Bạn đang có <span class="text-accent"><%= loyaltySummary.availablePoints %> điểm</span></div>
+                                    <div class="small text-muted mb-3">
+                                        1 điểm = <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(loyaltySummary.pointValueVnd) %>.
+                                        <% if (loyaltySummary.maxUsablePoints > 0) { %>
+                                            Đơn này dùng tối đa <strong><%= loyaltySummary.maxUsablePoints %> điểm</strong>
+                                            để giảm <strong><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(loyaltySummary.maxDiscountAmount) %></strong>.
+                                        <% } else { %>
+                                            Đơn hiện tại chưa đủ giá trị để đổi điểm.
+                                        <% } %>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between gap-3">
+                                        <div class="small text-muted">Hoàn tất đơn này bạn sẽ nhận thêm điểm theo 1% giá trị thanh toán thực tế.</div>
+                                        <button type="button" class="btn btn-outline-warning rounded-pill px-3 fw-bold" id="toggleRewardPointsBtn" <%= loyaltySummary.maxUsablePoints > 0 ? '' : 'disabled' %>>
+                                            Dùng điểm
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="reward_points_to_use" id="rewardPointsToUse" value="0">
+                            </div>
+                        <% } %>
+
                         <!-- Coupon Section -->
                         <div class="coupon-section mb-4 pb-3 border-bottom">
                             <label class="form-label small fw-bold text-muted mb-2">Mã giảm giá (Coupon)</label>
@@ -264,6 +291,10 @@
                             <div class="d-flex justify-content-between mb-2 text-muted" id="discountRow" style="display: none!important;">
                                 <span>Giảm giá (Sản phẩm)</span>
                                 <span class="fw-semibold text-danger">- <span id="discountValueText">0đ</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 text-muted" id="rewardDiscountRow" style="display: none;">
+                                <span>Đổi điểm tích lũy</span>
+                                <span class="fw-semibold text-danger">- <span id="rewardDiscountValueText">0đ</span></span>
                             </div>
                             <!-- Shipping Details -->
                             <div class="d-flex justify-content-between mb-2 text-muted">
@@ -391,6 +422,10 @@
 }
 .x-small { font-size: 0.75rem; }
 .cursor-pointer { cursor: pointer; }
+.loyalty-box {
+    background: linear-gradient(135deg, #fff8e1 0%, #fffdf5 100%);
+    border-color: #f1c40f !important;
+}
 </style>
 
 <script src="/js/address-helper.js"></script>
@@ -445,13 +480,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const discountValueText = document.getElementById('discountValueText');
     const baseTotal = <%= totalAmount %>;
     const shippingCampaigns = <%- JSON.stringify(shippingCampaigns) %>;
+    const loyaltySummary = <%- JSON.stringify(loyaltySummary || null) %>;
     
     const shippingDiscountRow = document.getElementById('shippingDiscountRow');
     const shippingDiscountValueText = document.getElementById('shippingDiscountValueText');
+    const rewardDiscountRow = document.getElementById('rewardDiscountRow');
+    const rewardDiscountValueText = document.getElementById('rewardDiscountValueText');
+    const rewardPointsInput = document.getElementById('rewardPointsToUse');
+    const toggleRewardPointsBtn = document.getElementById('toggleRewardPointsBtn');
     
     let couponDiscount = 0;
     let promoDiscount = 0;
     let shippingDiscount = 0;
+    let rewardDiscount = 0;
 
     function updateShipping() {
         // Check Shipping Campaigns (Chỉ lấy ghi chú, không tính tiền)
@@ -484,20 +525,64 @@ document.addEventListener('DOMContentLoaded', function() {
     const finalTotalText = document.getElementById('finalTotalText');
     const hiddenCouponCode = document.getElementById('hiddenCouponCode');
     const hiddenDiscountAmount = document.getElementById('hiddenDiscountAmount');
+
+    function getMaxRewardPointsForCurrentTotal() {
+        if (!loyaltySummary) {
+            return 0;
+        }
+
+        const payableBeforeReward = Math.max(0, baseTotal - couponDiscount - promoDiscount);
+        return Math.min(loyaltySummary.availablePoints, Math.floor(payableBeforeReward / loyaltySummary.pointValueVnd));
+    }
     
     function updateFinalTotal() {
-        const totalDiscount = couponDiscount + promoDiscount;
+        const productDiscount = couponDiscount + promoDiscount;
+        const rewardPointsInUse = parseInt(rewardPointsInput?.value || '0', 10);
+        const maxRewardPoints = getMaxRewardPointsForCurrentTotal();
+        if (rewardPointsInUse > maxRewardPoints) {
+            rewardPointsInput.value = maxRewardPoints;
+            rewardDiscount = maxRewardPoints * (loyaltySummary ? loyaltySummary.pointValueVnd : 0);
+        }
+        const totalDiscount = productDiscount + rewardDiscount;
         // Tổng tiền KHÔNG cộng ship, KHÔNG trừ discount ship
         const finalTotal = baseTotal - totalDiscount;
 
-        if (totalDiscount > 0) {
+        if (productDiscount > 0) {
             discountRow.style.setProperty('display', 'flex', 'important');
-            discountValueText.innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalDiscount);
+            discountValueText.innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(productDiscount);
         } else {
             discountRow.style.setProperty('display', 'none', 'important');
         }
 
+        if (rewardDiscount > 0) {
+            rewardDiscountRow.style.display = 'flex';
+            rewardDiscountValueText.innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(rewardDiscount);
+        } else {
+            rewardDiscountRow.style.display = 'none';
+        }
+
+        if (toggleRewardPointsBtn && loyaltySummary) {
+            const activeRewardPoints = parseInt(rewardPointsInput?.value || '0', 10);
+            toggleRewardPointsBtn.classList.toggle('btn-warning', activeRewardPoints > 0);
+            toggleRewardPointsBtn.classList.toggle('text-white', activeRewardPoints > 0);
+            toggleRewardPointsBtn.classList.toggle('btn-outline-warning', activeRewardPoints === 0);
+            toggleRewardPointsBtn.innerText = activeRewardPoints > 0 ? `Đã dùng ${activeRewardPoints} điểm` : 'Dùng điểm';
+        }
+
         finalTotalText.innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.max(0, finalTotal));
+    }
+
+    if (toggleRewardPointsBtn && loyaltySummary) {
+        toggleRewardPointsBtn.addEventListener('click', function() {
+            const nextPoints = rewardDiscount > 0 ? 0 : getMaxRewardPointsForCurrentTotal();
+            rewardDiscount = nextPoints * loyaltySummary.pointValueVnd;
+            rewardPointsInput.value = nextPoints;
+            toggleRewardPointsBtn.classList.toggle('btn-warning', nextPoints > 0);
+            toggleRewardPointsBtn.classList.toggle('text-white', nextPoints > 0);
+            toggleRewardPointsBtn.classList.toggle('btn-outline-warning', nextPoints === 0);
+            toggleRewardPointsBtn.innerText = nextPoints > 0 ? `Đã dùng ${nextPoints} điểm` : 'Dùng điểm';
+            updateFinalTotal();
+        });
     }
 
     // Export selectPromotion to global scope

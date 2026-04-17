@@ -140,17 +140,41 @@ exports.renderDetail = async (req, res, next) => {
         product.avg_rating = parseFloat(avgRating);
         product.review_count = product.reviews.length;
 
-        const relatedProducts = await db.product.findMany({
+        // Fetch a pool of 20 same-category products then shuffle for randomness
+        const relatedPool = await db.product.findMany({
             where: {
                 category_id: product.category_id,
                 id: { not: product.id },
-                status: 'published'
+                status: 'published',
+                stock_quantity: { gt: 0 }
             },
             include: {
                 images: { where: { is_thumbnail: true }, take: 1 }
             },
-            take: 4
+            take: 20
         });
+
+        // Shuffle the pool and pick 6
+        const shuffled = relatedPool.sort(() => Math.random() - 0.5);
+        let relatedProducts = shuffled.slice(0, 6);
+
+        // If we have fewer than 4, pad with other-category products
+        if (relatedProducts.length < 4) {
+            const extraProducts = await db.product.findMany({
+                where: {
+                    category_id: { not: product.category_id },
+                    id: { notIn: [product.id, ...relatedProducts.map(p => p.id)] },
+                    status: 'published',
+                    stock_quantity: { gt: 0 }
+                },
+                include: {
+                    images: { where: { is_thumbnail: true }, take: 1 }
+                },
+                take: 6 - relatedProducts.length,
+                orderBy: { created_at: 'desc' }
+            });
+            relatedProducts = [...relatedProducts, ...extraProducts];
+        }
 
         const baseUrl = `${req.protocol}://${req.get('host')}`;
 
