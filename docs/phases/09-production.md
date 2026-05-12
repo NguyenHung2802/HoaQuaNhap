@@ -260,13 +260,13 @@ git push origin main
 cd /var/www
 
 # Clone project (thay bằng link repo của bạn)
-sudo git clone https://github.com/your-username/WebHoaQua.git hoaqua
+sudo git clone https://github.com/NguyenHung2802/HoaQuaNhap.git HoaQuaNhap
 
 # Phân quyền cho user deploy
-sudo chown -R deploy:deploy /var/www/hoaqua
+sudo chown -R deploy:deploy /var/www/HoaQuaNhap
 
 # Vào thư mục project
-cd /var/www/hoaqua
+cd /var/www/HoaQuaNhap
 
 # Cài dependencies (không cài devDependencies)
 npm install --omit=dev
@@ -279,8 +279,8 @@ npm install --omit=dev
    - Username: `deploy`
    - Password: (password VPS)
    - Port: `22`
-3. Upload toàn bộ thư mục dự án lên `/var/www/hoaqua`
-4. SSH vào VPS → `cd /var/www/hoaqua` → `npm install --omit=dev`
+3. Upload toàn bộ thư mục dự án lên `/var/www/HoaQuaNhap`
+4. SSH vào VPS → `cd /var/www/HoaQuaNhap` → `npm install --omit=dev`
 
 > **Quan trọng:** Đừng upload thư mục `node_modules/` — rất nặng và không cần thiết.
 
@@ -301,7 +301,7 @@ File `.env` **không** được commit lên Git. Bạn phải tạo trực tiế
 
 ```bash
 # Trên VPS, trong thư mục project
-cd /var/www/hoaqua
+cd /var/www/HoaQuaNhap
 nano .env
 ```
 
@@ -345,7 +345,7 @@ MAIL_PASS="app_password_gmail"
 
 ### 8.1. Chạy migration database
 ```bash
-cd /var/www/hoaqua
+cd /var/www/HoaQuaNhap
 
 # Generate Prisma client
 npx prisma generate
@@ -394,14 +394,14 @@ pm2 save
 
 ### 9.1. Tạo file cấu hình Nginx cho website
 ```bash
-sudo nano /etc/nginx/sites-available/hoaqua
+sudo nano /etc/nginx/sites-available/HoaQuaNhap
 ```
 
-Dán nội dung sau (thay `yourdomain.com` bằng domain thật của bạn):
+Dán nội dung sau (thay `haianhfruit.com` bằng domain thật của bạn):
 ```nginx
 server {
     listen 80;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name haianhfruit.com www.haianhfruit.com;
 
     # Giới hạn kích thước upload (cho ảnh sản phẩm)
     client_max_body_size 10M;
@@ -433,7 +433,7 @@ server {
 ### 9.2. Kích hoạt cấu hình và kiểm tra
 ```bash
 # Tạo symlink để kích hoạt
-sudo ln -s /etc/nginx/sites-available/hoaqua /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/HoaQuaNhap /etc/nginx/sites-enabled/
 
 # Kiểm tra cấu hình không có lỗi
 sudo nginx -t
@@ -466,7 +466,7 @@ Thêm 2 bản ghi DNS:
 sudo apt install -y certbot python3-certbot-nginx
 
 # Cấp SSL (thay bằng domain thật — chờ DNS propagate xong mới làm bước này)
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+sudo certbot --nginx -d haianhfruit.com -d www.haianhfruit.com
 ```
 
 Certbot sẽ hỏi:
@@ -482,7 +482,7 @@ sudo certbot renew --dry-run
 # Phải hiện "Congratulations, all simulated renewals succeeded"
 ```
 
-**Mở trình duyệt:** Truy cập `https://yourdomain.com` → Phải thấy 🔒 xanh và trang web hiển thị bình thường.
+**Mở trình duyệt:** Truy cập `https://haianhfruit.com` → Phải thấy 🔒 xanh và trang web hiển thị bình thường.
 
 ---
 
@@ -586,7 +586,7 @@ Mỗi khi cần cập nhật code mới lên production:
 ssh deploy@123.45.67.89
 
 # 2. Vào thư mục project
-cd /var/www/hoaqua
+cd /var/www/HoaQuaNhap
 
 # 3. Pull code mới
 git pull origin main
@@ -644,7 +644,7 @@ sudo systemctl status postgresql
 - [ ] VPS đang chạy Ubuntu 22.04 LTS
 - [ ] Node.js 18, PM2, Nginx, PostgreSQL đã cài đặt
 - [ ] Database `web_hoaqua` đã tạo với user riêng
-- [ ] Code đã clone/upload lên `/var/www/hoaqua`
+- [ ] Code đã clone/upload lên `/var/www/HoaQuaNhap`
 - [ ] File `.env` production đã tạo với thông tin thật
 - [ ] `npx prisma migrate deploy` đã chạy thành công
 - [ ] Dữ liệu test đã xoá sạch, chỉ giữ seed danh mục

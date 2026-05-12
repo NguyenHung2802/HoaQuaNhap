@@ -8,15 +8,17 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
 const expressLayouts = require('express-ejs-layouts');
+const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 
-// Set up logging
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
+} else {
+    app.set('trust proxy', 1); // Trust first proxy (Nginx) for HTTPS cookies
 }
 
 // Safety and utility middlewares
@@ -36,15 +38,32 @@ const { PrismaClient } = require('@prisma/client');
 const _prisma = new PrismaClient();
 
 // Session configuration
-app.use(session({
+const sessionConfig = {
     secret: process.env.SESSION_SECRET || 'secret-key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     }
-}));
+};
+
+// Only use PrismaSessionStore if the model is generated and available
+if (_prisma.session) {
+    sessionConfig.store = new PrismaSessionStore(
+        _prisma,
+        {
+            checkPeriod: 2 * 60 * 1000,
+            dbRecordIdIsSessionId: true,
+            dbRecordIdFunction: undefined,
+            modelName: 'session',
+        }
+    );
+} else {
+    console.warn('WARNING: Prisma session model not found. Falling back to MemoryStore.');
+}
+
+app.use(session(sessionConfig));
 
 // Flash messages
 app.use(flash());

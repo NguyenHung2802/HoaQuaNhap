@@ -12,7 +12,7 @@ const renderPage = async (req, res, next) => {
         });
 
         if (!page || page.group_key !== 'static_page') {
-            return res.status(404).render('public/404', { title: '404 Not Found', layout: 'layouts/main' });
+            return res.status(404).render('public/pages/404', { title: '404 Not Found', layout: 'layouts/main' });
         }
 
         res.render('public/pages/static', {
