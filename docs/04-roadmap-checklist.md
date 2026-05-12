@@ -102,6 +102,12 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 - [ ] Thuật toán Gợi ý Sản phẩm Liên Quan / Mua Cùng (Cross-Selling - đã sửa hiển thị campaign ship trong cart và reload giỏ khi thêm từ block gợi ý)
 - [ ] Membership & Loyalty Points (Tích điểm Quả Dâu - đã xong schema, cộng/trừ điểm trong checkout và hiển thị điểm ở checkout/profile)
 - [ ] Worker Sao lưu Cơ sở Dữ liệu (Auto Backup Database)
+### 2.13. Homepage Analysis & Menu Fix (Phase 12 — 2026-05-08)
+- [x] **Phân tích cơ chế hiển thị**: Đã BA chi tiết 3 sections (Categories, Featured, Combo).
+- [x] **Fix Menu Hover**: Desktop hover hiện dropdown, click navigate. Mobile click toggle.
+- [x] **Fix Categories orderBy**: Thêm `sort_order ASC` cho query categories trang chủ.
+- [x] **Cải thiện Combo links**: Thay hardcoded links bằng filter category thực tế (dau-tay, nho-nhap-khau, tao-nhap-khau).
+- [ ] **Tương lai**: Tạo model Combo/Bundle/Gift Set, Admin CRUD, Tags/Labels (xem recommendations log).
 ---
 > [!TIP]
 > Hãy luôn cập nhật checklist sau mỗi Giai đoạn hoàn thành thành công và được test kỹ lưỡng.

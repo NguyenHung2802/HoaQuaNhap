@@ -1,7 +1,7 @@
 const db = require('../../config/db');
 
 const POINT_VALUE_VND = 1000;
-const EARN_RATE_PERCENT = 1;
+const EARN_RATE_PERCENT = 2;
 
 const toInt = (value) => parseInt(value, 10) || 0;
 const toNumber = (value) => Number(value) || 0;
@@ -105,8 +105,52 @@ const getOrderPointSummary = async (orderId, tx = db) => {
         if (row.type === 'earn') {
             summary.earnedPoints += points;
         }
+        if (row.type === 'refund') {
+            summary.usedPoints -= points;
+        }
+        if (row.type === 'revoke') {
+            summary.earnedPoints -= points;
+        }
         return summary;
     }, { usedPoints: 0, earnedPoints: 0 });
+};
+
+const revokePointsForOrder = async (tx, { userId, orderId, points, note }) => {
+    const safePoints = Math.max(0, toInt(points));
+    if (!userId || safePoints <= 0) {
+        return;
+    }
+
+    await tx.$executeRaw`
+        UPDATE "User"
+        SET "reward_points" = GREATEST(0, "reward_points" - ${safePoints}),
+            "updated_at" = CURRENT_TIMESTAMP
+        WHERE "id" = ${toInt(userId)}
+    `;
+
+    await tx.$executeRaw`
+        INSERT INTO "PointHistory" ("user_id", "order_id", "type", "points", "note", "created_at")
+        VALUES (${toInt(userId)}, ${toInt(orderId)}, 'revoke', ${safePoints}, ${note || 'Thu hồi điểm tích lũy'}, CURRENT_TIMESTAMP)
+    `;
+};
+
+const refundPointsForOrder = async (tx, { userId, orderId, points, note }) => {
+    const safePoints = Math.max(0, toInt(points));
+    if (!userId || safePoints <= 0) {
+        return;
+    }
+
+    await tx.$executeRaw`
+        UPDATE "User"
+        SET "reward_points" = "reward_points" + ${safePoints},
+            "updated_at" = CURRENT_TIMESTAMP
+        WHERE "id" = ${toInt(userId)}
+    `;
+
+    await tx.$executeRaw`
+        INSERT INTO "PointHistory" ("user_id", "order_id", "type", "points", "note", "created_at")
+        VALUES (${toInt(userId)}, ${toInt(orderId)}, 'refund', ${safePoints}, ${note || 'Hoàn lại điểm đã đổi'}, CURRENT_TIMESTAMP)
+    `;
 };
 
 module.exports = {
@@ -117,5 +161,7 @@ module.exports = {
     getCheckoutLoyaltySummary,
     redeemPointsForOrder,
     awardPointsForOrder,
+    revokePointsForOrder,
+    refundPointsForOrder,
     getOrderPointSummary
 };

@@ -253,7 +253,7 @@
                                         <% } %>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between gap-3">
-                                        <div class="small text-muted">Hoàn tất đơn này bạn sẽ nhận thêm điểm theo 1% giá trị thanh toán thực tế.</div>
+                                        <div class="small text-muted">Hoàn tất đơn này bạn sẽ nhận thêm điểm theo 2% giá trị thanh toán thực tế.</div>
                                         <button type="button" class="btn btn-outline-warning rounded-pill px-3 fw-bold" id="toggleRewardPointsBtn" <%= loyaltySummary.maxUsablePoints > 0 ? '' : 'disabled' %>>
                                             Dùng điểm
                                         </button>
@@ -539,10 +539,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const productDiscount = couponDiscount + promoDiscount;
         const rewardPointsInUse = parseInt(rewardPointsInput?.value || '0', 10);
         const maxRewardPoints = getMaxRewardPointsForCurrentTotal();
-        if (rewardPointsInUse > maxRewardPoints) {
-            rewardPointsInput.value = maxRewardPoints;
-            rewardDiscount = maxRewardPoints * (loyaltySummary ? loyaltySummary.pointValueVnd : 0);
+        
+        let finalRewardPoints = rewardPointsInUse;
+        if (finalRewardPoints > maxRewardPoints) {
+            finalRewardPoints = maxRewardPoints;
+            rewardPointsInput.value = finalRewardPoints;
         }
+        
+        rewardDiscount = finalRewardPoints * (loyaltySummary ? loyaltySummary.pointValueVnd : 0);
         const totalDiscount = productDiscount + rewardDiscount;
         // Tổng tiền KHÔNG cộng ship, KHÔNG trừ discount ship
         const finalTotal = baseTotal - totalDiscount;
@@ -574,13 +578,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (toggleRewardPointsBtn && loyaltySummary) {
         toggleRewardPointsBtn.addEventListener('click', function() {
-            const nextPoints = rewardDiscount > 0 ? 0 : getMaxRewardPointsForCurrentTotal();
-            rewardDiscount = nextPoints * loyaltySummary.pointValueVnd;
+            const currentPoints = parseInt(rewardPointsInput.value || '0', 10);
+            const nextPoints = currentPoints > 0 ? 0 : getMaxRewardPointsForCurrentTotal();
+            
             rewardPointsInput.value = nextPoints;
-            toggleRewardPointsBtn.classList.toggle('btn-warning', nextPoints > 0);
-            toggleRewardPointsBtn.classList.toggle('text-white', nextPoints > 0);
-            toggleRewardPointsBtn.classList.toggle('btn-outline-warning', nextPoints === 0);
-            toggleRewardPointsBtn.innerText = nextPoints > 0 ? `Đã dùng ${nextPoints} điểm` : 'Dùng điểm';
             updateFinalTotal();
         });
     }

@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const loyaltyService = require('../../loyalty/loyalty.service');
 
 /**
  * [GET] /admin/orders
@@ -82,9 +83,12 @@ const renderDetail = async (req, res, next) => {
             return res.redirect('/admin/orders');
         }
 
+        const pointSummary = await loyaltyService.getOrderPointSummary(orderId, prisma);
+        
         res.render('admin/orders/detail', {
             title: `Chi tiết Đơn hàng ${order.order_code}`,
             order,
+            pointSummary,
             layout: 'layouts/admin'
         });
     } catch (error) {
@@ -133,6 +137,32 @@ const updateStatus = async (req, res, next) => {
                 data: updateData
             });
 
+            // AWARD REWARD POINTS if completed or paid (if not already awarded)
+            if (status === 'completed' || (status === 'confirmed' && currentOrder.payment_status === 'paid')) {
+                const customer = await tx.customer.findUnique({
+                    where: { id: currentOrder.customer_id },
+                    select: { user_id: true }
+                });
+
+                if (customer && customer.user_id) {
+                    const existingEarn = await tx.pointHistory.findFirst({
+                        where: { order_id: orderId, type: 'earn' }
+                    });
+
+                    if (!existingEarn) {
+                        const earnedPoints = loyaltyService.calculateEarnedPoints(currentOrder.total_amount);
+                        if (earnedPoints > 0) {
+                            await loyaltyService.awardPointsForOrder(tx, {
+                                userId: customer.user_id,
+                                orderId: orderId,
+                                points: earnedPoints,
+                                note: `Tích điểm từ đơn hàng ${currentOrder.order_code} (Cập nhật bởi Admin)`
+                            });
+                        }
+                    }
+                }
+            }
+
             // Log change
             await tx.orderStatusLog.create({
                 data: {
@@ -144,8 +174,9 @@ const updateStatus = async (req, res, next) => {
                 }
             });
 
-            // IF CANCELLED: Restock items
+            // IF CANCELLED: Restock items & Loyalty Points
             if (status === 'cancelled') {
+                // 1. Restock items
                 for (const item of currentOrder.items) {
                     const product = await tx.product.findUnique({
                         where: { id: item.product_id }
@@ -170,6 +201,36 @@ const updateStatus = async (req, res, next) => {
                                 note: `Bù tồn kho do hủy đơn ${currentOrder.order_code}`,
                                 created_by: adminUser ? adminUser.full_name : 'Admin'
                             }
+                        });
+                    }
+                }
+
+                // 2. Loyalty Points handle
+                const customer = await tx.customer.findUnique({
+                    where: { id: currentOrder.customer_id },
+                    select: { user_id: true }
+                });
+
+                if (customer && customer.user_id) {
+                    const pointSummary = await loyaltyService.getOrderPointSummary(orderId, tx);
+                    
+                    // Revoke earned points
+                    if (pointSummary.earnedPoints > 0) {
+                        await loyaltyService.revokePointsForOrder(tx, {
+                            userId: customer.user_id,
+                            orderId: orderId,
+                            points: pointSummary.earnedPoints,
+                            note: `Thu hồi điểm đơn ${currentOrder.order_code} (Hủy đơn)`
+                        });
+                    }
+
+                    // Refund redeemed points
+                    if (pointSummary.usedPoints > 0) {
+                        await loyaltyService.refundPointsForOrder(tx, {
+                            userId: customer.user_id,
+                            orderId: orderId,
+                            points: pointSummary.usedPoints,
+                            note: `Hoàn điểm đơn ${currentOrder.order_code} (Hủy đơn)`
                         });
                     }
                 }
@@ -205,6 +266,32 @@ const updatePaymentStatus = async (req, res, next) => {
                 where: { id: orderId },
                 data: { payment_status }
             });
+
+            // AWARD REWARD POINTS if paid (if not already awarded)
+            if (payment_status === 'paid') {
+                const customer = await tx.customer.findUnique({
+                    where: { id: currentOrder.customer_id },
+                    select: { user_id: true }
+                });
+
+                if (customer && customer.user_id) {
+                    const existingEarn = await tx.pointHistory.findFirst({
+                        where: { order_id: orderId, type: 'earn' }
+                    });
+
+                    if (!existingEarn) {
+                        const earnedPoints = loyaltyService.calculateEarnedPoints(currentOrder.total_amount);
+                        if (earnedPoints > 0) {
+                            await loyaltyService.awardPointsForOrder(tx, {
+                                userId: customer.user_id,
+                                orderId: orderId,
+                                points: earnedPoints,
+                                note: `Tích điểm từ đơn hàng ${currentOrder.order_code} (Xác nhận thanh toán)`
+                            });
+                        }
+                    }
+                }
+            }
 
             // Log change
             await tx.orderStatusLog.create({

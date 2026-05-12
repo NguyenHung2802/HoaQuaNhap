@@ -79,9 +79,27 @@
                             <% if (order.shipping_campaign_id) { %>
                                 <tr>
                                     <td colspan="2"></td>
-                                    <td class="text-end text-success small pb-3">Ưu đãi vận chuyển (Note):</td>
-                                    <td class="text-end pe-4 pb-3 fw-bold text-success">
+                                    <td class="text-end text-success small pb-2">Ưu đãi vận chuyển:</td>
+                                    <td class="text-end pe-4 pb-2 fw-bold text-success font-italic">
                                         Giảm <%= order.shipping_discount_amount %><%= order.shipping_discount_amount < 100 ? '%' : 'đ' %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                            <% if (pointSummary && pointSummary.usedPoints > 0) { %>
+                                <tr>
+                                    <td colspan="2"></td>
+                                    <td class="text-end text-warning small pb-2">Đổi điểm Quả Dâu (<%= pointSummary.usedPoints %>đ):</td>
+                                    <td class="text-end pe-4 pb-2 fw-bold text-danger">
+                                        -<%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(pointSummary.usedPoints * 1000) %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                            <% if (pointSummary && pointSummary.earnedPoints > 0) { %>
+                                <tr>
+                                    <td colspan="2"></td>
+                                    <td class="text-end text-muted small pb-2">Điểm tích lũy:</td>
+                                    <td class="text-end pe-4 pb-2 fw-bold text-accent">
+                                        +<%= pointSummary.earnedPoints %> <i class="fas fa-seedling"></i>
                                     </td>
                                 </tr>
                             <% } %>

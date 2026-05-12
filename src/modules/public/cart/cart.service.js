@@ -74,6 +74,67 @@ const getCartDetails = async (sessionCart) => {
     };
 };
 
+/**
+ * Sync session cart with database for authenticated user
+ * @param {number} userId 
+ * @param {Array} sessionCart 
+ */
+const syncSessionCartToDb = async (userId, sessionCart) => {
+    if (!userId || !sessionCart) return;
+
+    const customer = await prisma.customer.findUnique({ where: { user_id: userId } });
+    if (!customer) return;
+
+    // Get or create active cart
+    let cart = await prisma.cart.findFirst({ 
+        where: { customer_id: customer.id, status: 'active' } 
+    });
+    if (!cart) {
+        cart = await prisma.cart.create({
+            data: { customer_id: customer.id }
+        });
+    }
+
+    // This is a simple "overwrite" sync to keep DB consistent with session
+    // In a more complex app, we might merge.
+    await prisma.cartItem.deleteMany({ where: { cart_id: cart.id } });
+
+    if (sessionCart.length > 0) {
+        await prisma.cartItem.createMany({
+            data: sessionCart.map(item => ({
+                cart_id: cart.id,
+                product_id: parseInt(item.product_id),
+                quantity: parseInt(item.quantity),
+                unit_price: 0 // Will be calculated on display/checkout
+            }))
+        });
+    }
+};
+
+/**
+ * Get cart from database for authenticated user
+ * @param {number} userId 
+ * @returns {Array} List of { product_id, quantity }
+ */
+const getDbCart = async (userId) => {
+    const customer = await prisma.customer.findUnique({ where: { user_id: userId } });
+    if (!customer) return [];
+
+    const cart = await prisma.cart.findFirst({
+        where: { customer_id: customer.id, status: 'active' },
+        include: { items: true }
+    });
+
+    if (!cart) return [];
+
+    return cart.items.map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity
+    }));
+};
+
 module.exports = {
-    getCartDetails
+    getCartDetails,
+    syncSessionCartToDb,
+    getDbCart
 };

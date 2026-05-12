@@ -55,8 +55,21 @@ const initCart = (req, res, next) => {
  */
 const renderCart = async (req, res, next) => {
     try {
+        // If logged in, prioritize DB cart if session is empty, or sync session to DB
+        if (req.session.user && (!req.session.cart || req.session.cart.length === 0)) {
+            const dbCart = await cartService.getDbCart(req.session.user.id);
+            if (dbCart.length > 0) {
+                req.session.cart = dbCart;
+            }
+        }
+
         const sessionCart = req.session.cart || [];
         const { items, totalAmount } = await cartService.getCartDetails(sessionCart);
+
+        // SYNC to DB if logged in to ensure consistency
+        if (req.session.user) {
+            await cartService.syncSessionCartToDb(req.session.user.id, sessionCart);
+        }
 
         // --- Shipping promotion progress logic ---
         const now = new Date();
@@ -115,16 +128,28 @@ const renderCart = async (req, res, next) => {
  * [GET] /cart/count
  * Return total quantity in cart for header badge
  */
-const getCartCount = (req, res) => {
-    const sessionCart = req.session.cart || [];
-    const count = sessionCart.reduce((total, item) => total + parseInt(item.quantity), 0);
-    res.json({ success: true, count });
+const getCartCount = async (req, res) => {
+    try {
+        // If logged in and session is empty, try to load from DB first
+        if (req.session.user && (!req.session.cart || req.session.cart.length === 0)) {
+            const dbCart = await cartService.getDbCart(req.session.user.id);
+            if (dbCart.length > 0) {
+                req.session.cart = dbCart;
+            }
+        }
+
+        const sessionCart = req.session.cart || [];
+        const count = sessionCart.reduce((total, item) => total + parseInt(item.quantity), 0);
+        res.json({ success: true, count });
+    } catch (error) {
+        res.json({ success: false, count: 0 });
+    }
 };
 
 /**
  * [POST] /cart/add
  */
-const addToCart = (req, res) => {
+const addToCart = async (req, res) => {
     try {
         let { product_id, quantity } = req.body;
         product_id = parseInt(product_id);
@@ -141,6 +166,11 @@ const addToCart = (req, res) => {
             req.session.cart.push({ product_id, quantity });
         }
 
+        // SYNC to DB if logged in
+        if (req.session.user) {
+            await cartService.syncSessionCartToDb(req.session.user.id, req.session.cart);
+        }
+
         const count = req.session.cart.reduce((tot, item) => tot + parseInt(item.quantity), 0);
         res.json({ success: true, message: 'Thêm vào giỏ hàng thành công', count });
     } catch (error) {
@@ -152,7 +182,7 @@ const addToCart = (req, res) => {
 /**
  * [POST] /cart/update
  */
-const updateCart = (req, res) => {
+const updateCart = async (req, res) => {
     try {
         let { product_id, quantity } = req.body;
         product_id = parseInt(product_id);
@@ -173,6 +203,11 @@ const updateCart = (req, res) => {
             }
         }
 
+        // SYNC to DB if logged in
+        if (req.session.user) {
+            await cartService.syncSessionCartToDb(req.session.user.id, req.session.cart);
+        }
+
         const count = req.session.cart.reduce((tot, item) => tot + parseInt(item.quantity), 0);
         res.json({ success: true, message: 'Cập nhật giỏ hàng thành công', count });
     } catch (error) {
@@ -183,7 +218,7 @@ const updateCart = (req, res) => {
 /**
  * [POST] /cart/remove
  */
-const removeFromCart = (req, res) => {
+const removeFromCart = async (req, res) => {
     try {
         let { product_id } = req.body;
         product_id = parseInt(product_id);
@@ -193,6 +228,12 @@ const removeFromCart = (req, res) => {
         }
 
         req.session.cart = req.session.cart.filter(item => parseInt(item.product_id) !== product_id);
+
+        // SYNC to DB if logged in
+        if (req.session.user) {
+            await cartService.syncSessionCartToDb(req.session.user.id, req.session.cart);
+        }
+
         const count = req.session.cart.reduce((tot, item) => tot + parseInt(item.quantity), 0);
         
         res.json({ success: true, message: 'Đã xóa sản phẩm khỏi giỏ', count });

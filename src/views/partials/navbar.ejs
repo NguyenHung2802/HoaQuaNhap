@@ -16,11 +16,11 @@
                 <li class="nav-item">
                     <a class="nav-link <%= req.originalUrl === '/' ? 'active' : '' %>" href="/">Trang chủ</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle <%= req.originalUrl.startsWith('/products') ? 'active' : '' %>" href="/products" role="button" data-bs-toggle="dropdown">
+                <li class="nav-item dropdown" id="navProductsDropdown">
+                    <a class="nav-link dropdown-toggle <%= req.originalUrl.startsWith('/products') ? 'active' : '' %>" href="/products">
                         Sản phẩm
                     </a>
-                    <ul class="dropdown-menu border-0 shadow-sm mt-2 rounded-4 py-2">
+                    <ul class="dropdown-menu border-0 shadow-sm rounded-4 py-2">
                         <li><a class="dropdown-item" href="/products">Tất cả sản phẩm</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <% if (typeof globalCategories !== 'undefined') { %>
@@ -141,4 +141,63 @@
 .dropdown-menu { min-width: 200px; }
 .dropdown-item { padding: 8px 20px; font-size: 0.9rem; }
 .dropdown-item:hover { background: var(--brand-light-green); color: var(--brand-primary); }
+
+/* Desktop: hover to open products dropdown */
+@media (min-width: 992px) {
+    #navProductsDropdown {
+        position: relative;
+    }
+    /* Bridge: pseudo-element fills the gap between link and menu */
+    #navProductsDropdown > .nav-link {
+        position: relative;
+    }
+    #navProductsDropdown > .nav-link::before {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 100%;
+        height: 10px;
+    }
+    #navProductsDropdown > .dropdown-menu {
+        margin-top: 8px;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: block;
+        pointer-events: none;
+    }
+    #navProductsDropdown:hover > .dropdown-menu {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+}
 </style>
+
+<script>
+// Mobile: toggle dropdown on tap instead of navigating
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdownItem = document.getElementById('navProductsDropdown');
+    if (!dropdownItem) return;
+    const link = dropdownItem.querySelector('.nav-link.dropdown-toggle');
+    const menu = dropdownItem.querySelector('.dropdown-menu');
+    if (!link || !menu) return;
+
+    // Only apply on mobile (< 992px)
+    link.addEventListener('click', function(e) {
+        if (window.innerWidth < 992) {
+            e.preventDefault();
+            menu.classList.toggle('show');
+        }
+        // Desktop: click navigates to /products (default behavior)
+    });
+
+    // Close dropdown when clicking outside on mobile
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth < 992 && !dropdownItem.contains(e.target)) {
+            menu.classList.remove('show');
+        }
+    });
+});
+</script>

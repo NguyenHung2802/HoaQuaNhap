@@ -69,8 +69,8 @@ exports.renderWishlistPage = async (req, res, next) => {
             }
         });
 
-        const activePromotions = await require('../../../utils/promotion-helper').getActivePromotions();
-        const calculateBestPrice = require('../../../utils/promotion-helper').calculateBestPrice;
+        const activePromotions = await require('../../utils/promotion-helper').getActivePromotions();
+        const calculateBestPrice = require('../../utils/promotion-helper').calculateBestPrice;
 
         const wishlistProducts = customer.wishlist.map(item => ({
             ...item.product,

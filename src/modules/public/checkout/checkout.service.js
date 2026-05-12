@@ -361,14 +361,8 @@ const processOrder = async (orderData, sessionCart, userId) => {
             });
         }
 
-        if (userId && earnedRewardPoints > 0) {
-            await loyaltyService.awardPointsForOrder(tx, {
-                userId,
-                orderId: order.id,
-                points: earnedRewardPoints,
-                note: `Tích điểm từ đơn hàng ${orderCode}`
-            });
-        }
+        // Points will be awarded when the order is marked as 'completed' or 'paid' by admin.
+        // This is handled in src/modules/admin/orders/orders.controller.js
 
         return order;
     });

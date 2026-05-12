@@ -43,6 +43,7 @@ exports.renderHome = async (req, res, next) => {
     // 3. Categories (đã có trong globalCategories, lấy thêm với count)
     const categories = await db.category.findMany({
       where: { is_active: true },
+      orderBy: { sort_order: 'asc' },
       take: 6
     });
 

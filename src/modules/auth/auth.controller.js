@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const db = require('../../config/db');
 const loyaltyService = require('../loyalty/loyalty.service');
+const cartService = require('../public/cart/cart.service');
 
 /**
  * Render trang Đăng nhập (Unified)
@@ -140,6 +141,24 @@ exports.login = async (req, res) => {
             where: { id: user.id },
             data: { last_login_at: new Date() }
         });
+
+        // 5. Sync Shopping Cart
+        try {
+            const sessionCart = req.session.cart || [];
+            if (sessionCart.length > 0) {
+                // User was shopping as guest, save this to DB
+                await cartService.syncSessionCartToDb(user.id, sessionCart);
+            } else {
+                // User has no guest items, load their previous DB cart
+                const dbCart = await cartService.getDbCart(user.id);
+                if (dbCart.length > 0) {
+                    req.session.cart = dbCart;
+                }
+            }
+        } catch (cartError) {
+            console.error('Cart sync error on login:', cartError);
+            // Non-blocking error
+        }
 
         // 5. Điều hướng dựa trên vai trò
         if (user.role === 'admin') {
