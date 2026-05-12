@@ -5,12 +5,12 @@ DROP INDEX IF EXISTS "PointHistory_order_id_idx";
 DROP INDEX IF EXISTS "PointHistory_user_id_idx";
 
 -- AlterTable
-ALTER TABLE "Product" ADD COLUMN     "flash_sale_end" TIMESTAMP(3),
-ADD COLUMN     "flash_sale_price" DECIMAL(10,2),
-ADD COLUMN     "is_flash_sale" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "flash_sale_end" TIMESTAMP(3);
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "flash_sale_price" DECIMAL(10,2);
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "is_flash_sale" BOOLEAN NOT NULL DEFAULT false;
 
 -- CreateTable
-CREATE TABLE "Session" (
+CREATE TABLE IF NOT EXISTS "Session" (
     "id" TEXT NOT NULL,
     "sid" TEXT NOT NULL,
     "data" TEXT NOT NULL,
@@ -20,4 +20,4 @@ CREATE TABLE "Session" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Session_sid_key" ON "Session"("sid");
+CREATE UNIQUE INDEX IF NOT EXISTS "Session_sid_key" ON "Session"("sid");
