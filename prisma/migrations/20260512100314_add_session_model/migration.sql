@@ -1,8 +1,8 @@
 -- DropIndex
-DROP INDEX "PointHistory_order_id_idx";
+DROP INDEX IF EXISTS "PointHistory_order_id_idx";
 
 -- DropIndex
-DROP INDEX "PointHistory_user_id_idx";
+DROP INDEX IF EXISTS "PointHistory_user_id_idx";
 
 -- AlterTable
 ALTER TABLE "Product" ADD COLUMN     "flash_sale_end" TIMESTAMP(3),
