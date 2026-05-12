@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= typeof title !== 'undefined' ? title : 'Trang chủ' %> | Hải Anh Fruit — Trái Cây Nhập Khẩu</title>
     <meta name="description" content="<%= typeof metaDesc !== 'undefined' ? metaDesc : 'Cửa hàng trái cây nhập khẩu cao cấp — Tươi ngon, chất lượng đảm bảo, giao hàng tận nhà.' %>">
+    <% if (typeof title !== 'undefined' && title === 'Trang chủ') { %>
+    <meta name="google-site-verification" content="ygLsmpi34UD9zW65OH6qIFbWxk1qE6mbv0mqc6xdEgE" />
+    <% } %>
     <!-- Favicon -->
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
     <!-- Google Fonts -->
