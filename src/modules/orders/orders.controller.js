@@ -73,7 +73,7 @@ exports.renderSuccess = async (req, res) => {
         if (order.payment_method === 'BANK_TRANSFER' && bankConfig.bank_id && bankConfig.bank_account_no) {
             const amount = parseInt(order.total_amount);
             const addInfo = encodeURIComponent(order.order_code);
-            const accountName = encodeURIComponent(bankConfig.bank_account_name || 'WEBHOAQUA');
+            const accountName = encodeURIComponent(bankConfig.bank_account_name || 'HAI ANH FRUIT');
             qrUrl = `https://img.vietqr.io/image/${bankConfig.bank_id}-${bankConfig.bank_account_no}-compact.png?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`;
             
             // Map common BINs to names for better UI

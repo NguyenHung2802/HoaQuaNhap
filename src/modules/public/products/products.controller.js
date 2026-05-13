@@ -87,7 +87,7 @@ exports.renderShop = async (req, res, next) => {
 
         res.render('public/products/shop', {
             title: q ? `Tìm kiếm: "${q}"` : (category ? `Danh mục: ${category}` : 'Tất cả sản phẩm'),
-            metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại WebHoaQua.',
+            metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại Hải Anh Fruit.',
             products: productsWithBestPrice,
             total,
             totalPages: Math.ceil(total / limit),
@@ -210,7 +210,7 @@ exports.renderDetail = async (req, res, next) => {
 
         res.render('public/products/detail', {
             title: product.name,
-            metaDesc: product.short_description || `Mua ${product.name} tươi ngon tại WebHoaQua`,
+            metaDesc: product.short_description || `Mua ${product.name} tươi ngon tại Hải Anh Fruit`,
             product: { ...productPlain, ...bestPriceData, isWishlisted },
             relatedProducts: relatedProducts.map(p => ({
                 ...p,

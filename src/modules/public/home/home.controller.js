@@ -68,7 +68,7 @@ exports.renderHome = async (req, res, next) => {
 
     res.render('public/home/index', {
       title: 'Trang chủ',
-      metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại WebHoaQua — Tươi ngon, đảm bảo chất lượng, giao hàng tận nơi.',
+      metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại Hải Anh Fruit — Tươi ngon, đảm bảo chất lượng, giao hàng tận nơi.',
       featuredProducts: featuredProducts.map(mapWithBestPrice),
       bestSellers: bestSellers.map(mapWithBestPrice),
       flashSaleProducts: flashSaleProducts.map(mapWithBestPrice),
