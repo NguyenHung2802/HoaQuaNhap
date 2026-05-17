@@ -28,7 +28,7 @@ const shippingHtml = `<div class="mb-5">
 
 <h4>5. Liên hệ giao hàng</h4>
 <ul>
-    <li><strong>Hotline đặt hàng nhanh:</strong> 0364672920</li>
+    <li><strong>Hotline đặt hàng nhanh:</strong> <a href="tel:0865223169">0865 223 169</a></li>
     <li><strong>Website:</strong> <a href=\"https://haianhfruit.vn\">haianhfruit.vn</a></li>
 </ul>
 

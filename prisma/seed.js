@@ -116,7 +116,8 @@ async function main() {
     { key: 'about_us', description: 'Giới thiệu WebHoaQua', value: '<h2>Chúng tôi là ai?</h2><p>WebHoaQua là hệ thống phân phối trái cây nhập khẩu hàng đầu Việt Nam...</p>' },
     { key: 'faq', description: 'Câu hỏi thường gặp (FAQ)', value: '<h2>Các câu hỏi thường gặp</h2><p>1. Cách thức đặt hàng?<br>2. Quy trình đổi trả?</p>' },
     { key: 'shipping_policy', description: 'Chính sách vận chuyển', value: '<h2>Chính sách giao hàng</h2><p>Miễn phí vận chuyển cho đơn hàng từ 500k tại nội thành...</p>' },
-    { key: 'privacy_policy', description: 'Chính sách bảo mật', value: '<h2>Bảo mật thông tin khách hàng</h2><p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn...</p>' }
+    { key: 'privacy_policy', description: 'Chính sách bảo mật', value: '<h2>Bảo mật thông tin khách hàng</h2><p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn...</p>' },
+    { key: 'return_policy', description: 'Chính sách đổi trả', value: '<h3>Chính sách đổi trả hàng</h3><p>Hải Anh Fruit cam kết mang đến cho khách hàng những sản phẩm trái cây nhập khẩu chất lượng cao, tươi ngon và đúng với tiêu chuẩn an toàn thực phẩm.</p>' }
   ];
 
   for (const page of staticPages) {

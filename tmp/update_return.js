@@ -26,8 +26,8 @@ const returnHtml = `<h3>Chính sách đổi trả hàng</h3>
 <h4>4. Liên hệ hỗ trợ</h4>
 <p>Nếu có bất kỳ thắc mắc nào về đơn hàng hoặc cần hỗ trợ kiểm tra, khách hàng có thể liên hệ:</p>
 <ul>
-    <li><strong>Hotline:</strong> <a href="tel:0364672920">0364 672 920</a></li>
-    <li><strong>Email:</strong> <a href="mailto:cskhhaianhfruit.vn@gmail.com">cskhhaianhfruit.vn@gmail.com</a></li>
+    <li><strong>Hotline:</strong> <a href="tel:0865223169">0865 223 169</a></li>
+    <li><strong>Email:</strong> <a href="mailto:cskhhaianhfruit@gmail.com">cskhhaianhfruit@gmail.com</a></li>
     <li><strong>Địa chỉ:</strong> N05 Ecohome 3, Đông Ngạc, Bắc Từ Liêm, Hà Nội</li>
     <li><strong>Website:</strong> <a href="https://haianhfruit.vn">haianhfruit.vn</a></li>
 </ul>

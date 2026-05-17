@@ -5,7 +5,7 @@ const fakeOrder = {
   id: 999,
   order_code: 'TEST-001',
   customer_name: 'Nguyễn Test',
-  customer_phone: '0364672920',
+  customer_phone: '0865223169',
   customer_email: null,
   delivery_address: 'N05 Ecohome 3, Đông Ngạc, Hà Nội',
   note: 'Test thông báo',
@@ -27,6 +27,6 @@ notify.sendOrderNotificationEmail(fakeOrder)
   .catch(e => console.error('Email error:', e));
 
 setTimeout(() => {
-    console.log('Test timed out after 10s');
-    process.exit(0);
+  console.log('Test timed out after 10s');
+  process.exit(0);
 }, 10000);
