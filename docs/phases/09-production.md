@@ -589,7 +589,7 @@ ssh deploy@123.45.67.89
 cd /var/www/HoaQuaNhap
 
 # 3. Pull code mới
-git pull origin main
+git pull origin master
 
 # 4. Cài dependencies mới (nếu có thêm package)
 npm install --omit=dev

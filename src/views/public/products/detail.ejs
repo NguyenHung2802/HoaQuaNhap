@@ -9,6 +9,9 @@
                 <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
                 <li class="breadcrumb-item"><a href="/products">Sản phẩm</a></li>
                 <% if (product.category) { %>
+                    <% if (product.category.parent) { %>
+                        <li class="breadcrumb-item"><a href="/products?category=<%= product.category.parent.slug %>"><%= product.category.parent.name %></a></li>
+                    <% } %>
                     <li class="breadcrumb-item"><a href="/products?category=<%= product.category.slug %>"><%= product.category.name %></a></li>
                 <% } %>
                 <li class="breadcrumb-item active"><%= product.name %></li>

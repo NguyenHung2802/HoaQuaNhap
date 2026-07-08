@@ -42,9 +42,18 @@
                                 <% categories.forEach(cat => { %>
                                     <label class="cat-filter-item d-flex justify-content-between align-items-center <%= filters.category === cat.slug ? 'active' : '' %>" style="cursor: pointer;">
                                         <input type="radio" name="category" value="<%= cat.slug %>" class="d-none" onchange="this.form.submit()" <%= filters.category === cat.slug ? 'checked' : '' %>>
-                                        <span><%= cat.name %></span>
+                                        <span class="fw-semibold"><%= cat.name %></span>
                                         <span class="badge bg-light text-dark rounded-pill border"><%= cat._count.products %></span>
                                     </label>
+                                    <% if (cat.children && cat.children.length > 0) { %>
+                                        <% cat.children.forEach(sub => { %>
+                                            <label class="cat-filter-item d-flex justify-content-between align-items-center ms-3 ps-2 border-start <%= filters.category === sub.slug ? 'active' : '' %>" style="cursor: pointer; font-size: 0.825rem;">
+                                                <input type="radio" name="category" value="<%= sub.slug %>" class="d-none" onchange="this.form.submit()" <%= filters.category === sub.slug ? 'checked' : '' %>>
+                                                <span class="text-muted"><%= sub.name %></span>
+                                                <span class="badge bg-light text-dark rounded-pill border" style="font-size: 0.7rem;"><%= sub._count.products %></span>
+                                            </label>
+                                        <% }) %>
+                                    <% } %>
                                 <% }) %>
                             </div>
                         </div>

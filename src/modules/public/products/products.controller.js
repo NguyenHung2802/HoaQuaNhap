@@ -21,7 +21,20 @@ exports.renderShop = async (req, res, next) => {
         }
 
         if (category) {
-            where.category = { slug: category };
+            const selectedCategory = await db.category.findUnique({
+                where: { slug: category },
+                select: { id: true }
+            });
+            if (selectedCategory) {
+                const subCategories = await db.category.findMany({
+                    where: { parent_id: selectedCategory.id, is_active: true },
+                    select: { id: true }
+                });
+                const categoryIds = [selectedCategory.id, ...subCategories.map(c => c.id)];
+                where.category_id = { in: categoryIds };
+            } else {
+                where.category = { slug: category };
+            }
         }
 
         if (origin) {
@@ -70,7 +83,10 @@ exports.renderShop = async (req, res, next) => {
             db.category.findMany({ 
                 where: { is_active: true }, 
                 include: { _count: { select: { products: { where: { status: 'published' } } } } },
-                orderBy: { name: 'asc' } 
+                orderBy: [
+                    { sort_order: 'asc' },
+                    { name: 'asc' }
+                ]
             }),
             db.product.groupBy({
                 by: ['origin_country'],
@@ -85,6 +101,13 @@ exports.renderShop = async (req, res, next) => {
             ...calculateBestPrice(p, activePromotions)
         }));
 
+        // Build category tree for sidebar filter
+        const parentCats = categories.filter(cat => !cat.parent_id);
+        const childCats = categories.filter(cat => cat.parent_id);
+        parentCats.forEach(parent => {
+            parent.children = childCats.filter(child => child.parent_id === parent.id);
+        });
+ 
         res.render('public/products/shop', {
             title: q ? `Tìm kiếm: "${q}"` : (category ? `Danh mục: ${category}` : 'Tất cả sản phẩm'),
             metaDesc: 'Khám phá hàng trăm loại trái cây nhập khẩu cao cấp tại Hải Anh Fruit.',
@@ -92,7 +115,7 @@ exports.renderShop = async (req, res, next) => {
             total,
             totalPages: Math.ceil(total / limit),
             currentPage: parseInt(page),
-            categories,
+            categories: parentCats,
             distinctOrigins,
             filters: { 
                 q: q || '', 
@@ -130,6 +153,13 @@ exports.renderDetail = async (req, res, next) => {
 
         if (!product) {
             return res.status(404).render('public/404', { title: 'Không tìm thấy', layout: 'layouts/main' });
+        }
+
+        // Fetch parent category if exists
+        if (product.category && product.category.parent_id) {
+            product.category.parent = await db.category.findUnique({
+                where: { id: product.category.parent_id }
+            });
         }
 
         // Calculate average rating

@@ -108,6 +108,11 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 - [x] **Fix Categories orderBy**: Thêm `sort_order ASC` cho query categories trang chủ.
 - [x] **Cải thiện Combo links**: Thay hardcoded links bằng filter category thực tế (dau-tay, nho-nhap-khau, tao-nhap-khau).
 - [ ] **Tương lai**: Tạo model Combo/Bundle/Gift Set, Admin CRUD, Tags/Labels (xem recommendations log).
+### 2.14. Phân cấp Danh mục (Category Hierarchy — 2026-07-06)
+- [x] **Menu Navbar Đa Cấp**: Ẩn danh mục con trên menu cấp 1, chỉ hiển thị khi hover danh mục cha. Hỗ trợ toggle trên mobile.
+- [x] **Sidebar Shop Filter**: Thụt lề và hiển thị danh mục con phân cấp trực quan.
+- [x] **Thuật toán Lọc Sản phẩm**: Lọc danh mục cha hiển thị sản phẩm của cả danh mục cha và các danh mục con.
+- [x] **Breadcrumbs Đa Cấp**: Hiển thị đầy đủ đường dẫn cha -> con trên trang chi tiết sản phẩm.
 ---
 > [!TIP]
 > Hãy luôn cập nhật checklist sau mỗi Giai đoạn hoàn thành thành công và được test kỹ lưỡng.

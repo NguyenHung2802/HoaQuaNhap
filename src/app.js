@@ -87,11 +87,21 @@ app.use(async (req, res, next) => {
     res.locals.cartItemsCount = sessionCart.reduce((total, item) => total + parseInt(item.quantity), 0);
 
     try {
-        res.locals.globalCategories = await _prisma.category.findMany({
+        const allCategories = await _prisma.category.findMany({
             where: { is_active: true },
-            orderBy: { name: 'asc' },
-            take: 8
+            orderBy: [
+                { sort_order: 'asc' },
+                { name: 'asc' }
+            ]
         });
+        const parentCategories = allCategories.filter(cat => !cat.parent_id);
+        const childCategories = allCategories.filter(cat => cat.parent_id);
+        
+        parentCategories.forEach(parent => {
+            parent.children = childCategories.filter(child => child.parent_id === parent.id);
+        });
+
+        res.locals.globalCategories = parentCategories;
     } catch (e) {
         res.locals.globalCategories = [];
     }

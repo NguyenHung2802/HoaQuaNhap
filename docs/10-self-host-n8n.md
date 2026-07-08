@@ -189,8 +189,8 @@ module.exports = {
       // Load biến môi trường từ file .env
       env: {
         NODE_ENV: 'production',
+        // Copy trực tiếp các biến môi trường vào đây hoặc cấu hình n8n parse n8n.env như bên dưới
       },
-      env_file: '/home/deploy/.n8n/n8n.env',
 
       // Log
       error_file: '/home/deploy/.n8n/logs/n8n-error.log',
@@ -198,6 +198,59 @@ module.exports = {
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
     },
   ],
+};
+```
+
+💡 **Mẹo nâng cao để tự động load file `.env` không cần viết cứng:**  
+Bạn nên viết thêm đoạn script đọc file `.env` bằng code Node.js thuần trực tiếp trong file `n8n-ecosystem.config.js` như sau:
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+function readEnv(filePath) {
+  const env = {};
+  if (fs.existsSync(filePath)) {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    content.split('\n').forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        const index = trimmed.indexOf('=');
+        if (index !== -1) {
+          const key = trimmed.substring(0, index).trim();
+          let val = trimmed.substring(index + 1).trim();
+          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.substring(1, val.length - 1);
+          }
+          env[key] = val;
+        }
+      }
+    });
+  }
+  return env;
+}
+
+const n8nEnv = readEnv('/home/deploy/.n8n/n8n.env');
+
+module.exports = {
+  apps: [
+    {
+      name: 'n8n',
+      script: 'n8n',
+      args: 'start',
+      cwd: '/home/deploy',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '512M',
+      env: {
+        NODE_ENV: 'production',
+        ...n8nEnv
+      },
+      error_file: '/home/deploy/.n8n/logs/n8n-error.log',
+      out_file: '/home/deploy/.n8n/logs/n8n-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss',
+    }
+  ]
 };
 ```
 
@@ -283,6 +336,11 @@ server {
     location / {
         proxy_pass http://localhost:5678;
         proxy_http_version 1.1;
+
+        # Tắt buffering và cache để tránh lỗi lặp đăng nhập (Auth login loop) của n8n
+        chunked_transfer_encoding off;
+        proxy_buffering off;
+        proxy_cache off;
 
         # Headers cần thiết cho n8n
         proxy_set_header Upgrade $http_upgrade;
