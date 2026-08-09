@@ -111,8 +111,12 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 ### 2.14. Phân cấp Danh mục (Category Hierarchy — 2026-07-06)
 - [x] **Menu Navbar Đa Cấp**: Ẩn danh mục con trên menu cấp 1, chỉ hiển thị khi hover danh mục cha. Hỗ trợ toggle trên mobile.
 - [x] **Sidebar Shop Filter**: Thụt lề và hiển thị danh mục con phân cấp trực quan.
+- [x] **Sidebar Shop Filter Nâng cao (2026-07-28)**: Ẩn danh mục con cấp 2 mặc định, chỉ hiển thị khi hover danh mục cha hoặc khi danh mục cha/con tương ứng hoạt động (active).
+- [x] **Mô tả Sản phẩm Rich Text (2026-07-28)**: Tích hợp Quill Editor vào trang thêm/sửa sản phẩm trong Admin và hỗ trợ hiển thị đẹp mắt (HTML & tương thích plain text) tại trang chi tiết sản phẩm.
 - [x] **Thuật toán Lọc Sản phẩm**: Lọc danh mục cha hiển thị sản phẩm của cả danh mục cha và các danh mục con.
 - [x] **Breadcrumbs Đa Cấp**: Hiển thị đầy đủ đường dẫn cha -> con trên trang chi tiết sản phẩm.
+- [x] **Sidebar Shop Filter Trực quan (2026-07-29)**: Luôn hiển thị chevron, số mục con và tổng sản phẩm theo nhóm; hỗ trợ click/keyboard ngoài hover.
+- [x] **Thông tin Dinh dưỡng Rich Text (2026-07-29)**: Quill ở Admin create/edit, card rich text ở trang chi tiết và tương thích dữ liệu plain text cũ.
 ---
 > [!TIP]
 > Hãy luôn cập nhật checklist sau mỗi Giai đoạn hoàn thành thành công và được test kỹ lưỡng.

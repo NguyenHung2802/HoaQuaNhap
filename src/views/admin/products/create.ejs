@@ -1,3 +1,5 @@
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="mb-0">Thêm sản phẩm mới</h4>
@@ -46,12 +48,15 @@
 
                     <div class="mb-3">
                         <label for="description" class="form-label fw-bold">Mô tả chi tiết</label>
-                        <textarea class="form-control" id="description" name="description" rows="5" placeholder="Thông tin chi tiết về sản phẩm..."></textarea>
+                        <div id="description-editor" style="height: 300px;" class="rounded-3 bg-white border"></div>
+                        <input type="hidden" name="description" id="description-input">
                     </div>
 
                     <div class="mb-0">
                         <label for="nutritional_info" class="form-label fw-bold">Thông tin dinh dưỡng</label>
-                        <textarea class="form-control" id="nutritional_info" name="nutritional_info" rows="5" placeholder="Giá trị dinh dưỡng, vitamin..."></textarea>
+                        <div id="nutrition-editor" style="height: 240px;" class="rounded-3 bg-white border"></div>
+                        <input type="hidden" name="nutritional_info" id="nutrition-input">
+                        <div class="form-text">Có thể trình bày theo tiêu đề, danh sách, bảng chỉ số hoặc nhấn mạnh các vitamin nổi bật.</div>
                     </div>
                 </div>
             </div>
@@ -347,5 +352,37 @@
     // Mark SKU as manually edited if user types in it
     document.getElementById('sku').addEventListener('input', function() {
         this.dataset.auto = 'false';
+    });
+</script>
+
+<!-- Quill Editor JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editorOptions = {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [2, 3, 4, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['link', 'image', 'video'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Thông tin chi tiết về sản phẩm...'
+        };
+        const quill = new Quill('#description-editor', editorOptions);
+        const nutritionQuill = new Quill('#nutrition-editor', {
+            ...editorOptions,
+            placeholder: 'Ví dụ: Giá trị dinh dưỡng trong 100g, vitamin, khoáng chất...'
+        });
+
+        const form = document.getElementById('description-input').form;
+        form.addEventListener('submit', function() {
+            document.getElementById('description-input').value = quill.root.innerHTML;
+            document.getElementById('nutrition-input').value = nutritionQuill.root.innerHTML;
+        });
     });
 </script>

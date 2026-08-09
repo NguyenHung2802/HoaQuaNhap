@@ -11,4 +11,5 @@ MAYBE       TODO     2026-04-02  Phase 3 - Categories      Hỗ trợ Đa ngôn 
 SHOULD      TODO     2026-05-08  Homepage - Combo          Tạo model Combo/Bundle/Gift Set (Giỏ quả, Set, Túi) trong DB.
 SHOULD      TODO     2026-05-08  Homepage - Combo          Admin CRUD cho Combo collections, liên kết sản phẩm thực.
 COULD       TODO     2026-05-08  Homepage - Products       Thêm Tags/Labels cho SP để filter linh hoạt (buoi-sang, qua-bieu).
+SHOULD      TODO     2026-07-29  Product Rich Text         Sanitization HTML tập trung cho description và nutritional_info.
 ```

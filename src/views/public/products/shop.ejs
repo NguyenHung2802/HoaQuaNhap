@@ -40,20 +40,41 @@
                                     <span class="badge bg-light text-dark rounded-pill border"><%= total %></span>
                                 </label>
                                 <% categories.forEach(cat => { %>
-                                    <label class="cat-filter-item d-flex justify-content-between align-items-center <%= filters.category === cat.slug ? 'active' : '' %>" style="cursor: pointer;">
-                                        <input type="radio" name="category" value="<%= cat.slug %>" class="d-none" onchange="this.form.submit()" <%= filters.category === cat.slug ? 'checked' : '' %>>
-                                        <span class="fw-semibold"><%= cat.name %></span>
-                                        <span class="badge bg-light text-dark rounded-pill border"><%= cat._count.products %></span>
-                                    </label>
-                                    <% if (cat.children && cat.children.length > 0) { %>
-                                        <% cat.children.forEach(sub => { %>
-                                            <label class="cat-filter-item d-flex justify-content-between align-items-center ms-3 ps-2 border-start <%= filters.category === sub.slug ? 'active' : '' %>" style="cursor: pointer; font-size: 0.825rem;">
-                                                <input type="radio" name="category" value="<%= sub.slug %>" class="d-none" onchange="this.form.submit()" <%= filters.category === sub.slug ? 'checked' : '' %>>
-                                                <span class="text-muted"><%= sub.name %></span>
-                                                <span class="badge bg-light text-dark rounded-pill border" style="font-size: 0.7rem;"><%= sub._count.products %></span>
+                                    <%
+                                        const isParentActive = filters.category === cat.slug;
+                                        const isChildActive = cat.children && cat.children.some(sub => filters.category === sub.slug);
+                                        const isGroupActive = isParentActive || isChildActive;
+                                    %>
+                                    <div class="cat-filter-wrapper <%= isGroupActive ? 'active expanded' : '' %> mb-1">
+                                        <div class="cat-filter-parent d-flex align-items-center <%= isParentActive ? 'active' : '' %>">
+                                            <label class="cat-filter-item flex-grow-1 d-flex justify-content-between align-items-center <%= isParentActive ? 'active' : '' %>" style="cursor: pointer;">
+                                                <input type="radio" name="category" value="<%= cat.slug %>" class="d-none" onchange="this.form.submit()" <%= isParentActive ? 'checked' : '' %>>
+                                                <span class="fw-semibold"><%= cat.name %></span>
+                                                <span class="badge bg-light text-dark rounded-pill border" title="Tổng sản phẩm trong nhóm"><%= cat.groupProductCount %></span>
                                             </label>
-                                        <% }) %>
-                                    <% } %>
+                                            <% if (cat.children && cat.children.length > 0) { %>
+                                                <button type="button"
+                                                        class="cat-expand-btn"
+                                                        aria-expanded="<%= isGroupActive ? 'true' : 'false' %>"
+                                                        aria-label="Hiển thị <%= cat.children.length %> danh mục con của <%= cat.name %>"
+                                                        title="<%= cat.children.length %> danh mục con">
+                                                    <span class="cat-child-count"><%= cat.children.length %></span>
+                                                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                        <% if (cat.children && cat.children.length > 0) { %>
+                                            <div class="sub-categories-list ms-3 ps-2 border-start">
+                                                <% cat.children.forEach(sub => { %>
+                                                    <label class="cat-filter-item d-flex justify-content-between align-items-center <%= filters.category === sub.slug ? 'active' : '' %>" style="cursor: pointer; font-size: 0.825rem;">
+                                                        <input type="radio" name="category" value="<%= sub.slug %>" class="d-none" onchange="this.form.submit()" <%= filters.category === sub.slug ? 'checked' : '' %>>
+                                                        <span class="text-muted"><%= sub.name %></span>
+                                                        <span class="badge bg-light text-dark rounded-pill border" style="font-size: 0.7rem;"><%= sub._count.products %></span>
+                                                    </label>
+                                                <% }) %>
+                                            </div>
+                                        <% } %>
+                                    </div>
                                 <% }) %>
                             </div>
                         </div>
@@ -230,6 +251,39 @@
 .sidebar-title { font-weight: 700; color: var(--brand-primary); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--brand-light-green); font-size: 0.95rem; }
 .cat-filter-item { display: block; padding: 8px 14px; border-radius: 100px; font-size: 0.875rem; color: var(--text-muted); text-decoration: none; transition: all 0.2s ease; }
 .cat-filter-item:hover, .cat-filter-item.active { background: var(--brand-light-green); color: var(--brand-primary); font-weight: 600; }
+.cat-filter-parent { border: 1px solid transparent; border-radius: 100px; transition: border-color 0.2s ease, background 0.2s ease; }
+.cat-filter-parent:hover, .cat-filter-wrapper.expanded .cat-filter-parent { border-color: #dce9dc; background: #f8fbf7; }
+.cat-filter-parent .cat-filter-item { min-width: 0; }
+.cat-expand-btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 7px;
+    padding: 5px 8px;
+    border: 0;
+    border-radius: 999px;
+    background: #eaf4e8;
+    color: var(--brand-primary);
+    font-size: 0.7rem;
+    line-height: 1;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.cat-expand-btn:hover, .cat-expand-btn:focus-visible { background: #d7ead3; outline: 2px solid rgba(46, 125, 50, 0.22); outline-offset: 2px; }
+.cat-expand-btn i { transition: transform 0.25s ease; }
+.cat-filter-wrapper.expanded .cat-expand-btn i { transform: rotate(180deg); }
+.cat-child-count { min-width: 14px; text-align: center; font-weight: 700; }
+
+/* Subcategories animation & visibility toggle */
+.sub-categories-list {
+    display: none;
+    padding-top: 6px;
+}
+.cat-filter-wrapper:hover .sub-categories-list,
+.cat-filter-wrapper.active .sub-categories-list,
+.cat-filter-wrapper.expanded .sub-categories-list {
+    display: block;
+}
 
 /* Product Cards (Same as home) */
 .fruit-card { border: 1px solid #eee; border-radius: 18px; overflow: hidden; background: #fff; transition: all 0.3s ease; color: inherit; }
@@ -253,3 +307,13 @@
 .pagination .page-link { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #dee2e6; color: var(--brand-primary); font-size: 0.85rem; }
 .pagination .page-item.active .page-link { background: var(--brand-primary); border-color: var(--brand-primary); }
 </style>
+
+<script>
+    document.querySelectorAll('.cat-expand-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            const wrapper = button.closest('.cat-filter-wrapper');
+            const isExpanded = wrapper.classList.toggle('expanded');
+            button.setAttribute('aria-expanded', String(isExpanded));
+        });
+    });
+</script>

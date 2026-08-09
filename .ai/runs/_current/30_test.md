@@ -124,3 +124,33 @@ Profile reward points display     OK      N/A          OK            N/A        
 
 ### Notes & Recommendations
 - Cần giải quyết file lock để chạy lại `npx prisma generate`; hiện tại runtime loyalty đã được bọc bằng raw SQL nên không block dev tiếp.
+
+## 2026-07-29 10:30 — Test S40/S41
+- Trạng thái: PASS (automated syntax/template/schema); UI browser smoke chưa chạy vì không khởi động service trong phiên.
+- Risk: thay đổi presentation và phép tổng hợp in-memory; không đổi DB/API/auth.
+
+### Test Gap Analysis
+```text
+TEST TYPE                 STATUS     NOTES
+------------------------  ---------  --------------------------------------------
+Node syntax               OK         Controller pass node --check
+EJS template compile      OK         4/4 template pass
+Prisma schema             OK         prisma validate pass
+UI interaction smoke      PARTIAL    Logic/ARIA review; chưa browser smoke
+Regression                OK         Payload key và radio filter giữ nguyên
+```
+
+### Branch Matrix
+```text
+AREA                       HAPPY   EMPTY/OLD DATA   ACTIVE   KEYBOARD
+-------------------------  ------  ---------------  -------  --------
+Category expand            OK      N/A              OK       OK
+Nutrition create/edit      OK      OK               N/A      OK
+Nutrition public render    OK      OK               N/A      N/A
+```
+
+### Commands
+- `node --check src/modules/public/products/products.controller.js`
+- Compile EJS bằng package `ejs`
+- `npx prisma validate`
+- `git diff --check -- <5 file code>`

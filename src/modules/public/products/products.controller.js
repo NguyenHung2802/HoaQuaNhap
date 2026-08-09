@@ -106,6 +106,8 @@ exports.renderShop = async (req, res, next) => {
         const childCats = categories.filter(cat => cat.parent_id);
         parentCats.forEach(parent => {
             parent.children = childCats.filter(child => child.parent_id === parent.id);
+            parent.groupProductCount = parent._count.products
+                + parent.children.reduce((sum, child) => sum + child._count.products, 0);
         });
  
         res.render('public/products/shop', {

@@ -475,3 +475,17 @@ Profile reward points display      OK      N/A          OK            N/A       
 - `node --check src/modules/loyalty/loyalty.service.js`
 - `node --check src/modules/public/checkout/checkout.service.js`
 - Coverage note: hotspot c�n thi?u l� branch coupon + points + promo v� race condition nhi?u tab checkout.
+
+## 2026-07-29 10:20 — S40/S41: UI danh mục và dinh dưỡng
+
+### Thay đổi
+- Controller bổ sung `groupProductCount` từ count cha và các con, không thêm query.
+- Shop thêm badge tổng nhóm, số mục con, chevron luôn hiện, click toggle và ARIA.
+- Admin create/edit dùng Quill riêng cho dinh dưỡng, đồng bộ hidden input khi submit.
+- Public detail render Quill; fallback escape an toàn cho dữ liệu plain text cũ.
+
+### Verification
+- `node --check src/modules/public/products/products.controller.js`: PASS.
+- Compile 4 EJS bằng `ejs.compile`: PASS.
+- `npx prisma validate`: PASS.
+- `git diff --check` trên 5 file code: PASS (chỉ có cảnh báo line-ending).

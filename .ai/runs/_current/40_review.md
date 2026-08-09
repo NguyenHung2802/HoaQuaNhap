@@ -107,3 +107,25 @@ Flaky risk                        OK       Loyalty backend nằm trong transacti
 
 ### Recommendations log update
 - Chưa thêm TODO mới vào `.ai/runs/persist/00_recommendations_log.md`; follow-up hiện được nêu ngay trong review này.
+
+## 2026-07-29 10:40 — Review S40/S41
+- Kết luận: SHIP WITH FOLLOW-UP.
+- BA/Plan: Must requirements S40/S41 hoàn thành; không có schema/API drift.
+
+### Conformance
+```text
+ITEM                              STATUS  EVIDENCE
+--------------------------------  ------  ----------------------------------------
+Dấu hiệu danh mục con luôn hiện   DONE    shop.ejs cat-expand-btn
+Tổng sản phẩm nhóm                DONE    products.controller.js groupProductCount
+Rich text dinh dưỡng admin        DONE    create.ejs/edit.ejs nutrition-editor
+Rich text dinh dưỡng public       DONE    detail.ejs nutritional-content
+Plain text cũ                     DONE    edit/detail fallback
+```
+
+### Quality gate
+- Không có ship blocker.
+- Nút toggle dùng `type=button`, ARIA cập nhật theo state, active tự mở.
+- Không thêm query và không migration.
+- Follow-up P2: sanitization HTML tập trung cho description/nutritional_info; đã ghi recommendations log.
+- Checkpoints: requirements log, recommendations log và repo map đã cập nhật.

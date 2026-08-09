@@ -28,3 +28,8 @@
 
 ## Cập nhật/Điều chỉnh
 - 2026-04-03 11:45: Khởi tạo nhật ký theo yêu cầu của Phase 08.
+
+## Cập nhật 2026-07-29 10:00 — UI danh mục con và dinh dưỡng
+- Trong bộ lọc sản phẩm, cần có dấu hiệu luôn hiển thị để biết danh mục cha có mục con, không phụ thuộc hover.
+- Làm phần thông tin dinh dưỡng ở cả admin và public đẹp, trực quan và tương tự mô tả chi tiết.
+- Phạm vi chốt: chevron + số mục con + tổng sản phẩm nhóm; Quill rich text + tương thích plain text cũ; không đổi DB/API.
