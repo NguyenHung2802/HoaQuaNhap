@@ -312,6 +312,7 @@ a:hover {
         position: static;
         opacity: 1;
         display: none;
+        pointer-events: auto;
         float: none;
         transform: none;
         box-shadow: none;
