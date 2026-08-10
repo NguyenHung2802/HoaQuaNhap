@@ -66,7 +66,10 @@ const calculateBestPrice = (product, activePromotions = []) => {
             if (promo.target_type === 'all') return true;
             
             if (promo.target_type === 'category') {
-                return promo.categories && promo.categories.some(pc => pc.category_id === product.category_id);
+                const productCategoryIds = product.categories && product.categories.length
+                    ? product.categories.map(item => item.category_id)
+                    : [product.category_id];
+                return promo.categories && promo.categories.some(pc => productCategoryIds.includes(pc.category_id));
             }
 
             if (promo.target_type === 'product') {

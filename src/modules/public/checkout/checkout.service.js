@@ -23,7 +23,8 @@ const processOrder = async (orderData, sessionCart, userId) => {
         // 1. Fetch current products to check stock and prices
         const productIds = sessionCart.map(item => parseInt(item.product_id));
         const products = await tx.product.findMany({
-            where: { id: { in: productIds } }
+            where: { id: { in: productIds } },
+            include: { categories: true }
         });
 
         // 1.1 Restriction: Only Hà Nội
@@ -133,7 +134,10 @@ const processOrder = async (orderData, sessionCart, userId) => {
                     isItemEligible = true;
                 } else if (appliedPromotion.target_type === 'category') {
                     const allowedCatIds = appliedPromotion.categories.map(c => c.category_id);
-                    if (allowedCatIds.includes(product.category_id)) isItemEligible = true;
+                    const productCategoryIds = product.categories.length
+                        ? product.categories.map(item => item.category_id)
+                        : [product.category_id];
+                    if (productCategoryIds.some(categoryId => allowedCatIds.includes(categoryId))) isItemEligible = true;
                 } else if (appliedPromotion.target_type === 'product') {
                     const allowedProdIds = appliedPromotion.products.map(p => p.product_id);
                     if (allowedProdIds.includes(product.id)) isItemEligible = true;

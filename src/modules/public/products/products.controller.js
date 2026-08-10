@@ -31,7 +31,12 @@ exports.renderShop = async (req, res, next) => {
                     select: { id: true }
                 });
                 const categoryIds = [selectedCategory.id, ...subCategories.map(c => c.id)];
-                where.category_id = { in: categoryIds };
+                where.AND = [{
+                    OR: [
+                        { category_id: { in: categoryIds } },
+                        { categories: { some: { category_id: { in: categoryIds } } } }
+                    ]
+                }];
             } else {
                 where.category = { slug: category };
             }
@@ -73,7 +78,8 @@ exports.renderShop = async (req, res, next) => {
                 where,
                 include: {
                     images: { where: { is_thumbnail: true }, take: 1 },
-                    category: { select: { name: true, slug: true } }
+                    category: { select: { name: true, slug: true } },
+                    categories: true
                 },
                 orderBy,
                 skip,
@@ -82,7 +88,7 @@ exports.renderShop = async (req, res, next) => {
             db.product.count({ where }),
             db.category.findMany({ 
                 where: { is_active: true }, 
-                include: { _count: { select: { products: { where: { status: 'published' } } } } },
+                include: { _count: { select: { product_categories: { where: { product: { status: 'published' } } } } } },
                 orderBy: [
                     { sort_order: 'asc' },
                     { name: 'asc' }
@@ -106,8 +112,8 @@ exports.renderShop = async (req, res, next) => {
         const childCats = categories.filter(cat => cat.parent_id);
         parentCats.forEach(parent => {
             parent.children = childCats.filter(child => child.parent_id === parent.id);
-            parent.groupProductCount = parent._count.products
-                + parent.children.reduce((sum, child) => sum + child._count.products, 0);
+            parent.groupProductCount = parent._count.product_categories
+                + parent.children.reduce((sum, child) => sum + child._count.product_categories, 0);
         });
  
         res.render('public/products/shop', {
@@ -146,6 +152,7 @@ exports.renderDetail = async (req, res, next) => {
             include: {
                 images: { orderBy: { sort_order: 'asc' } },
                 category: true,
+                categories: { include: { category: true } },
                 reviews: {
                     where: { is_approved: true },
                     orderBy: { created_at: 'desc' }
@@ -172,16 +179,24 @@ exports.renderDetail = async (req, res, next) => {
         product.avg_rating = parseFloat(avgRating);
         product.review_count = product.reviews.length;
 
-        // Fetch a pool of 20 same-category products then shuffle for randomness
+        const productCategoryIds = product.categories.length
+            ? product.categories.map(item => item.category_id)
+            : [product.category_id];
+
+        // Fetch a pool of 20 products sharing at least one category then shuffle for randomness
         const relatedPool = await db.product.findMany({
             where: {
-                category_id: product.category_id,
+                OR: [
+                    { category_id: { in: productCategoryIds } },
+                    { categories: { some: { category_id: { in: productCategoryIds } } } }
+                ],
                 id: { not: product.id },
                 status: 'published',
                 stock_quantity: { gt: 0 }
             },
             include: {
-                images: { where: { is_thumbnail: true }, take: 1 }
+                images: { where: { is_thumbnail: true }, take: 1 },
+                categories: true
             },
             take: 20
         });
@@ -194,13 +209,19 @@ exports.renderDetail = async (req, res, next) => {
         if (relatedProducts.length < 4) {
             const extraProducts = await db.product.findMany({
                 where: {
-                    category_id: { not: product.category_id },
+                    NOT: {
+                        OR: [
+                            { category_id: { in: productCategoryIds } },
+                            { categories: { some: { category_id: { in: productCategoryIds } } } }
+                        ]
+                    },
                     id: { notIn: [product.id, ...relatedProducts.map(p => p.id)] },
                     status: 'published',
                     stock_quantity: { gt: 0 }
                 },
                 include: {
-                    images: { where: { is_thumbnail: true }, take: 1 }
+                    images: { where: { is_thumbnail: true }, take: 1 },
+                    categories: true
                 },
                 take: 6 - relatedProducts.length,
                 orderBy: { created_at: 'desc' }
@@ -216,7 +237,7 @@ exports.renderDetail = async (req, res, next) => {
         // Fetch promotion campaigns that apply directly (for display/list)
         const productPromotions = activePromotions.filter(promo => {
             if (promo.target_type === 'all') return true;
-            if (promo.target_type === 'category' && promo.categories.some(c => c.category_id === product.category_id)) return true;
+            if (promo.target_type === 'category' && promo.categories.some(c => productCategoryIds.includes(c.category_id))) return true;
             if (promo.target_type === 'product' && promo.products.some(p => p.product_id === product.id)) return true;
             return false;
         });

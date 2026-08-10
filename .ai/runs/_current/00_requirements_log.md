@@ -27,6 +27,7 @@
 - MAYBE: Hỗ trợ Đa ngôn ngữ (I18n) cho tên sản phẩm/danh mục. (Out of scope for this phase unless requested)
 
 ## Cập nhật/Điều chỉnh
+- 2026-08-10 12:00: Admin được chọn một danh mục chính và nhiều danh mục bổ sung cho sản phẩm; dữ liệu cũ phải được backfill an toàn; bổ sung tài liệu migrate để triển khai lại trên môi trường nhận code.
 - 2026-04-03 11:45: Khởi tạo nhật ký theo yêu cầu của Phase 08.
 
 ## Cập nhật 2026-07-29 10:00 — UI danh mục con và dinh dưỡng

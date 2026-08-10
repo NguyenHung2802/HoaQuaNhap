@@ -10,7 +10,8 @@ exports.renderHome = async (req, res, next) => {
     const featuredProducts = await db.product.findMany({
       where: { is_featured: true, status: 'published' },
       include: {
-        images: { where: { is_thumbnail: true }, take: 1 }
+        images: { where: { is_thumbnail: true }, take: 1 },
+        categories: true
       },
       take: 8,
       orderBy: { created_at: 'desc' }
@@ -20,7 +21,8 @@ exports.renderHome = async (req, res, next) => {
     const bestSellers = await db.product.findMany({
       where: { is_best_seller: true, status: 'published' },
       include: {
-        images: { where: { is_thumbnail: true }, take: 1 }
+        images: { where: { is_thumbnail: true }, take: 1 },
+        categories: true
       },
       take: 8,
       orderBy: { created_at: 'desc' }
@@ -34,7 +36,8 @@ exports.renderHome = async (req, res, next) => {
         flash_sale_end: { gt: new Date() }
       },
       include: {
-        images: { where: { is_thumbnail: true }, take: 1 }
+        images: { where: { is_thumbnail: true }, take: 1 },
+        categories: true
       },
       take: 8,
       orderBy: { created_at: 'desc' }

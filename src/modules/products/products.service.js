@@ -1,6 +1,13 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const normalizeCategoryIds = (categoryId, categoryIds = []) => {
+    const values = Array.isArray(categoryIds) ? categoryIds : [categoryIds];
+    return [...new Set([categoryId, ...values]
+        .map(value => parseInt(value))
+        .filter(Number.isInteger))];
+};
+
 /**
  * Get all products with filters and search
  */
@@ -25,7 +32,13 @@ const getAllProducts = async (query = {}) => {
     }
     
     if (category_id) {
-        where.category_id = parseInt(category_id);
+        const selectedCategoryId = parseInt(category_id);
+        where.AND = [{
+            OR: [
+                { category_id: selectedCategoryId },
+                { categories: { some: { category_id: selectedCategoryId } } }
+            ]
+        }];
     }
     
     if (status) {
@@ -37,8 +50,9 @@ const getAllProducts = async (query = {}) => {
             where,
             include: {
                 category: {
-                    select: { name: true }
+                    select: { id: true, name: true }
                 },
+                categories: { include: { category: { select: { id: true, name: true } } } },
                 images: {
                     where: { is_thumbnail: true },
                     take: 1
@@ -69,7 +83,8 @@ const getProductById = async (id) => {
             images: {
               orderBy: { sort_order: 'asc' }
             },
-            category: true
+            category: true,
+            categories: { include: { category: true } }
         }
     });
 };
@@ -80,7 +95,7 @@ const getProductById = async (id) => {
 const createProduct = async (data) => {
     const { 
         name, slug, sku, short_description, description, 
-        category_id, origin_country, unit, weight_value, 
+        category_id, category_ids, origin_country, unit, weight_value,
         packing_type, price, sale_price, cost_price, 
         stock_quantity, min_stock_alert, status, 
         is_featured, is_best_seller, is_flash_sale, flash_sale_price, flash_sale_end, nutritional_info, images 
@@ -107,6 +122,9 @@ const createProduct = async (data) => {
             skuCounter++;
         }
 
+        const normalizedCategoryIds = normalizeCategoryIds(category_id, category_ids);
+        if (!normalizedCategoryIds.length) throw new Error('Vui lòng chọn ít nhất một danh mục');
+
         // 1. Create Product
         const product = await tx.product.create({
             data: {
@@ -131,6 +149,11 @@ const createProduct = async (data) => {
                 flash_sale_end: flash_sale_end && (is_flash_sale === 'true' || is_flash_sale === true) ? new Date(flash_sale_end) : null,
                 nutritional_info: nutritional_info || null,
             }
+        });
+
+        await tx.productCategory.createMany({
+            data: normalizedCategoryIds.map(categoryId => ({ product_id: product.id, category_id: categoryId })),
+            skipDuplicates: true
         });
 
         // 2. Create images if any
@@ -170,7 +193,7 @@ const createProduct = async (data) => {
 const updateProduct = async (id, data) => {
     const { 
         name, slug, sku, short_description, description, 
-        category_id, origin_country, unit, weight_value, 
+        category_id, category_ids, origin_country, unit, weight_value,
         packing_type, price, sale_price, cost_price, 
         stock_quantity, min_stock_alert, status, 
         is_featured, is_best_seller, is_flash_sale, flash_sale_price, flash_sale_end, nutritional_info, new_images, delete_image_ids 
@@ -182,6 +205,9 @@ const updateProduct = async (id, data) => {
             where: { id: parseInt(id) },
             select: { stock_quantity: true }
         });
+
+        const normalizedCategoryIds = normalizeCategoryIds(category_id, category_ids);
+        if (!normalizedCategoryIds.length) throw new Error('Vui lòng chọn ít nhất một danh mục');
 
         // 1. Update Product
         const product = await tx.product.update({
@@ -205,6 +231,12 @@ const updateProduct = async (id, data) => {
                 flash_sale_end: flash_sale_end && (is_flash_sale === 'true' || is_flash_sale === true) ? new Date(flash_sale_end) : null,
                 nutritional_info: nutritional_info,
             }
+        });
+
+        await tx.productCategory.deleteMany({ where: { product_id: parseInt(id) } });
+        await tx.productCategory.createMany({
+            data: normalizedCategoryIds.map(categoryId => ({ product_id: parseInt(id), category_id: categoryId })),
+            skipDuplicates: true
         });
 
         // 1.1 Log stock change if any
@@ -268,7 +300,7 @@ const deleteProduct = async (id) => {
 const duplicateProduct = async (id) => {
     const original = await prisma.product.findUnique({
         where: { id: parseInt(id) },
-        include: { images: true }
+        include: { images: true, categories: true }
     });
 
     if (!original) throw new Error('Không tìm thấy sản phẩm gốc');
@@ -277,7 +309,7 @@ const duplicateProduct = async (id) => {
     
     return await prisma.$transaction(async (tx) => {
         // 1. Create New Product
-        const { id: _, created_at, updated_at, images, ...productData } = original;
+        const { id: _, created_at, updated_at, images, categories, ...productData } = original;
         
         const duplicated = await tx.product.create({
             data: {
@@ -288,6 +320,12 @@ const duplicateProduct = async (id) => {
                 status: 'draft', // Set to draft for review
                 stock_quantity: 0, // Reset stock for duplicate
             }
+        });
+
+        await tx.productCategory.createMany({
+            data: normalizeCategoryIds(original.category_id, categories.map(item => item.category_id))
+                .map(categoryId => ({ product_id: duplicated.id, category_id: categoryId })),
+            skipDuplicates: true
         });
 
         // 2. Copy Images

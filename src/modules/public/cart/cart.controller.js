@@ -96,7 +96,8 @@ const renderCart = async (req, res, next) => {
                     stock_quantity: { gt: 0 }
                 },
                 include: {
-                    images: { where: { is_thumbnail: true }, take: 1 }
+                    images: { where: { is_thumbnail: true }, take: 1 },
+                    categories: true
                 },
                 orderBy: { price: 'asc' },
                 take: 10

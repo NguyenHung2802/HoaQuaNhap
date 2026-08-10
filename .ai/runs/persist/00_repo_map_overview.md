@@ -22,3 +22,9 @@
 
 ## Feature maps
 - `.ai/runs/persist/01_repo_map_features/product-filter-and-nutrition-ui.md`
+- `.ai/runs/persist/01_repo_map_features/product-multi-category.md`
+
+## Cập nhật 2026-08-10 — Product Multi-category
+- `Product.category_id` là danh mục chính tương thích ngược.
+- `ProductCategory` lưu toàn bộ quan hệ nhiều-nhiều.
+- Luồng bị ảnh hưởng: Admin Product, public listing/detail/home/cart, promotion và checkout.

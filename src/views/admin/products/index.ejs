@@ -88,7 +88,10 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-light text-dark border"><%= p.category ? p.category.name : 'N/A' %></span>
+                                    <% const productCategories = p.categories && p.categories.length ? p.categories.map(item => item.category) : (p.category ? [p.category] : []); %>
+                                    <% productCategories.forEach(cat => { %>
+                                        <span class="badge <%= cat.id === p.category_id ? 'bg-primary' : 'bg-secondary' %> me-1"><%= cat.name %></span>
+                                    <% }) %>
                                 </td>
                                 <td>
                                     <div class="fw-bold text-primary"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price) %></div>

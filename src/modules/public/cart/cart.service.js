@@ -28,6 +28,7 @@ const getCartDetails = async (sessionCart) => {
             stock_quantity: true,
             status: true,
             category_id: true,
+            categories: { select: { category_id: true } },
             images: {
                 where: { is_thumbnail: true },
                 take: 1
@@ -60,6 +61,9 @@ const getCartDetails = async (sessionCart) => {
                 is_discounted: pricing.isDiscounted,
                 discount_percent: pricing.discountPercent,
                 category_id: product.category_id,
+                category_ids: product.categories.length
+                    ? product.categories.map(item => item.category_id)
+                    : [product.category_id],
                 quantity: cartItem.quantity,
                 stock_quantity: product.stock_quantity,
                 line_total: lineTotal,

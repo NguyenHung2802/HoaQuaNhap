@@ -182,7 +182,7 @@ const getAvailablePromotions = async (cartItems) => {
         }
     });
 
-    // cartItems có cấu trúc: { product_id, price, quantity, category_id, line_total, ... }
+    // cartItems: { product_id, category_id, category_ids, line_total, ... }
     const totalAmount = cartItems.reduce((sum, item) => sum + item.line_total, 0);
     const available = [];
 
@@ -198,7 +198,12 @@ const getAvailablePromotions = async (cartItems) => {
         } else if (promo.target_type === 'category') {
             const allowedCategoryIds = promo.categories.map(c => c.category_id);
             eligibleAmount = cartItems
-                .filter(item => allowedCategoryIds.includes(item.category_id))
+                .filter(item => {
+                    const itemCategoryIds = item.category_ids && item.category_ids.length
+                        ? item.category_ids
+                        : [item.category_id];
+                    return itemCategoryIds.some(categoryId => allowedCategoryIds.includes(categoryId));
+                })
                 .reduce((sum, item) => sum + item.line_total, 0);
             
             if (eligibleAmount > 0 && eligibleAmount >= (promo.min_order_value || 0)) {

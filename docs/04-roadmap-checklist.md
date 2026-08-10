@@ -1,5 +1,12 @@
 # Lộ trình và Checklist Tổng quát
 
+## Cập nhật 2026-08-10 — Sản phẩm nhiều danh mục
+
+- [x] Giữ danh mục chính để tương thích dữ liệu cũ.
+- [x] Thêm quan hệ nhiều-nhiều và backfill bằng Prisma migration.
+- [x] Cập nhật Admin CRUD, public listing, sản phẩm liên quan, promotion và checkout.
+- [x] Bổ sung hướng dẫn migrate/deploy tại `docs/11-product-multi-category-migration.md`.
+
 ## 1. Thứ tự triển khai chi tiết
 
 Mục tiêu là đi đúng trình tự để không bị rối:

@@ -69,7 +69,7 @@
                                                     <label class="cat-filter-item d-flex justify-content-between align-items-center <%= filters.category === sub.slug ? 'active' : '' %>" style="cursor: pointer; font-size: 0.825rem;">
                                                         <input type="radio" name="category" value="<%= sub.slug %>" class="d-none" onchange="this.form.submit()" <%= filters.category === sub.slug ? 'checked' : '' %>>
                                                         <span class="text-muted"><%= sub.name %></span>
-                                                        <span class="badge bg-light text-dark rounded-pill border" style="font-size: 0.7rem;"><%= sub._count.products %></span>
+                                                        <span class="badge bg-light text-dark rounded-pill border" style="font-size: 0.7rem;"><%= sub._count.product_categories %></span>
                                                     </label>
                                                 <% }) %>
                                             </div>

@@ -147,12 +147,24 @@
                     <h5 class="card-title mb-3">Phân loại</h5>
                     
                     <div class="mb-3">
-                        <label for="category_id" class="form-label fw-bold">Danh mục <span class="text-danger">*</span></label>
+                        <label for="category_id" class="form-label fw-bold">Danh mục chính <span class="text-danger">*</span></label>
                         <select class="form-select" id="category_id" name="category_id" required>
                             <% categories.forEach(cat => { %>
                                 <option value="<%= cat.id %>" <%= product.category_id === cat.id ? 'selected' : '' %>><%= cat.name %></option>
                             <% }) %>
                         </select>
+                        <div class="form-text">Dùng cho breadcrumb và SEO.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category_ids" class="form-label fw-bold">Danh mục bổ sung</label>
+                        <% const selectedCategoryIds = product.categories ? product.categories.map(item => item.category_id) : [product.category_id]; %>
+                        <select class="form-select" id="category_ids" name="category_ids" multiple size="6">
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat.id %>" <%= selectedCategoryIds.includes(cat.id) && product.category_id !== cat.id ? 'selected' : '' %>><%= cat.name %></option>
+                            <% }) %>
+                        </select>
+                        <div class="form-text">Giữ Ctrl (Windows) hoặc Cmd (macOS) để chọn nhiều mục.</div>
                     </div>
 
                     <div class="mb-3">

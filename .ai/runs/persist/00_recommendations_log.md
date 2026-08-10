@@ -12,4 +12,5 @@ SHOULD      TODO     2026-05-08  Homepage - Combo          Tạo model Combo/Bun
 SHOULD      TODO     2026-05-08  Homepage - Combo          Admin CRUD cho Combo collections, liên kết sản phẩm thực.
 COULD       TODO     2026-05-08  Homepage - Products       Thêm Tags/Labels cho SP để filter linh hoạt (buoi-sang, qua-bieu).
 SHOULD      TODO     2026-07-29  Product Rich Text         Sanitization HTML tập trung cho description và nutritional_info.
+MUST        DONE     2026-08-10  Product Categories        Quan hệ nhiều-nhiều, backfill dữ liệu cũ và giữ category_id làm danh mục chính.
 ```
