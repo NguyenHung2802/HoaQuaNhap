@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../../config/db');
 
 const normalizeCategoryIds = (categoryId, categoryIds = []) => {
     const values = Array.isArray(categoryIds) ? categoryIds : [categoryIds];

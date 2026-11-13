@@ -21,12 +21,8 @@ const upload = multer({
  */
 const uploadToCloudinary = (buffer, folder) => {
   return new Promise((resolve, reject) => {
-    // Chuyển buffer sang base64 Data URI để đảm bảo tính ổn định tối đa
-    const fileBase64 = buffer.toString('base64');
-    const dataUri = `data:image/jpeg;base64,${fileBase64}`;
-
-    cloudinary.uploader.upload(
-      dataUri,
+    // Stream thẳng buffer lên Cloudinary (không chuyển base64 -> tiết kiệm RAM trên VPS 1GB)
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: folder,
         resource_type: 'image',
@@ -39,6 +35,7 @@ const uploadToCloudinary = (buffer, folder) => {
         resolve(result);
       }
     );
+    uploadStream.end(buffer);
   });
 };
 

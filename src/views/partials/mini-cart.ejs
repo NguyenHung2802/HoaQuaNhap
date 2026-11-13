@@ -1,0 +1,18 @@
+<%# Ngăn kéo giỏ hàng (giao diện v2). Dữ liệu nạp từ GET /cart/mini bởi /js/theme-v2.js; nếu JS lỗi, biểu tượng giỏ vẫn dẫn tới /cart. %>
+<div id="tv2-scrim" hidden></div>
+<aside id="tv2-cart" role="dialog" aria-modal="true" aria-labelledby="tv2-cart-title" aria-hidden="true" hidden>
+    <header class="tv2-cart-head">
+        <h3 id="tv2-cart-title">Giỏ hàng <small id="tv2-cart-count"></small></h3>
+        <button type="button" class="tv2-x" id="tv2-cart-close" aria-label="Đóng giỏ hàng">&times;</button>
+    </header>
+    <div class="tv2-ship" id="tv2-ship" hidden>
+        <div class="tv2-ship-msg" id="tv2-ship-msg"></div>
+        <div class="tv2-ship-bar"><i id="tv2-ship-fill"></i></div>
+    </div>
+    <div class="tv2-cart-list" id="tv2-cart-list" aria-live="polite"></div>
+    <footer class="tv2-cart-foot">
+        <div class="tv2-total"><span>Tạm tính</span><b id="tv2-cart-total">0đ</b></div>
+        <a class="btn btn-primary w-100" href="/checkout" id="tv2-checkout">Thanh toán</a>
+        <a class="tv2-viewcart" href="/cart">Xem giỏ hàng chi tiết</a>
+    </footer>
+</aside>

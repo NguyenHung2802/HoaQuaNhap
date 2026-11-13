@@ -19,7 +19,7 @@
 
     <% categories.forEach(c => { %>
         <url>
-            <loc><%= baseUrl %>/products?category_id=<%= c.id %></loc>
+            <loc><%= baseUrl %>/products?category=<%= c.slug %></loc>
             <changefreq>weekly</changefreq>
             <priority>0.7</priority>
         </url>
@@ -27,7 +27,7 @@
 
     <% blogs.forEach(b => { %>
         <url>
-            <loc><%= baseUrl %>/blog/<%= b.id %></loc>
+            <loc><%= baseUrl %>/blog/<%= b.slug %></loc>
             <lastmod><%= b.updated_at.toISOString().split('T')[0] %></lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.6</priority>

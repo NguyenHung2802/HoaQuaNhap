@@ -108,7 +108,7 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 - [x] Plugin Flash Sale Khung Giờ Vàng
 - [ ] Thuật toán Gợi ý Sản phẩm Liên Quan / Mua Cùng (Cross-Selling - đã sửa hiển thị campaign ship trong cart và reload giỏ khi thêm từ block gợi ý)
 - [ ] Membership & Loyalty Points (Tích điểm Quả Dâu - đã xong schema, cộng/trừ điểm trong checkout và hiển thị điểm ở checkout/profile)
-- [ ] Worker Sao lưu Cơ sở Dữ liệu (Auto Backup Database)
+- [ ] Worker Sao lưu Cơ sở Dữ liệu (Auto Backup Database) — đã có `scripts/backup-db.js`, cần cài cron trên VPS (docs/14)
 ### 2.13. Homepage Analysis & Menu Fix (Phase 12 — 2026-05-08)
 - [x] **Phân tích cơ chế hiển thị**: Đã BA chi tiết 3 sections (Categories, Featured, Combo).
 - [x] **Fix Menu Hover**: Desktop hover hiện dropdown, click navigate. Mobile click toggle.
@@ -124,6 +124,26 @@ Mục tiêu là đi đúng trình tự để không bị rối:
 - [x] **Breadcrumbs Đa Cấp**: Hiển thị đầy đủ đường dẫn cha -> con trên trang chi tiết sản phẩm.
 - [x] **Sidebar Shop Filter Trực quan (2026-07-29)**: Luôn hiển thị chevron, số mục con và tổng sản phẩm theo nhóm; hỗ trợ click/keyboard ngoài hover.
 - [x] **Thông tin Dinh dưỡng Rich Text (2026-07-29)**: Quill ở Admin create/edit, card rich text ở trang chi tiết và tương thích dữ liệu plain text cũ.
+### 2.15. Nâng cấp Giao diện, API đăng bài (n8n), Tin tức ẩn + Popup Affiliate (Phase 13 — 2026-11-12)
+- [x] BA v9: `.ai/runs/_current/00_ba_v9_addendum.md`
+- [x] Master Plan v9 (S42–S54): `.ai/runs/_current/10_plan_v9.md` — chờ chủ web xác nhận để tạo file slice.
+- [x] S50: 3 bản mẫu giao diện trong `docs/mockups/`; đã CHỐT bản C nền trắng (mẫu `mau-c2-nen-trang.html`, giữ nhận diện và bố cục cũ).
+- [x] S42 Nền dữ liệu (đã viết migration, chưa áp lên DB thật) (BlogPost mở rộng, ApiKey, NewsStatDaily)
+- [x] S43 Pipeline nội dung và media (sanitize, slug, Cloudinary stream) — cần `npm install` để cài sanitize-html
+- [x] S44 API key + `POST /api/v1/posts` (xem docs/12-api-posts.md; chưa thử với DB/Cloudinary thật)
+- [x] S45 Admin tin tức ẩn (/admin/news, cài đặt news.*; chưa xem trên trình duyệt với DB thật)
+- [x] S46 Host routing + trang tin ẩn (subdomain `tin.`; xem docs/13-news-subdomain.md; chưa thử Nginx/DB thật)
+- [x] S47 Popup affiliate + thống kê (đã thử bằng trình duyệt; chưa thử Safari iOS/in-app, chưa thử DB thật)
+- [x] S48 Trang bài viết chuyên nghiệp (blog: SEO/OG/JSON-LD, mục lục, chia sẻ, liên quan; đã xem desktop/mobile)
+- [x] S49 Vận hành VPS 1GB (gộp PrismaClient, cache menu, /healthz, PM2, script backup, docs/14; chưa chạy trên VPS thật)
+- [x] S51 Design system + layout chung v2 (lớp phủ CSS/JS, ngăn kéo giỏ, cờ UI_THEME; docs/15-ui-theme-v2.md)
+- [x] S52 Trang chủ mới (hero editorial + tinh chỉnh các khối; classic không đổi; đã xem desktop/mobile)
+- [x] S53 Shop + chi tiết sản phẩm mới (lọc không tải lại trang, thêm nhanh, thanh mua dính; classic không đổi)
+- [x] S54 Giỏ hàng + checkout mới (chỉ đổi trình bày; form thanh toán giống hệt classic; CHƯA chạy đặt hàng thật)
+- [x] S55 Tối ưu tốc độ tải v2 (tự phục vụ thư viện/phông, bỏ AOS, hero CSS thuần; DOMContentLoaded ~3,5s → ~0,4s)
+- [ ] Deploy Phase 13: làm theo `docs/16-phase13-deploy-checklist.md` (staging trước, thử đặt hàng thật)
 ---
 > [!TIP]
 > Hãy luôn cập nhật checklist sau mỗi Giai đoạn hoàn thành thành công và được test kỹ lưỡng.
+- Phase 13 / S58 (2026-11-13): tăng bảo mật đăng nhập (admin dùng chung /auth/login với khách): chặn dò mật khẩu theo IP + theo email (5 lần/email, 20 lần/IP mỗi 15 phút, trong bộ nhớ, không cần Redis — src/middlewares/login-throttle.middleware.js), thông báo lỗi dùng chung một câu "Email hoặc mật khẩu không đúng" (không còn lộ email nào có tài khoản), so mật khẩu với hash giả khi tài khoản không tồn tại (chặn dò qua thời gian phản hồi), cookie phiên thêm httpOnly + sameSite=lax. Ghi log cảnh báo khi đăng nhập sai, ghi log khi admin đăng nhập thành công. Test: tests/s58-login-throttle.test.js. Chưa làm: CAPTCHA, 2FA, đổi đường dẫn /admin, khóa tài khoản lâu dài trong DB (xem gợi ý thêm bên dưới).
+- Phase 13 / S57 (2026-11-13): trang chủ v2: 'Bộ sưu tập theo nhu cầu' viết lại dạng bento, dữ liệu thật từ danh mục (src/modules/public/home/collections.service.js, public/css/home-v2.css); /products hỗ trợ ?category=a,b. Test: tests/s57-home-collections.test.js.

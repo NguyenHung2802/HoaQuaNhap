@@ -1,5 +1,7 @@
+<div id="read-progress" aria-hidden="true"></div>
+
 <!-- ===== BREADCRUMB ===== -->
-<nav class="bg-light py-3 border-bottom">
+<nav class="bg-light py-3 border-bottom" aria-label="Breadcrumb">
     <div class="container">
         <ol class="breadcrumb mb-0 small uppercase fw-bold" style="letter-spacing: 0.05em;">
             <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
@@ -14,12 +16,14 @@
         <div class="row g-5">
             <!-- Article Body -->
             <div class="col-lg-8 blog-content-wrapper">
-                <article class="blog-detail bg-white p-4 p-md-5 rounded-4 shadow-sm">
+                <article class="blog-detail bg-white p-4 p-md-5 rounded-4 shadow-sm" id="article">
                     <header class="mb-4">
-                        <div class="blog-date text-muted mb-2">
-                            <i class="far fa-calendar-alt me-1"></i><%= new Date(blog.created_at).toLocaleDateString('vi-VN') %>
-                            <span class="mx-2 opacity-50">|</span>
-                            <i class="fas fa-user-edit me-1"></i><%= blog.author ? blog.author.full_name : 'Admin' %>
+                        <div class="blog-date text-muted mb-2 d-flex flex-wrap align-items-center gap-2">
+                            <span><i class="far fa-calendar-alt me-1"></i><time datetime="<%= new Date(publishedAt).toISOString() %>"><%= new Date(publishedAt).toLocaleDateString('vi-VN') %></time></span>
+                            <span class="opacity-50">|</span>
+                            <span><i class="far fa-clock me-1"></i><%= readMinutes %> phút đọc</span>
+                            <span class="opacity-50">|</span>
+                            <span><i class="fas fa-user-edit me-1"></i><%= blog.author ? blog.author.full_name : 'Admin' %></span>
                         </div>
                         <h1 class="display-5 fw-bold text-dark lh-sm"><%= blog.title %></h1>
                         <% if (blog.summary) { %>
@@ -27,26 +31,57 @@
                         <% } %>
                     </header>
 
-                    <% if (blog.thumbnail_url) { %>
-                        <div class="mb-5 rounded-4 overflow-hidden border">
-                            <img src="<%= blog.thumbnail_url %>" alt="<%= blog.title %>" class="w-100 object-fit-cover shadow-sm" style="max-height: 480px;">
+                    <% if (heroImage) { %>
+                        <div class="mb-4 rounded-4 overflow-hidden border">
+                            <img src="<%= heroImage %>" alt="<%= blog.title %>" class="w-100 object-fit-cover shadow-sm" style="max-height: 480px;" fetchpriority="high">
                         </div>
                     <% } %>
 
-                    <div class="blog-body ql-editor px-0 text-dark" style="font-size: 1.15rem; line-height: 1.8; color: #1a202c !important;">
-                        <%- blog.content %>
+                    <% if (toc.length >= 3) { %>
+                        <details class="blog-toc-mobile d-lg-none mb-4">
+                            <summary><i class="fas fa-list-ul me-2"></i>Mục lục bài viết</summary>
+                            <ol class="mt-3 mb-0">
+                                <% toc.forEach(function (h) { %>
+                                    <li class="<%= h.level === 3 ? 'toc-sub' : '' %>"><a href="#<%= h.id %>"><%= h.text %></a></li>
+                                <% }) %>
+                            </ol>
+                        </details>
+                    <% } %>
+
+                    <% if (blog.video_url) { %>
+                        <div class="ratio ratio-16x9 rounded-4 overflow-hidden mb-4 bg-dark">
+                            <% if (isFileVideo) { %>
+                                <video src="<%= blog.video_url %>" controls preload="metadata" playsinline></video>
+                            <% } else { %>
+                                <iframe src="<%= blog.video_url %>" title="Video: <%= blog.title %>" loading="lazy" allowfullscreen allow="accelerometer; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                            <% } %>
+                        </div>
+                    <% } %>
+
+                    <div class="blog-body ql-editor px-0 text-dark" id="article-body" style="font-size: 1.15rem; line-height: 1.8; color: #1a202c !important;">
+                        <%- bodyHtml %>
                     </div>
 
+                    <% if (gallery.length) { %>
+                        <div class="blog-gallery mt-4" aria-label="Thư viện ảnh">
+                            <% gallery.forEach(function (g) { %>
+                                <button type="button" class="blog-gallery-item" data-full="<%= g.full %>" aria-label="Phóng to ảnh"><img src="<%= g.thumb %>" alt="" loading="lazy"></button>
+                            <% }) %>
+                        </div>
+                    <% } %>
+
                     <footer class="mt-5 pt-4 border-top">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div class="blog-tags">
-                                <span class="badge bg-light text-muted border px-3 rounded-pill me-1">#tráicây</span>
-                                <span class="badge bg-light text-muted border px-3 rounded-pill">#sứckhỏe</span>
+                                <% tags.forEach(function (t) { %><span class="badge bg-light text-muted border px-3 rounded-pill me-1">#<%= t %></span><% }) %>
                             </div>
-                            <div class="blog-share d-flex align-items-center gap-3">
+                            <div class="blog-share d-flex align-items-center gap-2 flex-wrap">
                                 <span class="small text-muted fw-bold share-label">Chia sẻ:</span>
-                                <a href="https://www.facebook.com/profile.php?id=61592738625329" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;"><i class="fab fa-facebook-f"></i></a>
-                                <a href="https://www.facebook.com/profile.php?id=61592738625329" target="_blank" rel="noopener noreferrer" aria-label="Twitter" class="btn btn-sm btn-outline-info rounded-circle text-info border-info" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;"><i class="fab fa-twitter"></i></a>
+                                <a href="<%= share.facebook %>" target="_blank" rel="noopener noreferrer" aria-label="Chia sẻ lên Facebook" class="share-btn"><i class="fab fa-facebook-f"></i></a>
+                                <a href="<%= share.twitter %>" target="_blank" rel="noopener noreferrer" aria-label="Chia sẻ lên X (Twitter)" class="share-btn"><i class="fab fa-x-twitter"></i></a>
+                                <button type="button" class="share-btn" id="copy-link" data-url="<%= shareUrl %>" aria-label="Sao chép liên kết" title="Sao chép liên kết"><i class="fas fa-link"></i></button>
+                                <button type="button" class="share-btn d-none" id="native-share" data-url="<%= shareUrl %>" data-title="<%= blog.title %>" aria-label="Chia sẻ qua ứng dụng khác" title="Chia sẻ"><i class="fas fa-share-nodes"></i></button>
+                                <span class="small text-success fw-bold ms-1" id="copy-note" role="status" aria-live="polite"></span>
                             </div>
                         </div>
                     </footer>
@@ -55,6 +90,17 @@
 
             <!-- Sidebar -->
             <div class="col-lg-4 blog-sidebar">
+                <% if (toc.length >= 3) { %>
+                    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 d-none d-lg-block blog-toc-card">
+                        <h5 class="fw-bold mb-3 position-relative pb-2 section-underline">Mục lục</h5>
+                        <nav id="toc" aria-label="Mục lục bài viết">
+                            <% toc.forEach(function (h) { %>
+                                <a href="#<%= h.id %>" class="toc-link <%= h.level === 3 ? 'toc-sub' : '' %>" data-target="<%= h.id %>"><%= h.text %></a>
+                            <% }) %>
+                        </nav>
+                    </div>
+                <% } %>
+
                 <!-- Recent Posts -->
                 <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
                     <h5 class="fw-bold mb-4 position-relative pb-2 section-underline">Bài viết mới nhất</h5>
@@ -65,7 +111,7 @@
                                     <div class="row align-items-center g-2">
                                         <div class="col-4">
                                             <div class="rounded-3 overflow-hidden" style="height: 65px;">
-                                                <img src="<%= rb.thumbnail_url || 'https://via.placeholder.com/300x180' %>" alt="<%= rb.title %>" class="w-100 h-100 object-fit-cover shadow-sm">
+                                                <img src="<%= rb.thumbnail_url || 'https://via.placeholder.com/300x180' %>" alt="" class="w-100 h-100 object-fit-cover shadow-sm" loading="lazy">
                                             </div>
                                         </div>
                                         <div class="col-8">
@@ -95,20 +141,180 @@
     </div>
 </section>
 
+<!-- ===== SẢN PHẨM LIÊN QUAN ===== -->
+<% if (relatedProducts && relatedProducts.length) { %>
+<section class="section-padding bg-light-grey pt-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4" data-aos="fade-up">
+            <div>
+                <p class="section-eyebrow">Gợi ý từ bài viết</p>
+                <h2 class="section-title mb-0">Sản phẩm liên quan</h2>
+            </div>
+            <a href="/products" class="btn btn-outline-primary rounded-pill px-4 d-none d-md-block">Xem tất cả <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row g-4">
+            <% relatedProducts.forEach((p, i) => { %>
+                <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="<%= i * 80 %>">
+                    <a href="/product/<%= p.slug %>" class="fruit-card d-block text-decoration-none">
+                        <div class="fruit-card-img-wrap">
+                            <% if (p.images && p.images.length > 0) { %>
+                                <img src="<%= p.images[0].image_url %>" alt="<%= p.name %>" loading="lazy">
+                            <% } else { %>
+                                <div class="fruit-card-placeholder"><i class="fas fa-apple-whole"></i></div>
+                            <% } %>
+                            <% if (p.discountPercent > 0) { %><span class="fruit-tag discount">-<%= p.discountPercent %>%</span><% } %>
+                        </div>
+                        <div class="fruit-card-body">
+                            <h5 class="fruit-card-name"><%= p.name %></h5>
+                            <div class="fruit-card-price-wrap">
+                                <span class="price-main"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.bestPrice) %></span>
+                                <% if (p.isDiscounted) { %><span class="price-old"><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.originalPrice) %></span><% } %>
+                            </div>
+                            <p class="fruit-card-unit"><%= p.unit || 'kg' %> · <%= p.origin_country || '' %></p>
+                        </div>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+<% } %>
+
+<!-- ===== BÀI VIẾT LIÊN QUAN ===== -->
+<% if (relatedPosts && relatedPosts.length) { %>
+<section class="section-padding pt-5">
+    <div class="container">
+        <div class="mb-4" data-aos="fade-up">
+            <p class="section-eyebrow">Đọc tiếp</p>
+            <h2 class="section-title mb-0">Bài viết liên quan</h2>
+        </div>
+        <div class="row g-4">
+            <% relatedPosts.forEach((rp, i) => { %>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="<%= i * 80 %>">
+                    <a href="/blog/<%= rp.slug %>" class="related-post d-block text-decoration-none text-dark">
+                        <div class="related-post-img rounded-4 overflow-hidden mb-3">
+                            <img src="<%= rp.thumbnail_url || 'https://via.placeholder.com/600x400?text=Hai+Anh+Fruit' %>" alt="" loading="lazy" class="w-100 object-fit-cover">
+                        </div>
+                        <div class="small text-muted mb-1"><%= new Date(rp.published_at || rp.created_at).toLocaleDateString('vi-VN') %></div>
+                        <h5 class="fw-bold line-clamp-2"><%= rp.title %></h5>
+                        <% if (rp.summary) { %><p class="small text-muted line-clamp-2 mb-0"><%= rp.summary %></p><% } %>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+<% } %>
+
+<dialog id="lightbox" aria-label="Xem ảnh lớn"><button type="button" id="lightbox-close" aria-label="Đóng">×</button><img src="" alt=""></dialog>
+
 <!-- Quill Styles to ensure consistency -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
-    .section-underline::after {
-        content: ''; position: absolute; bottom: 0; left: 0;
-        width: 40px; height: 3px; background: var(--brand-accent);
-    }
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;  
-        overflow: hidden;
-    }
+    .section-underline::after { content: ''; position: absolute; bottom: 0; left: 0; width: 40px; height: 3px; background: var(--brand-accent); }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .blog-detail h1 { color: #2d3748 !important; }
-    .blog-body h2 { font-weight: 800; font-family: var(--font-heading); color: var(--brand-primary); margin-top: 2.5rem; margin-bottom: 1.2rem; }
+    .blog-body h2 { font-weight: 800; font-family: var(--font-heading); color: var(--brand-primary); margin-top: 2.5rem; margin-bottom: 1.2rem; scroll-margin-top: 90px; }
+    .blog-body h3 { font-weight: 700; font-family: var(--font-heading); color: var(--brand-primary); margin-top: 1.8rem; scroll-margin-top: 90px; }
     .blog-body p { margin-bottom: 1.5rem; }
+    .blog-body img { max-width: 100%; height: auto; border-radius: 14px; }
+    .blog-body iframe { max-width: 100%; border: 0; border-radius: 14px; }
+    /* Thanh tiến độ đọc */
+    #read-progress { position: fixed; left: 0; top: 0; height: 3px; width: 0; z-index: 2000; background: linear-gradient(90deg, var(--brand-accent), var(--brand-secondary)); transition: width .1s linear; }
+    /* Mục lục */
+    .blog-toc-card { position: sticky; top: 96px; }
+    .toc-link { display: block; padding: 7px 12px; border-left: 3px solid #e5e7eb; color: #4b5563; text-decoration: none; font-size: .95rem; line-height: 1.4; transition: color .2s, border-color .2s, background .2s; }
+    .toc-link.toc-sub { padding-left: 26px; font-size: .88rem; }
+    .toc-link:hover { color: var(--brand-primary); background: #f9fafb; }
+    .toc-link.active { color: var(--brand-primary); border-left-color: var(--brand-accent); background: var(--brand-light-green); font-weight: 600; }
+    .blog-toc-mobile { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 14px; padding: 14px 18px; }
+    .blog-toc-mobile summary { cursor: pointer; font-weight: 700; color: var(--brand-primary); }
+    .blog-toc-mobile ol { padding-left: 1.2rem; }
+    .blog-toc-mobile li.toc-sub { margin-left: 1rem; list-style: circle; }
+    .blog-toc-mobile a { color: #374151; text-decoration: none; }
+    /* Chia sẻ */
+    .share-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #d1d5db; background: #fff; color: var(--brand-primary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: transform .25s, background .25s, color .25s, border-color .25s; }
+    .share-btn:hover { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); transform: translateY(-3px); }
+    /* Gallery + lightbox */
+    .blog-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+    .blog-gallery-item { border: 0; padding: 0; border-radius: 14px; overflow: hidden; cursor: zoom-in; background: #f3f4f6; aspect-ratio: 4/3; }
+    .blog-gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; display: block; }
+    .blog-gallery-item:hover img { transform: scale(1.07); }
+    #lightbox { border: 0; padding: 0; background: transparent; max-width: 96vw; max-height: 94vh; overflow: visible; }
+    #lightbox::backdrop { background: rgba(10, 20, 15, .85); backdrop-filter: blur(4px); }
+    #lightbox img { max-width: 96vw; max-height: 90vh; border-radius: 14px; display: block; }
+    #lightbox-close { position: absolute; top: -14px; right: -14px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: #fff; font-size: 22px; line-height: 1; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+    /* Bài liên quan */
+    .related-post-img { aspect-ratio: 16/10; background: #f3f4f6; }
+    .related-post-img img { height: 100%; transition: transform .6s; }
+    .related-post:hover .related-post-img img { transform: scale(1.06); }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<script>
+(function () {
+    // Thanh tiến độ đọc
+    var bar = document.getElementById('read-progress');
+    var article = document.getElementById('article');
+    function onScroll() {
+        if (!article || !bar) return;
+        var rect = article.getBoundingClientRect();
+        var total = rect.height - window.innerHeight * 0.6;
+        var done = Math.min(Math.max(-rect.top + window.innerHeight * 0.3, 0), Math.max(total, 1));
+        bar.style.width = (done / Math.max(total, 1) * 100) + '%';
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mục lục: đánh dấu mục đang đọc
+    var links = [].slice.call(document.querySelectorAll('#toc .toc-link'));
+    if (links.length && 'IntersectionObserver' in window) {
+        var map = {};
+        links.forEach(function (l) { map[l.dataset.target] = l; });
+        var current = null;
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+                if (en.isIntersecting) {
+                    if (current) current.classList.remove('active');
+                    current = map[en.target.id];
+                    if (current) current.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-90px 0px -70% 0px', threshold: 0 });
+        Object.keys(map).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+    }
+
+    // Sao chép liên kết + chia sẻ hệ thống
+    var note = document.getElementById('copy-note');
+    function say(msg) { if (!note) return; note.textContent = msg; setTimeout(function () { note.textContent = ''; }, 2000); }
+    var copyBtn = document.getElementById('copy-link');
+    if (copyBtn) copyBtn.addEventListener('click', function () {
+        var url = copyBtn.dataset.url;
+        function legacyCopy() {
+            var t = document.createElement('textarea');
+            t.value = url; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0';
+            document.body.appendChild(t); t.select();
+            var ok = false;
+            try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+            t.remove();
+            say(ok ? 'Đã sao chép liên kết' : 'Không sao chép được, hãy sao chép từ thanh địa chỉ');
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { say('Đã sao chép liên kết'); }, legacyCopy);
+        else legacyCopy();
+    });
+    var shareBtn = document.getElementById('native-share');
+    if (shareBtn && navigator.share) {
+        shareBtn.classList.remove('d-none');
+        shareBtn.addEventListener('click', function () { navigator.share({ title: shareBtn.dataset.title, url: shareBtn.dataset.url }).catch(function () {}); });
+    }
+
+    // Phóng to ảnh gallery
+    var box = document.getElementById('lightbox');
+    if (box && box.showModal) {
+        var img = box.querySelector('img');
+        document.querySelectorAll('.blog-gallery-item').forEach(function (b) {
+            b.addEventListener('click', function () { img.src = b.dataset.full; box.showModal(); });
+        });
+        box.addEventListener('click', function (e) { if (e.target === box || e.target.id === 'lightbox-close') box.close(); });
+    }
+})();
+</script>

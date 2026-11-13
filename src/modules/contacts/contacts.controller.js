@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../../config/db');
 const nodemailer = require('nodemailer');
 const https = require('https');
 

@@ -11,6 +11,9 @@ router.get('/', cartController.renderCart);
 // [GET] /cart/count
 router.get('/count', cartController.getCartCount);
 
+// [GET] /cart/mini (ngăn kéo giỏ hàng giao diện v2)
+router.get('/mini', cartController.getMiniCart);
+
 // [POST] /cart/add
 router.post('/add', cartController.addToCart);
 

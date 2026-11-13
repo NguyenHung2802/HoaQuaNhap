@@ -20,7 +20,13 @@ exports.renderShop = async (req, res, next) => {
             ];
         }
 
-        if (category) {
+        if (category && String(category).includes(',')) {
+            // Nhiều danh mục cùng lúc (dùng cho bộ sưu tập ở trang chủ), ví dụ ?category=tao-nhap-khau,nho-nhap-khau
+            const slugs = String(category).split(',').map((s) => s.trim()).filter(Boolean).slice(0, 10);
+            const cats = await db.category.findMany({ where: { slug: { in: slugs }, is_active: true }, select: { id: true } });
+            const ids = cats.map((c) => c.id);
+            where.AND = [{ OR: [{ category_id: { in: ids } }, { categories: { some: { category_id: { in: ids } } } }] }];
+        } else if (category) {
             const selectedCategory = await db.category.findUnique({
                 where: { slug: category },
                 select: { id: true }
@@ -161,7 +167,7 @@ exports.renderDetail = async (req, res, next) => {
         });
 
         if (!product) {
-            return res.status(404).render('public/404', { title: 'Không tìm thấy', layout: 'layouts/main' });
+            return res.status(404).render('public/pages/404', { title: 'Không tìm thấy', layout: 'layouts/main' });
         }
 
         // Fetch parent category if exists

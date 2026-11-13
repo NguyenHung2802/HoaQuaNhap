@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../../config/db');
 const slugify = require('../../utils/slug');
 const { uploadToCloudinary } = require('../../middlewares/upload.middleware');
 
@@ -14,12 +13,13 @@ const renderList = async (req, res, next) => {
 
         const [blogs, total] = await Promise.all([
             prisma.blogPost.findMany({
+                where: { post_type: 'blog' },
                 include: { author: { select: { full_name: true } } },
                 orderBy: { created_at: 'desc' },
                 skip,
                 take: limit
             }),
-            prisma.blogPost.count()
+            prisma.blogPost.count({ where: { post_type: 'blog' } })
         ]);
 
         res.render('admin/blogs/index', {
@@ -92,7 +92,7 @@ const renderEdit = async (req, res, next) => {
             where: { id }
         });
 
-        if (!blog) {
+        if (!blog || blog.post_type !== 'blog') {
             req.flash('error_msg', 'Không tìm thấy bài viết.');
             return res.redirect('/admin/blogs');
         }
@@ -116,6 +116,10 @@ const updateBlog = async (req, res, next) => {
         const { title, summary, content, is_published } = req.body;
         
         const currentBlog = await prisma.blogPost.findUnique({ where: { id } });
+        if (!currentBlog || currentBlog.post_type !== 'blog') {
+            req.flash('error_msg', 'Không tìm thấy bài viết.');
+            return res.redirect('/admin/blogs');
+        }
         let thumbnail_url = currentBlog.thumbnail_url;
 
         if (req.file) {
@@ -149,6 +153,10 @@ const updateBlog = async (req, res, next) => {
 const deleteBlog = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id);
+        const target = await prisma.blogPost.findUnique({ where: { id }, select: { post_type: true } });
+        if (!target || target.post_type !== 'blog') {
+            return res.json({ success: false, message: 'Không tìm thấy bài viết.' });
+        }
         await prisma.blogPost.delete({ where: { id } });
         res.json({ success: true, message: 'Xóa bài viết thành công!' });
     } catch (error) {

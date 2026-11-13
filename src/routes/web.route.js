@@ -28,8 +28,7 @@ router.use('/blogs', blogsRoute);
 
 // Static Pages
 router.get('/contact', (req, res) => res.render('public/pages/contact', { title: 'Liên hệ', layout: 'layouts/main' }));
-const { PrismaClient } = require('@prisma/client');
-const prismaClient = new PrismaClient();
+const prismaClient = require('../config/db');
 const contactsController = require('../modules/contacts/contacts.controller');
 
 router.post('/contact/submit', async (req, res) => {

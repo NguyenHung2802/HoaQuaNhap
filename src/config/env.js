@@ -6,6 +6,7 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 module.exports = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: process.env.PORT || 3000,
+  SITE_URL: process.env.SITE_URL || 'https://haianhfruit.com',
   DATABASE_URL: process.env.DATABASE_URL,
   SESSION_SECRET: process.env.SESSION_SECRET || 'abcxyz',
   JWT_SECRET: process.env.JWT_SECRET || 'secret',

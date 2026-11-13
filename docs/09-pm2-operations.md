@@ -6,6 +6,8 @@ Tài liệu này cung cấp các lệnh quản lý PM2 được thiết kế ri�
 > - **Dev:** Tự động watch file trong `src/` và khởi động lại, đổ log vào thư mục `logs/`.
 > - **Prod:** Tối ưu hóa hiệu năng, không theo dõi file, không hiện log Dev.
 
+> **Cập nhật S49 (2026-11-12):** các lệnh trên trước đây dùng `all` và sẽ làm dừng/khởi động lại cả n8n chạy chung trong PM2. Nay chúng chỉ nhắm đúng ứng dụng web. Cấu hình RAM, swap, Nginx và sao lưu cho VPS 1GB xem `docs/14-vps-1gb-operations.md`. Mã dùng chung một PrismaClient; kiểm tra sức khỏe: `curl http://127.0.0.1:3000/healthz?db=1`.
+
 ## Các lệnh thường dùng
 
 Tất cả các lệnh này có thể gõ trực tiếp qua `npm run`.
@@ -15,17 +17,17 @@ Tất cả các lệnh này có thể gõ trực tiếp qua `npm run`.
 - `npm run pm2:prod` : Bật server ở chế độ Production, phục vụ cho việc Live thật sự trên hosting.
 
 ### 2. Xem Nhật ký (Logs)
-- `npm run pm2:logs` : Xem toàn bộ log đang chạy (cả 2 phiên bản).
-- `npm run pm2:clean` : **Dọn sạch nhật ký** (Xóa trắng log trong PM2 và xóa tệp tin vật lý trong thư mục `logs/`).
+- `npm run pm2:logs` : Xem log web production (`pm2:logs:dev` cho bản dev). Không xem log của n8n.
+- `npm run pm2:clean` : Xóa nhật ký PM2 của web (prod và dev). Không ảnh hưởng n8n.
 - Bạn có thể vào trực tiếp thư mục `logs/` ở thư mục gốc của dự án để tải file:
   - `pm2-out-dev.log` : Nhật ký hoạt động chung của DEV.
   - `pm2-error-dev.log` : Báo lỗi khẩn cấp (Crash) của DEV.
   - `pm2-combined-dev.log` : Gộp cả Out và Error.
 
 ### 3. Tắt & Bảo trì
-- `npm run pm2:restart` : Khởi động lại toàn bộ các instance đang chạy.
-- `npm run pm2:stop` : Dừng toàn bộ PM2 (Server sập nhưng Daemon PM2 vẫn sống để kích lại sau).
-- `npm run pm2:kill` : Dọn dẹp sạch sẽ toàn bộ mọi tiến trình ngầm của PM2 ở background.
+- `npm run pm2:restart` : Khởi động lại **chỉ web production** (`WebHoaQua-Prod`). `pm2:reload` nạp lại với `--update-env`; `pm2:restart:dev` cho bản dev.
+- `npm run pm2:stop` : Dừng web production (n8n và các ứng dụng PM2 khác vẫn chạy). `pm2:stop:dev` cho bản dev.
+- `npm run pm2:kill` : Xóa `WebHoaQua-Prod` và `WebHoaQua-Dev` khỏi PM2 (không xóa n8n hay tiến trình khác).
 
 ## Một vài mẹo nâng cao (Chạy qua npx)
 Nếu bạn rành PM2, hãy dùng thẳng `npx pm2`:

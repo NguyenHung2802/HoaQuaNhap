@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../../config/db');
+const categoryCache = require('../../utils/category-cache');
 
 /**
  * Get all categories with parent info
@@ -83,10 +83,17 @@ const deleteCategory = async (id) => {
     });
 };
 
+// Ghi (tạo/sửa/xóa) xong thì xóa cache menu để khách thấy thay đổi ngay
+const invalidating = (fn) => async (...args) => {
+    const result = await fn(...args);
+    categoryCache.invalidate();
+    return result;
+};
+
 module.exports = {
     getAllCategories,
-    createCategory,
+    createCategory: invalidating(createCategory),
     getCategoryById,
-    updateCategory,
-    deleteCategory
+    updateCategory: invalidating(updateCategory),
+    deleteCategory: invalidating(deleteCategory)
 };

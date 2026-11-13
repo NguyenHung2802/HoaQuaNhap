@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const db = require('../../config/db');
 const loyaltyService = require('../loyalty/loyalty.service');
 const cartService = require('../public/cart/cart.service');
+const { recordFailedAttempt, clearAttempts } = require('../../middlewares/login-throttle.middleware');
 
 /**
  * Render trang Đăng nhập (Unified)
@@ -114,15 +115,27 @@ exports.login = async (req, res) => {
 
         const user = await db.user.findUnique({ where: { email } });
 
-        if (!user || user.status !== 'active') {
-            req.flash('error_msg', 'Tài khoản không tồn tại hoặc bị khóa.');
+        // Thông báo chung cho mọi trường hợp sai (không nói rõ "email không tồn tại" hay "sai mật khẩu")
+        // để người ngoài không dò được email nào có tài khoản admin trong hệ thống.
+        const genericFail = () => {
+            recordFailedAttempt(req, res);
+            console.warn(`[auth] đăng nhập thất bại ip=${req.ip} email=${email}`);
+            req.flash('error_msg', 'Email hoặc mật khẩu không đúng.');
             return res.redirect('/auth/login');
+        };
+
+        // So sánh mật khẩu với hash giả khi không có tài khoản, để thời gian phản hồi giống hệt
+        // trường hợp sai mật khẩu — tránh lộ "email này có tồn tại hay không" qua tốc độ trả lời.
+        const DUMMY_HASH = '$2a$10$CwTycUXWue0Thq9StjUM0uJ8q4mP2u2TJZ5oJ5L9NIOO6o7R1VP6e';
+        const isMatch = await bcrypt.compare(password, (user && user.password_hash) || DUMMY_HASH);
+
+        if (!user || user.status !== 'active' || !isMatch) {
+            return genericFail();
         }
 
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-        if (!isMatch) {
-            req.flash('error_msg', 'Mật khẩu không chính xác.');
-            return res.redirect('/auth/login');
+        clearAttempts(req, res);
+        if (user.role === 'admin') {
+            console.info(`[auth] admin đăng nhập ip=${req.ip} email=${user.email} lúc ${new Date().toISOString()}`);
         }
 
         // 4. Lưu session

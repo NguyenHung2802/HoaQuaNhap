@@ -21,6 +21,10 @@
 
 ---
 
+> **Cập nhật 2026-11-12 (S49):** khóa `N8N_ENCRYPTION_KEY` không còn ghi cứng trong tài liệu. Nếu khóa cũ từng nằm trong file này đang dùng thật trên server, hãy coi nó là đã lộ: tạo khóa mới và nhập lại credentials trong n8n (đổi khóa làm hỏng credentials đã lưu, nên sao lưu `/home/deploy/.n8n/` trước). Cấu hình RAM tổng thể cho VPS 1GB xem `docs/14-vps-1gb-operations.md`.
+
+---
+
 ## 1. n8n là gì và tại sao nên self-host?
 
 **n8n** là công cụ **workflow automation** (tự động hóa luồng công việc) mã nguồn mở — tương tự Zapier hay Make.com — nhưng bạn có thể tự host miễn phí.
@@ -109,7 +113,7 @@ GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
 # ===================================================
 
 # Mật khẩu mã hóa credentials (bắt buộc, tạo chuỗi ngẫu nhiên)
-N8N_ENCRYPTION_KEY=^SvH56kq+UCj%K5am&q5TdcHBVFKS+47WWTGq^T473dy9ws%eIgsx5zDAuhjXSIw
+N8N_ENCRYPTION_KEY=<dan-khoa-ngau-nhien-o-day>
 
 # Kích hoạt xác thực cơ bản (tài khoản/mật khẩu đăng nhập n8n)
 # Bỏ qua nếu bạn muốn dùng tài khoản n8n khi vào lần đầu
@@ -136,13 +140,17 @@ N8N_ENCRYPTION_KEY=^SvH56kq+UCj%K5am&q5TdcHBVFKS+47WWTGq^T473dy9ws%eIgsx5zDAuhjX
 # HIỆU SUẤT
 # ===================================================
 
-# Giới hạn số workflows chạy đồng thời (tiết kiệm RAM)
-EXECUTIONS_PROCESS=main
-N8N_DEFAULT_CONCURRENCY=5
+# Giới hạn workflow chạy đồng thời (VPS 1GB RAM chạy chung web + PostgreSQL, chỉ nên 1-2)
+# (EXECUTIONS_PROCESS đã lỗi thời ở n8n mới, không cần đặt)
+N8N_CONCURRENCY_PRODUCTION_LIMIT=2
 
-# Tự xoá lịch sử execution sau 30 ngày (tiết kiệm ổ cứng)
+# Tiết kiệm RAM và ổ cứng: không lưu execution thành công, giữ lịch sử lỗi 7 ngày, file nhị phân (ảnh) ghi ra đĩa thay vì DB
 EXECUTIONS_DATA_PRUNE=true
-EXECUTIONS_DATA_MAX_AGE=720
+EXECUTIONS_DATA_MAX_AGE=168
+EXECUTIONS_DATA_SAVE_ON_SUCCESS=none
+N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+# Giới hạn heap Node của n8n (khớp max_memory_restart trong PM2)
+NODE_OPTIONS=--max-old-space-size=384
 ```
 
 **Lưu file:** `Ctrl+X` → `Y` → `Enter`
@@ -184,7 +192,7 @@ module.exports = {
       // Không tự restart khi crash (tránh vòng lặp lỗi)
       autorestart: true,
       watch: false,
-      max_memory_restart: '512M',
+      max_memory_restart: '450M',
 
       // Load biến môi trường từ file .env
       env: {
@@ -241,7 +249,7 @@ module.exports = {
       cwd: '/home/deploy',
       autorestart: true,
       watch: false,
-      max_memory_restart: '512M',
+      max_memory_restart: '450M',
       env: {
         NODE_ENV: 'production',
         ...n8nEnv

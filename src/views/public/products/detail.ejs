@@ -1,3 +1,5 @@
+<% const isV2 = (typeof uiTheme !== 'undefined' && uiTheme === 'v2'); %>
+<% if (isV2) { %><link rel="stylesheet" href="/css/shop-v2.css?v=s53"><% } %>
 <!-- FancyBox CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
 <!-- Quill CSS for Rich Text Description -->
@@ -625,3 +627,4 @@
   }
 }
 </script>
+<% if (isV2) { %><script src="/js/product-v2.js?v=s53" defer></script><% } %>

@@ -1,0 +1,143 @@
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h4 class="mb-0">Tin tức ẩn</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tin tức ẩn</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/admin/news/settings" class="btn btn-outline-secondary"><i class="fas fa-sliders-h me-2"></i>Cài đặt</a>
+        <a href="/admin/news/create" class="btn btn-primary"><i class="fas fa-pen-nib me-2"></i>Viết tin ẩn</a>
+    </div>
+</div>
+
+<div class="alert alert-light border small rounded-4">
+    <i class="fas fa-eye-slash me-2 text-secondary"></i>
+    Tin ẩn <strong>không xuất hiện</strong> ở menu, blog, trang chủ hay sitemap. Chỉ ai có đúng link đầy đủ mới đọc được. Hãy sao chép link ở cột "Link" để chia sẻ.
+    <% if (!newsEnabled) { %><span class="badge bg-danger ms-2">Khu tin ẩn và API đang TẮT</span><% } %>
+</div>
+
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <a href="/admin/news" class="btn btn-sm <%= filter === 'all' ? 'btn-dark' : 'btn-outline-dark' %> rounded-pill px-3">Tất cả</a>
+    <a href="/admin/news?status=published" class="btn btn-sm <%= filter === 'published' ? 'btn-dark' : 'btn-outline-dark' %> rounded-pill px-3">Đã đăng</a>
+    <a href="/admin/news?status=draft" class="btn btn-sm <%= filter === 'draft' ? 'btn-dark' : 'btn-outline-dark' %> rounded-pill px-3">Bản nháp</a>
+    <span class="ms-auto small text-muted align-self-center"><%= total %> bài</span>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4">Bài viết</th>
+                        <th>Trạng thái</th>
+                        <th class="text-center">Lượt vào</th>
+                        <th class="text-center">Hiện popup</th>
+                        <th class="text-center">Lượt bấm</th>
+                        <th>Link</th>
+                        <th class="text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (posts.length) { %>
+                        <% posts.forEach(p => { %>
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 overflow-hidden border flex-shrink-0 bg-light" style="width:72px;height:48px;">
+                                            <% if (p.thumbnail_url) { %><img src="<%= p.thumbnail_url %>" alt="" class="w-100 h-100 object-fit-cover" loading="lazy"><% } %>
+                                        </div>
+                                        <div style="min-width:180px;">
+                                            <div class="fw-bold text-dark"><%= p.title %></div>
+                                            <div class="small text-muted"><%= p.url_date %> · <%= p.affiliate_url ? 'Link riêng' : 'Link mặc định' %></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% if (p.is_published) { %>
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-1">Đã đăng</span>
+                                    <% } else { %>
+                                        <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-1">Bản nháp</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-center"><%= p.stats.view.toLocaleString('vi-VN') %></td>
+                                <td class="text-center"><%= p.stats.popup_show.toLocaleString('vi-VN') %></td>
+                                <td class="text-center fw-bold"><%= p.clicks.toLocaleString('vi-VN') %></td>
+                                <td>
+                                    <% if (p.is_published) { %>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary copy-link" data-link="<%= p.link %>" title="Sao chép link đầy đủ">
+                                            <i class="fas fa-copy me-1"></i>Sao chép
+                                        </button>
+                                    <% } else { %>
+                                        <span class="small text-muted">Chưa đăng</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a href="/admin/news/stats/<%= p.id %>" class="btn btn-sm btn-outline-info" title="Thống kê"><i class="fas fa-chart-line"></i></a>
+                                        <a href="/admin/news/preview/<%= p.id %>" class="btn btn-sm btn-outline-secondary" title="Xem trước"><i class="fas fa-eye"></i></a>
+                                        <a href="/admin/news/edit/<%= p.id %>" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="fas fa-edit"></i></a>
+                                        <form method="POST" action="/admin/news/<%= p.id %>/toggle" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-<%= p.is_published ? 'warning' : 'success' %>" title="<%= p.is_published ? 'Gỡ về nháp' : 'Đăng' %>">
+                                                <i class="fas fa-<%= p.is_published ? 'eye-slash' : 'paper-plane' %>"></i>
+                                            </button>
+                                        </form>
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-news" data-id="<%= p.id %>" title="Xóa"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-user-secret fa-3x mb-3 opacity-10"></i>
+                                <p class="mb-0">Chưa có tin ẩn nào<%= filter !== 'all' ? ' trong mục này' : '' %>.</p>
+                                <a href="/admin/news/create" class="btn btn-sm btn-link mt-2">Viết tin đầu tiên</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <% if (totalPages > 1) { %>
+        <div class="card-footer bg-white py-3">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %><%= filter !== 'all' ? '&status=' + filter : '' %>"><%= i %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    document.querySelectorAll('.copy-link').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var text = btn.getAttribute('data-link');
+            var done = function () {
+                var old = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Đã chép';
+                setTimeout(function () { btn.innerHTML = old; }, 1500);
+            };
+            if (navigator.clipboard) navigator.clipboard.writeText(text).then(done);
+            else { var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); done(); }
+        });
+    });
+    document.querySelectorAll('.delete-news').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+            if (!confirm('Xóa tin ẩn này? Link đã chia sẻ sẽ không mở được nữa và thống kê bị xóa.')) return;
+            try {
+                var r = await fetch('/admin/news/' + btn.dataset.id, { method: 'DELETE' });
+                var j = await r.json();
+                if (j.success) location.reload(); else alert('Lỗi: ' + j.message);
+            } catch (e) { alert('Có lỗi xảy ra!'); }
+        });
+    });
+</script>

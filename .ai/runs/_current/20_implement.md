@@ -489,3 +489,74 @@ Profile reward points display      OK      N/A          OK            N/A       
 - Compile 4 EJS bằng `ejs.compile`: PASS.
 - `npx prisma validate`: PASS.
 - `git diff --check` trên 5 file code: PASS (chỉ có cảnh báo line-ending).
+
+
+## Plan v9 — S42 Nền dữ liệu (2026-11-12)
+- Schema: BlogPost mở rộng + ApiKey + NewsStatDaily; migration `20261112100000_news_api_foundation`.
+- Lọc `post_type='blog'`: home, blog công khai (list/detail/recent), admin blogs (list/count/edit).
+- Seed Setting `news.*`.
+- Verify: prisma validate/generate, node --check. Chưa áp migration lên DB (DB local tắt).
+
+## Plan v9 — S43 Pipeline nội dung và media (2026-11-12)
+- Mới: `src/modules/posts/content.service.js`, `src/modules/media/media.service.js`, `tests/s43-content-media.test.js`.
+- Sửa: `src/middlewares/upload.middleware.js` (upload_stream thay base64), `package.json` (thêm sanitize-html).
+- Verify: 45 kiểm tra đạt (Cloudinary giả lập). Chưa cài sanitize-html vào node_modules dự án (npm bị EPERM ở node_modules/fsevents).
+
+## Plan v9 — S44 API key + API đăng bài (2026-11-12)
+- Mới: `src/modules/api-keys/*`, `src/modules/posts/posts.service.js`, `src/modules/posts/posts.api.route.js`, `src/modules/settings/news-settings.service.js`, `src/middlewares/api-key.middleware.js`, `src/middlewares/rate-limit.middleware.js`, `src/views/admin/api-keys/index.ejs`, `docs/12-api-posts.md`, `tests/s44-api-posts.test.js`.
+- Sửa: `src/app.js`, `src/routes/api.route.js`, `src/routes/admin.route.js`, `src/views/layouts/admin.ejs`, `src/config/env.js`, `.env.example`.
+- Verify: 29/29 kiểm tra HTTP đạt (DB/Cloudinary giả lập). Chưa chạy với DB/Cloudinary thật.
+
+## Plan v9 — S45 Admin tin tức ẩn (2026-11-12)
+- Mới: `src/modules/news/*`, `src/views/admin/news/{index,form,preview,settings}.ejs`, `tests/s45-admin-news.test.js`.
+- Sửa: `src/modules/posts/posts.service.js` (ad_image), `src/modules/blogs/blogs.controller.js` (chặn sửa/xóa news), `src/routes/admin.route.js`, `src/views/layouts/admin.ejs`.
+- Verify: 19/19 (S45), 29/29 (S44), 45/45 (S43). Chưa chạy trên DB/Cloudinary thật; chưa xem bằng trình duyệt thật.
+
+## Plan v9 — S46 Host routing + trang tin ẩn công khai (2026-11-12)
+- Mới: `src/middlewares/news-host.middleware.js`, `src/modules/public/news/*`, `src/views/news/{show,404}.ejs`, `docs/13-news-subdomain.md`, `docs/mockups/xem-thu-trang-tin-an.html`, `tests/s46-news-public.test.js`.
+- Sửa: `src/app.js` (gắn middleware host trước cors/session).
+- Verify: 18/18 (S46), 19/19 (S45), 29/29 (S44), 45/45 (S43). Chưa chạy trên Nginx/DB/Cloudinary thật.
+
+## Plan v9 — S47 Popup affiliate + thống kê (2026-11-12)
+- Mới: `public/news-assets/news.js`, `src/modules/news-stats/news-stats.service.js`, `src/views/admin/news/stats.ejs`, `tests/s47-popup-stats.test.js`.
+- Sửa: `src/views/news/show.ejs` (CSS popup/banner, nhúng cấu hình), `src/modules/public/news/*` (beacon /t, đếm lượt vào, cache static), `src/modules/news/*` (trang thống kê, flush), `src/views/admin/news/{index,form}.ejs`, `src/server.js`.
+- Verify: 22/22 (S47) + S43–S46 vẫn đạt; thử popup bằng trình duyệt thật trên máy chủ giả lập (X, nền mờ, Esc, bấm thân, banner, mobile 375px).
+
+## Plan v9 — S48 Trang bài viết chuyên nghiệp (2026-11-12)
+- Mới: `src/modules/posts/article.service.js`, `tests/s48-article.test.js`.
+- Sửa: `src/modules/public/blogs/blogs.controller.js`, `src/views/public/blogs/detail.ejs`, `src/views/layouts/main.ejs` (canonicalUrl, headExtra), `src/modules/posts/content.service.js` (jsonForScript, escapeHtml), `src/modules/public/news/news.public.controller.js` (dùng chung jsonForScript).
+- Verify: 17/17 (S48) + S43–S47 vẫn đạt; xem bằng trình duyệt desktop và mobile.
+
+## Plan v9 — S49 Vận hành VPS 1GB (2026-11-12)
+- Mới: `src/utils/category-cache.js`, `scripts/backup-db.js`, `docs/14-vps-1gb-operations.md`, `tests/s49-ops.test.js`.
+- Sửa: 24 file thay `new PrismaClient()` bằng `require('.../config/db')`; `src/config/db.js`, `src/app.js` (cache menu, /healthz), `src/modules/categories/categories.service.js`, `ecosystem.config.js`, `package.json`, `docs/09-pm2-operations.md`, `docs/10-self-host-n8n.md`.
+- Verify: 15/15 (S49) + S43–S48 vẫn đạt. Chưa chạy trên VPS thật.
+
+## Plan v9 — S51 Design system + layout chung v2 (2026-11-12)
+- Mới: `public/css/theme-v2.css`, `public/js/theme-v2.js`, `src/views/partials/mini-cart.ejs`, `docs/15-ui-theme-v2.md`, `tests/s51-theme-v2.test.js`.
+- Sửa: `src/views/layouts/main.ejs` (cờ theme, nạp v2), `src/app.js` (res.locals.uiTheme), `src/modules/public/cart/cart.controller.js` + `cart.route.js` (GET /cart/mini).
+- Verify: 13/13 (S51) + S43–S49 vẫn đạt; xem bằng trình duyệt desktop/mobile. Chưa xem các trang shop/chi tiết/checkout.
+
+## Plan v9 — S52 Trang chủ v2 (2026-11-12)
+- Mới: `public/css/home-v2.css`, `tests/s52-home-v2.test.js`.
+- Sửa: `src/views/public/home/index.ejs` (nhánh hero v2, nhánh classic giữ nguyên), `public/css/theme-v2.css` (overflow-x clip).
+- Verify: 8/8 (S52) + S43–S51 vẫn đạt; xem desktop/mobile bằng trình duyệt thật với banner mẫu.
+
+## Plan v9 — S53 Shop + chi tiết sản phẩm v2 (2026-11-12)
+- Mới: `public/css/shop-v2.css`, `public/js/shop-v2.js`, `public/js/product-v2.js`, `tests/helpers/fake-shop-prisma.js`, `tests/s53-shop-v2.test.js`.
+- Sửa: `src/views/public/products/shop.ejs` (mốc id, nút thêm nhanh v2, nạp asset v2), `src/views/public/products/detail.ejs` (nạp asset v2), `src/modules/public/products/products.controller.js` (view 404 đúng).
+- Verify: 14/14 (S53) + S43–S52 vẫn đạt; xem desktop/mobile bằng trình duyệt thật (lọc AJAX, Back, thêm nhanh, thanh mua dính, bộ lọc gập).
+
+## Plan v9 — S54 Giỏ hàng + thanh toán v2 (2026-11-12)
+- Mới: `src/views/partials/order-steps.ejs`, `public/css/cart-v2.css`, `public/js/cart-v2.js`, `tests/s54-cart-checkout-v2.test.js`.
+- Sửa: `src/views/public/cart/index.ejs`, `src/views/public/checkout/index.ejs`, `src/views/public/checkout/success.ejs` (chỉ chèn thanh tiến trình + nạp asset v2).
+- Verify: 11/11 (S54) + S43–S53 vẫn đạt; form/script thanh toán giống hệt classic; xem giỏ hàng desktop/mobile và thanh toán desktop bằng trình duyệt thật. Chưa chạy đặt hàng thật.
+
+## Plan v9 — S55 Tối ưu tốc độ tải v2 (2026-11-12)
+- Mới: `public/vendor/*` (bootstrap, fontawesome, swiper, sweetalert2, fonts), `tests/s55-performance.test.js`.
+- Sửa: `src/views/layouts/main.ejs`, `src/app.js` (/vendor cache dài), `public/js/theme-v2.js`, `public/css/theme-v2.css`, `public/css/home-v2.css`, `src/views/public/home/index.ejs`, `src/views/partials/footer.ejs`, tests S52/S54.
+- Verify: đo trình duyệt thật trước/sau (DCL 3510→415ms); 12/12 (S55) + toàn bộ test cũ đạt.
+
+## Sửa lỗi sitemap (2026-11-13)
+- `src/modules/public/pages/pages.controller.js` + `src/views/public/seo/sitemap.ejs`: dùng `prisma.blogPost` (blog đã đăng, loại tin ẩn), URL blog theo slug, danh mục theo `?category=<slug>`, bỏ trang tĩnh trùng/404, ưu tiên `SITE_URL`.
+- Mới: `tests/s56-sitemap.test.js` (5 kiểm tra đạt). Phát hiện khi bật web thật và gọi 21 đường dẫn chính.

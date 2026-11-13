@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mẫu B — Dark Premium | Hải Anh Fruit</title>
+<style>
+:root{--bg:#070b09;--bg2:#0d1410;--ink:#eef5ee;--mut:#8fa396;--line:rgba(255,255,255,.09);--lime:#b8ff3d;--mg:#ffb02e;--pk:#ff4d8d;--r:22px}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;background:radial-gradient(900px 500px at 15% -10%,rgba(184,255,61,.14),transparent 60%),radial-gradient(800px 500px at 100% 10%,rgba(255,77,141,.12),transparent 60%);pointer-events:none;z-index:0}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:auto;padding:0 20px;position:relative;z-index:1}
+header{position:sticky;top:0;z-index:30;backdrop-filter:blur(16px);background:rgba(7,11,9,.6);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:26px;height:68px}
+.logo{font-weight:800;letter-spacing:-.4px;font-size:19px;display:flex;align-items:center;gap:10px}
+.logo i{font-style:normal;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--lime),#4ade80);color:#06210f;box-shadow:0 0 24px rgba(184,255,61,.5)}
+.nav ul{display:flex;gap:24px;list-style:none;margin-left:auto;color:var(--mut);font-size:15px;font-weight:600}
+.nav li a:hover{color:var(--lime)}
+.cartbtn{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer;transition:.25s}
+.cartbtn:hover{border-color:var(--lime);box-shadow:0 0 20px rgba(184,255,61,.25)}
+#cartCount{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:7px;background:var(--lime);color:#06210f;margin-left:8px;font-size:12px;font-weight:800}
+#cartCount.bump{animation:bump .4s}@keyframes bump{50%{transform:scale(1.5)}}
+@media(max-width:800px){.nav ul{display:none}.cartbtn{margin-left:auto}}
+/* hero */
+.hero{text-align:center;padding:78px 0 40px;position:relative}
+.pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:99px;padding:7px 16px;font-size:13px;color:var(--lime);font-weight:700}
+h1{font-size:clamp(40px,7vw,84px);line-height:1.02;letter-spacing:-2.5px;margin:22px auto 18px;max-width:900px}
+h1 em{font-style:normal;background:linear-gradient(95deg,var(--lime),var(--mg) 55%,var(--pk));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:200% center}}
+.lead{color:var(--mut);max-width:560px;margin:auto;font-size:18px}
+.cta{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.btn{padding:15px 28px;border-radius:14px;font-weight:700;border:0;cursor:pointer;font-size:16px;transition:.25s;display:inline-flex;gap:8px;align-items:center}
+.btn.p{background:var(--lime);color:#07210f;box-shadow:0 0 30px rgba(184,255,61,.35)}.btn.p:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(184,255,61,.55)}
+.btn.g{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.g:hover{border-color:var(--lime);color:var(--lime)}
+.orbit{position:relative;width:min(520px,88vw);height:min(520px,88vw);margin:44px auto 0}
+.orbit .core{position:absolute;inset:30%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffd37a,#ff7a3d 55%,#a3123e);box-shadow:0 0 90px rgba(255,122,61,.55),inset -20px -30px 50px rgba(0,0,0,.35);display:grid;place-items:center;font-size:clamp(80px,16vw,150px);animation:breath 4s ease-in-out infinite}
+@keyframes breath{50%{transform:scale(1.05)}}
+.ring{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(255,255,255,.14);animation:spin 30s linear infinite}
+.ring.r2{inset:12%;animation-duration:22s;animation-direction:reverse}
+.ring span{position:absolute;font-size:clamp(28px,6vw,46px);filter:drop-shadow(0 0 14px rgba(255,255,255,.25))}
+.ring span:nth-child(1){top:-3%;left:48%}.ring span:nth-child(2){right:-2%;top:46%}.ring span:nth-child(3){bottom:-3%;left:46%}.ring span:nth-child(4){left:-2%;top:44%}
+.ring.r2 span:nth-child(1){top:-5%}.ring.r2 span:nth-child(2){right:-5%}.ring.r2 span:nth-child(3){bottom:-5%}
+.ring span{animation:spin 30s linear infinite reverse}.ring.r2 span{animation:spin 22s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:var(--r);background:rgba(255,255,255,.03);margin:20px 0 0;overflow:hidden}
+.st{padding:26px;text-align:center;border-right:1px solid var(--line)}.st:last-child{border:0}
+.st b{font-size:38px;letter-spacing:-1px;color:var(--lime)}.st small{display:block;color:var(--mut)}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.st{border-bottom:1px solid var(--line)}}
+section{padding:70px 0 20px}
+h2{font-size:clamp(28px,4.4vw,46px);letter-spacing:-1.4px;line-height:1.08}
+.kick{color:var(--lime);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.sh{margin-bottom:30px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}}
+.card{position:relative;border-radius:var(--r);padding:1px;background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.03));transition:transform .3s}
+.card:before{content:"";position:absolute;inset:-1px;border-radius:var(--r);background:conic-gradient(from var(--a,0deg),transparent 0 70%,var(--lime),var(--mg),transparent);opacity:0;transition:.4s;animation:rot 4s linear infinite}
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes rot{to{--a:360deg}}
+.card:hover:before{opacity:1}.card:hover{transform:translateY(-6px)}
+.in2{position:relative;background:var(--bg2);border-radius:calc(var(--r) - 1px);padding:16px;height:100%}
+.thumb{height:160px;border-radius:16px;display:grid;place-items:center;font-size:84px;position:relative;background:radial-gradient(circle at 50% 60%,var(--g,rgba(255,120,60,.3)),transparent 70%)}
+.thumb span{transition:.4s;filter:drop-shadow(0 12px 18px rgba(0,0,0,.6))}.card:hover .thumb span{transform:scale(1.15) translateY(-6px)}
+.badge{position:absolute;left:0;top:0;font-size:11px;font-weight:800;color:#07210f;background:var(--lime);border-radius:8px;padding:3px 9px}
+.card h3{margin:14px 0 2px;font-size:17px}.card small{color:var(--mut)}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.price{font-weight:800;font-size:18px}.price s{display:block;font-size:12px;font-weight:500;color:#667a6c}
+.add{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--lime);font-size:22px;cursor:pointer;transition:.25s}
+.add:hover{background:var(--lime);color:#07210f;box-shadow:0 0 22px rgba(184,255,61,.5)}
+/* gifts */
+.hs{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 20px;scroll-snap-type:x mandatory;scrollbar-width:none}.hs::-webkit-scrollbar{display:none}
+.gift{flex:0 0 min(340px,80vw);scroll-snap-align:start;border-radius:var(--r);padding:26px;min-height:280px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;border:1px solid var(--line);transition:.3s}
+.gift:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.25)}
+.gift .e{position:absolute;right:14px;top:6px;font-size:110px;opacity:.92}
+.gift.a{background:linear-gradient(160deg,#241a06,#4a3208)}.gift.b{background:linear-gradient(160deg,#2a0b1a,#5a1636)}.gift.c{background:linear-gradient(160deg,#0a2316,#12523a)}.gift.d{background:linear-gradient(160deg,#1a1535,#35296f)}
+.gift h3{font-size:22px}.gift p{color:#c8d6cb;font-size:14px}.gift b{color:var(--lime);display:block;margin-top:8px}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;position:relative}
+@media(max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
+.step{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:rgba(255,255,255,.03)}
+.step i{font-style:normal;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:rgba(184,255,61,.12);color:var(--lime);font-weight:800;margin-bottom:14px}
+.step h3{font-size:18px;margin-bottom:4px}.step p{color:var(--mut);font-size:14px}
+footer{border-top:1px solid var(--line);margin-top:80px;padding:44px 0 28px;color:var(--mut)}
+.fg{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:24px}@media(max-width:700px){.fg{grid-template-columns:1fr}}
+footer h4{color:var(--ink);margin-bottom:8px}footer a,footer p{display:block;margin:6px 0;font-size:14px}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:.3s;z-index:50}#scrim.open{opacity:1;pointer-events:auto}
+#drawer{position:fixed;right:0;top:0;bottom:0;width:min(400px,92vw);background:#0b120e;border-left:1px solid var(--line);z-index:60;transform:translateX(105%);transition:.4s cubic-bezier(.2,.8,.2,1);padding:22px;display:flex;flex-direction:column}#drawer.open{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#drawerClose{border:1px solid var(--line);background:none;color:var(--ink);width:36px;height:36px;border-radius:10px;font-size:20px;cursor:pointer}
+#drawerList{flex:1;overflow:auto}
+.d-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.d-emo{font-size:32px;width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.05);display:grid;place-items:center}
+.d-info{flex:1}.d-info small{display:block;color:var(--mut)}.d-del{border:0;background:none;color:var(--mut);font-size:22px;cursor:pointer}
+.d-empty{color:var(--mut);text-align:center;padding:30px 0}
+.dt{display:flex;justify-content:space-between;font-weight:800;font-size:20px;margin:14px 0}
+.fly{position:fixed;font-size:42px;z-index:90;pointer-events:none;transition:transform .7s cubic-bezier(.5,-.2,.7,.9),opacity .7s}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .7s}.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <a class="logo" href="#"><i>H</i>Hải Anh Fruit</a>
+  <ul><li><a href="#sp">Sản phẩm</a></li><li><a href="#qua">Quà biếu</a></li><li><a href="#quy-trinh">Quy trình</a></li><li><a href="#lh">Liên hệ</a></li></ul>
+  <button class="cartbtn" id="cartBtn">Giỏ hàng<span id="cartCount">0</span></button>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <span class="pill">● Nhập khẩu chính ngạch · Chuỗi lạnh 2–8°C</span>
+    <h1>Trái cây cao cấp, <em>tươi như vừa hái</em>.</h1>
+    <p class="lead">Tuyển chọn từ vùng trồng tốt nhất thế giới, kiểm soát nhiệt độ đến tận tay bạn.</p>
+    <div class="cta"><a class="btn p" href="#sp">Khám phá ngay →</a><a class="btn g" href="#qua">Set quà biếu</a></div>
+    <div class="orbit">
+      <div class="ring"><span>🍇</span><span>🍒</span><span>🥝</span><span>🍊</span></div>
+      <div class="ring r2"><span>🥭</span><span>🍎</span><span>🍐</span></div>
+      <div class="core">🍓</div>
+    </div>
+  </div>
+  <div class="stats reveal">
+    <div class="st"><b data-count="2400">0</b>+<small>khách hàng</small></div>
+    <div class="st"><b data-count="24">0</b>h<small>giao tươi</small></div>
+    <div class="st"><b data-count="4.9" data-dec="1">0</b>★<small>đánh giá</small></div>
+    <div class="st"><b data-count="100">0</b>%<small>hoàn tiền nếu hỏng</small></div>
+  </div>
+
+  <section id="sp">
+    <div class="sh reveal"><div class="kick">Bán chạy</div><h2>Chọn lọc cho tuần này</h2></div>
+    <div class="grid">
+      <div class="card reveal"><div class="in2"><div class="thumb" style="--g:rgba(255,77,100,.35)"><span class="badge">-12%</span><span>🍓</span></div><h3>Dâu Hàn Quốc</h3><small>Hộp 500g · Hàn Quốc</small><div class="row"><div class="price">289.000đ<s>329.000đ</s></div><button class="add" data-add data-name="Dâu Hàn Quốc" data-price="289000" data-emoji="🍓">+</button></div></div></div>
+      <div class="card reveal"><div class="in2"><div class="thumb" style="--g:rgba(150,90,255,.35)"><span class="badge">Mới</span><span>🍇</span></div><h3>Nho Mỹ không hạt</h3><small>Hộp 1kg · Mỹ</small><div class="row"><div class="price">169.000đ</div><button class="add" data-add data-name="Nho Mỹ không hạt" data-price="169000" data-emoji="🍇">+</button></div></div></div>
+      <div class="card reveal"><div class="in2"><div class="thumb" style="--g:rgba(255,60,60,.35)"><span>🍒</span></div><h3>Cherry Úc</h3><small>Hộp 500g · Úc</small><div class="row"><div class="price">459.000đ</div><button class="add" data-add data-name="Cherry Úc" data-price="459000" data-emoji="🍒">+</button></div></div></div>
+      <div class="card reveal"><div class="in2"><div class="thumb" style="--g:rgba(255,190,40,.35)"><span class="badge">Hot</span><span>🥭</span></div><h3>Xoài Úc R2E2</h3><small>Khay 1kg · Úc</small><div class="row"><div class="price">99.000đ<s>119.000đ</s></div><button class="add" data-add data-name="Xoài Úc R2E2" data-price="99000" data-emoji="🥭">+</button></div></div></div>
+    </div>
+  </section>
+
+  <section id="qua">
+    <div class="sh reveal"><div class="kick">Quà biếu</div><h2>Set quà sang trọng</h2></div>
+    <div class="hs">
+      <div class="gift a reveal"><span class="e">🎁</span><h3>Giỏ Hoàng Kim</h3><p>Cherry, nho Mỹ, xoài Úc, kiwi vàng.</p><b>1.290.000đ</b></div>
+      <div class="gift b reveal"><span class="e">🍓</span><h3>Hộp Dâu Tình Yêu</h3><p>Dâu Hàn tuyển chọn, hộp gỗ cao cấp.</p><b>690.000đ</b></div>
+      <div class="gift c reveal"><span class="e">🥝</span><h3>Set Sức Khỏe</h3><p>Kiwi, cam, táo, lê — giàu vitamin.</p><b>890.000đ</b></div>
+      <div class="gift d reveal"><span class="e">🍇</span><h3>Set Doanh Nhân</h3><p>Nho, cherry, táo Envy, lê Hàn.</p><b>1.590.000đ</b></div>
+    </div>
+  </section>
+
+  <section id="quy-trinh">
+    <div class="sh reveal"><div class="kick">Quy trình</div><h2>Từ vườn đến tay bạn</h2></div>
+    <div class="steps">
+      <div class="step reveal"><i>01</i><h3>Tuyển chọn</h3><p>Chọn trực tiếp từ vùng trồng đạt chuẩn.</p></div>
+      <div class="step reveal"><i>02</i><h3>Vận chuyển lạnh</h3><p>Container lạnh, theo dõi nhiệt độ liên tục.</p></div>
+      <div class="step reveal"><i>03</i><h3>Kiểm định</h3><p>Phân loại, loại bỏ trái không đạt tại kho.</p></div>
+      <div class="step reveal"><i>04</i><h3>Giao tận nhà</h3><p>Giao nội thành Hà Nội trong 24 giờ.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer id="lh"><div class="wrap fg">
+  <div><h4>Hải Anh Fruit</h4><p>Trái cây nhập khẩu cao cấp, giao tận nơi trong nội thành Hà Nội.</p></div>
+  <div><h4>Hỗ trợ</h4><a href="#">Chính sách giao hàng</a><a href="#">Đổi trả</a><a href="#">Câu hỏi thường gặp</a></div>
+  <div><h4>Liên hệ</h4><p>Hotline: 09xx xxx xxx</p><p>Hà Nội</p></div>
+</div></footer>
+
+<div id="scrim"></div>
+<aside id="drawer"><div class="dh"><h3>Giỏ hàng</h3><button id="drawerClose" aria-label="Đóng">×</button></div>
+  <div id="drawerList"></div>
+  <div class="dt"><span>Tạm tính</span><span id="drawerTotal">0đ</span></div>
+  <button class="btn p" style="justify-content:center">Thanh toán →</button>
+</aside>
+<script src="mock.js"></script>
+</body>
+</html>

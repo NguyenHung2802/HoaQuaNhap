@@ -17,6 +17,8 @@ const promotionsRoute = require('../modules/promotions/promotions.route');
 const customersRoute = require('../modules/customers/customers.route');
 const reportsRoute = require('../modules/reports/reports.route');
 const contactsRoute = require('../modules/contacts/contacts.route');
+const apiKeysRoute = require('../modules/api-keys/api-keys.route');
+const newsRoute = require('../modules/news/news.route');
 
 // [GET] /admin/login (Redirect to unified login)
 router.get('/login', (req, res) => res.redirect('/auth/login'));
@@ -44,5 +46,7 @@ router.use('/shipping-campaigns', isAdmin, shippingCampaignsRoute);
 router.use('/customers', isAdmin, customersRoute);
 router.use('/reports', isAdmin, reportsRoute);
 router.use('/contacts', isAdmin, contactsRoute);
+router.use('/api-keys', isAdmin, apiKeysRoute);
+router.use('/news', isAdmin, newsRoute);
 
 module.exports = router;

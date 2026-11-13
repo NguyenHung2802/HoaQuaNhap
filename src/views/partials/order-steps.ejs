@@ -1,0 +1,21 @@
+<%# Thanh tiến trình đặt hàng (giao diện v2). Tham số: current = 1 (Giỏ hàng) | 2 (Thanh toán) | 3 (Hoàn tất). Chỉ trình bày, không có logic. %>
+<%
+    const steps = [
+        { n: 1, label: 'Giỏ hàng', href: '/cart' },
+        { n: 2, label: 'Thanh toán', href: '/checkout' },
+        { n: 3, label: 'Hoàn tất', href: null }
+    ];
+%>
+<ol class="tv2-steps" aria-label="Tiến trình đặt hàng">
+    <% steps.forEach(function (s) {
+        const state = s.n < current ? 'done' : (s.n === current ? 'current' : 'todo');
+    %>
+        <li class="tv2-step is-<%= state %>" <%- state === 'current' ? 'aria-current="step"' : '' %>>
+            <% if (state === 'done' && s.href && current !== 3) { %>
+                <a href="<%= s.href %>" class="tv2-step-link"><span class="tv2-step-n"><i class="fas fa-check" aria-hidden="true"></i></span><span class="tv2-step-t"><%= s.label %></span></a>
+            <% } else { %>
+                <span class="tv2-step-link"><span class="tv2-step-n"><% if (state === 'done') { %><i class="fas fa-check" aria-hidden="true"></i><% } else { %><%= s.n %><% } %></span><span class="tv2-step-t"><%= s.label %></span></span>
+            <% } %>
+        </li>
+    <% }) %>
+</ol>

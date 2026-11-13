@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const policies = require('./policy-content');
 const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
@@ -116,8 +117,8 @@ async function main() {
     { key: 'about_us', description: 'Giới thiệu WebHoaQua', value: '<h2>Chúng tôi là ai?</h2><p>WebHoaQua là hệ thống phân phối trái cây nhập khẩu hàng đầu Việt Nam...</p>' },
     { key: 'faq', description: 'Câu hỏi thường gặp (FAQ)', value: '<h2>Các câu hỏi thường gặp</h2><p>1. Cách thức đặt hàng?<br>2. Quy trình đổi trả?</p>' },
     { key: 'shipping_policy', description: 'Chính sách vận chuyển', value: '<h2>Chính sách giao hàng</h2><p>Miễn phí vận chuyển cho đơn hàng từ 500k tại nội thành...</p>' },
-    { key: 'privacy_policy', description: 'Chính sách bảo mật', value: '<h2>Bảo mật thông tin khách hàng</h2><p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn...</p>' },
-    { key: 'return_policy', description: 'Chính sách đổi trả', value: '<h3>Chính sách đổi trả hàng</h3><p>Hải Anh Fruit cam kết mang đến cho khách hàng những sản phẩm trái cây nhập khẩu chất lượng cao, tươi ngon và đúng với tiêu chuẩn an toàn thực phẩm.</p>' }
+    { key: 'privacy_policy', description: 'Chính sách bảo mật', value: policies.privacy_policy },
+    { key: 'return_policy', description: 'Chính sách đổi trả', value: policies.return_policy }
   ];
 
   for (const page of staticPages) {
@@ -128,6 +129,23 @@ async function main() {
         ...page,
         group_key: 'static_page'
       }
+    });
+  }
+
+  // 5. Cấu hình tin tức ẩn / API đăng bài (BA v9) — không ghi đè giá trị đã có
+  const newsSettings = [
+    { key: 'news.enabled', value: 'true', description: 'Bật/tắt khu tin tức ẩn và API đăng bài' },
+    { key: 'news.host', value: 'tin.haianhfruit.com', description: 'Subdomain phục vụ tin tức ẩn' },
+    { key: 'news.default_affiliate_url', value: '', description: 'Link affiliate mặc định khi bài không có link riêng' },
+    { key: 'news.affiliate_hosts', value: 'shopee.vn,s.shopee.vn,shope.ee,tiktok.com,vt.tiktok.com,vm.tiktok.com,shop.tiktok.com', description: 'Danh sách host affiliate được phép (cách nhau dấu phẩy)' },
+    { key: 'news.popup_delay_ms', value: '1500', description: 'Độ trễ hiện popup affiliate (ms)' }
+  ];
+
+  for (const st of newsSettings) {
+    await prisma.setting.upsert({
+      where: { key: st.key },
+      update: {},
+      create: { ...st, group_key: 'news' }
     });
   }
 

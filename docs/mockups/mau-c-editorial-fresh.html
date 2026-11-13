@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mẫu C — Editorial Fresh | Hải Anh Fruit</title>
+<style>
+:root{--bg:#fbf4e6;--ink:#1d1a14;--mut:#6f675a;--line:#e6dcc7;--red:#e2412b;--grn:#2f6b3a;--yel:#f5b82e;--ser:Georgia,"Times New Roman",serif}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:auto;padding:0 22px}
+header{border-bottom:1px solid var(--ink);position:sticky;top:0;background:rgba(251,244,230,.92);backdrop-filter:blur(8px);z-index:30}
+.nav{display:flex;align-items:center;height:64px;gap:28px}
+.logo{font-family:var(--ser);font-size:24px;font-weight:700;font-style:italic}
+.nav ul{display:flex;gap:26px;list-style:none;margin-left:auto;font-size:14px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.nav li a{background:linear-gradient(var(--ink),var(--ink)) left bottom/0 2px no-repeat;transition:.3s;padding-bottom:3px}.nav li a:hover{background-size:100% 2px}
+.cartbtn{border:1.5px solid var(--ink);background:none;padding:9px 18px;border-radius:99px;font-weight:700;cursor:pointer;transition:.25s}
+.cartbtn:hover{background:var(--ink);color:var(--bg)}
+#cartCount{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:11px;background:var(--red);color:#fff;margin-left:8px;font-size:12px}
+#cartCount.bump{animation:bump .4s}@keyframes bump{50%{transform:scale(1.5)}}
+@media(max-width:800px){.nav ul{display:none}.cartbtn{margin-left:auto}}
+/* hero */
+.hero{position:relative;padding:60px 0 40px;display:grid;grid-template-columns:1.3fr 1fr;gap:30px;align-items:center}
+@media(max-width:900px){.hero{grid-template-columns:1fr}}
+.eyebrow{text-transform:uppercase;letter-spacing:3px;font-size:12px;font-weight:700;color:var(--red)}
+h1{font-family:var(--ser);font-size:clamp(46px,8.6vw,118px);line-height:.95;letter-spacing:-3px;margin:16px 0 22px;font-weight:700}
+h1 i{color:var(--red)}
+h1 .line{display:block;overflow:hidden}
+h1 .line span{display:inline-block;animation:up 1s cubic-bezier(.2,.8,.2,1) both}
+h1 .line:nth-child(2) span{animation-delay:.12s}h1 .line:nth-child(3) span{animation-delay:.24s}
+@keyframes up{from{transform:translateY(110%)}}
+.lead{font-size:18px;color:var(--mut);max-width:480px}
+.cta{margin-top:28px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:99px;padding:16px 30px;font-weight:700;font-size:16px;cursor:pointer;transition:.25s}
+.btn:hover{background:var(--red);transform:translateY(-3px)}
+.lnk{font-weight:700;border-bottom:2px solid var(--ink)}
+.collage{position:relative;aspect-ratio:1/1.05}
+.blob{position:absolute;border-radius:50%;display:grid;place-items:center}
+.blob.b1{width:78%;aspect-ratio:1;right:0;top:0;background:var(--yel);font-size:clamp(120px,22vw,250px)}
+.blob.b2{width:42%;aspect-ratio:1;left:0;bottom:6%;background:var(--red);font-size:clamp(60px,10vw,110px)}
+.blob.b3{width:30%;aspect-ratio:1;right:8%;bottom:0;background:var(--grn);font-size:clamp(46px,8vw,80px)}
+.blob span{animation:bob 5s ease-in-out infinite;filter:drop-shadow(0 18px 18px rgba(0,0,0,.25))}
+.b2 span{animation-delay:-1.5s}.b3 span{animation-delay:-3s}
+@keyframes bob{50%{transform:translateY(-14px) rotate(5deg)}}
+.stamp{position:absolute;left:2%;top:6%;width:120px;height:120px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;text-align:center;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--bg);animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ticker */
+.tk{background:var(--ink);color:var(--bg);overflow:hidden;padding:14px 0;font-family:var(--ser);font-size:26px;font-style:italic}
+.tk div{display:flex;gap:40px;width:max-content;animation:mq 26s linear infinite}.tk span{white-space:nowrap}
+@keyframes mq{to{transform:translateX(-50%)}}
+section{padding:80px 0 10px}
+.sh{display:flex;gap:20px;align-items:baseline;border-bottom:1px solid var(--ink);padding-bottom:14px;margin-bottom:6px}
+.sh small{font-weight:800;color:var(--red);letter-spacing:2px}
+h2{font-family:var(--ser);font-size:clamp(32px,5vw,58px);letter-spacing:-1.5px;line-height:1}
+/* editorial rows */
+.rows{position:relative}
+.er{display:grid;grid-template-columns:70px 1.2fr 1fr 130px 60px;gap:20px;align-items:center;padding:26px 0;border-bottom:1px solid var(--line);position:relative;cursor:pointer;transition:.3s}
+.er:hover{padding-left:16px;background:linear-gradient(90deg,rgba(226,65,43,.06),transparent)}
+.er .n{font-family:var(--ser);font-size:34px;color:var(--mut);font-style:italic}
+.er h3{font-family:var(--ser);font-size:clamp(26px,3.4vw,42px);letter-spacing:-1px;line-height:1.05}
+.er p{color:var(--mut);font-size:15px}
+.er .pr{font-weight:800;font-size:19px;text-align:right}
+.er .em{position:absolute;right:30%;top:50%;font-size:90px;transform:translateY(-50%) scale(.4) rotate(-20deg);opacity:0;transition:.45s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.er:hover .em{opacity:1;transform:translateY(-50%) scale(1) rotate(8deg)}
+.add{width:48px;height:48px;border-radius:50%;border:1.5px solid var(--ink);background:none;font-size:22px;cursor:pointer;transition:.25s}
+.add:hover{background:var(--ink);color:var(--bg);transform:rotate(90deg)}
+@media(max-width:800px){.er{grid-template-columns:40px 1fr 48px;gap:12px}.er p,.er .em{display:none}.er .pr{grid-column:2}.er .add{grid-row:1/3;grid-column:3}}
+/* story */
+.story{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+@media(max-width:800px){.story{grid-template-columns:1fr}}
+.big{font-family:var(--ser);font-size:clamp(26px,3.4vw,40px);line-height:1.2;letter-spacing:-.8px}
+.big mark{background:linear-gradient(transparent 60%,var(--yel) 60%);color:inherit}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.fact b{font-family:var(--ser);font-size:56px;letter-spacing:-2px;line-height:1;display:block}.fact small{color:var(--mut)}
+/* journal */
+.jr{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:30px}
+@media(max-width:850px){.jr{grid-template-columns:1fr}}
+.post .im{aspect-ratio:4/3;border-radius:6px;display:grid;place-items:center;font-size:96px;overflow:hidden;transition:.4s}
+.post:hover .im{border-radius:80px 6px 80px 6px}
+.post .im span{transition:.5s}.post:hover .im span{transform:scale(1.2) rotate(-8deg)}
+.post small{color:var(--red);font-weight:800;letter-spacing:1.5px;text-transform:uppercase;font-size:11px;display:block;margin-top:14px}
+.post h3{font-family:var(--ser);font-size:24px;line-height:1.15;margin-top:6px}
+footer{background:var(--ink);color:#cfc7b6;margin-top:90px;padding:60px 0 26px}
+footer .big{color:var(--bg);margin-bottom:36px;max-width:760px}
+.fg{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:24px;border-top:1px solid #3a352b;padding-top:26px}@media(max-width:700px){.fg{grid-template-columns:1fr}}
+footer h4{color:var(--bg);margin-bottom:8px}footer a,footer p{display:block;margin:6px 0;font-size:14px}
+#scrim{position:fixed;inset:0;background:rgba(29,26,20,.5);opacity:0;pointer-events:none;transition:.3s;z-index:50}#scrim.open{opacity:1;pointer-events:auto}
+#drawer{position:fixed;right:0;top:0;bottom:0;width:min(400px,92vw);background:var(--bg);border-left:1.5px solid var(--ink);z-index:60;transform:translateX(105%);transition:.4s cubic-bezier(.2,.8,.2,1);padding:22px;display:flex;flex-direction:column}#drawer.open{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.dh h3{font-family:var(--ser);font-size:26px}
+#drawerClose{border:1.5px solid var(--ink);background:none;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer}
+#drawerList{flex:1;overflow:auto}
+.d-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.d-emo{font-size:32px;width:54px;height:54px;border-radius:50%;background:var(--yel);display:grid;place-items:center}
+.d-info{flex:1}.d-info small{display:block;color:var(--mut)}.d-del{border:0;background:none;font-size:22px;cursor:pointer;color:var(--mut)}
+.d-empty{color:var(--mut);text-align:center;padding:30px 0}
+.dt{display:flex;justify-content:space-between;font-family:var(--ser);font-size:26px;margin:14px 0}
+.fly{position:fixed;font-size:42px;z-index:90;pointer-events:none;transition:transform .7s cubic-bezier(.5,-.2,.7,.9),opacity .7s}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .7s}.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <a class="logo" href="#">Hải Anh Fruit</a>
+  <ul><li><a href="#sp">Mùa này</a></li><li><a href="#cau-chuyen">Câu chuyện</a></li><li><a href="#tap-chi">Tạp chí</a></li><li><a href="#lh">Liên hệ</a></li></ul>
+  <button class="cartbtn" id="cartBtn">Giỏ hàng<span id="cartCount">0</span></button>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Trái cây nhập khẩu · Hà Nội</div>
+      <h1><span class="line"><span>Ngon thật,</span></span><span class="line"><span>tươi <i>thật</i>,</span></span><span class="line"><span>giá thật.</span></span></h1>
+      <p class="lead">Mỗi quả đều được chọn tay, giữ lạnh và giao trong ngày. Chúng tôi kể rõ quả này đến từ đâu, ngon nhất lúc nào.</p>
+      <div class="cta"><a class="btn" href="#sp">Xem mùa này</a><a class="lnk" href="#cau-chuyen">Câu chuyện của chúng tôi</a></div>
+    </div>
+    <div class="collage">
+      <div class="blob b1" data-par="-.04"><span>🍊</span></div>
+      <div class="blob b2" data-par="-.08"><span>🍓</span></div>
+      <div class="blob b3" data-par="-.02"><span>🥝</span></div>
+      <div class="stamp">Giao<br>trong<br>24h</div>
+    </div>
+  </div>
+</main>
+
+<div class="tk"><div>
+  <span>Dâu Hàn ✦ Cherry Úc ✦ Nho Mỹ ✦ Xoài Úc ✦ Kiwi ✦ Cam Navel ✦ Táo Envy ✦ </span>
+  <span>Dâu Hàn ✦ Cherry Úc ✦ Nho Mỹ ✦ Xoài Úc ✦ Kiwi ✦ Cam Navel ✦ Táo Envy ✦ </span>
+</div></div>
+
+<main class="wrap">
+  <section id="sp">
+    <div class="sh reveal"><small>01</small><h2>Mùa này có gì?</h2></div>
+    <div class="rows">
+      <div class="er reveal"><span class="n">01</span><h3>Dâu Hàn Quốc</h3><p>Ngọt thanh, mọng nước. Ngon nhất tháng 12 đến tháng 4.</p><span class="pr">289.000đ</span><button class="add" data-add data-name="Dâu Hàn Quốc" data-price="289000" data-emoji="🍓">+</button><span class="em">🍓</span></div>
+      <div class="er reveal"><span class="n">02</span><h3>Cherry Úc</h3><p>Trái to, vỏ bóng, giòn ngọt. Vào vụ cuối năm.</p><span class="pr">459.000đ</span><button class="add" data-add data-name="Cherry Úc" data-price="459000" data-emoji="🍒">+</button><span class="em">🍒</span></div>
+      <div class="er reveal"><span class="n">03</span><h3>Nho Mỹ không hạt</h3><p>Hạt chắc, vị ngọt đậm, bảo quản được lâu.</p><span class="pr">169.000đ</span><button class="add" data-add data-name="Nho Mỹ không hạt" data-price="169000" data-emoji="🍇">+</button><span class="em">🍇</span></div>
+      <div class="er reveal"><span class="n">04</span><h3>Xoài Úc R2E2</h3><p>Thịt dày, ít xơ, thơm đặc trưng.</p><span class="pr">99.000đ</span><button class="add" data-add data-name="Xoài Úc R2E2" data-price="99000" data-emoji="🥭">+</button><span class="em">🥭</span></div>
+      <div class="er reveal"><span class="n">05</span><h3>Kiwi vàng Zespri</h3><p>Ngọt dịu, ít chua, giàu vitamin C.</p><span class="pr">149.000đ</span><button class="add" data-add data-name="Kiwi vàng Zespri" data-price="149000" data-emoji="🥝">+</button><span class="em">🥝</span></div>
+    </div>
+  </section>
+
+  <section id="cau-chuyen">
+    <div class="sh reveal"><small>02</small><h2>Câu chuyện</h2></div>
+    <div class="story" style="margin-top:40px">
+      <p class="big reveal">Chúng tôi tin rằng một quả ngon bắt đầu từ <mark>vùng trồng đúng</mark>, đi qua <mark>chuỗi lạnh liên tục</mark>, và đến tay bạn khi còn nguyên độ giòn ngọt.</p>
+      <div class="facts reveal">
+        <div class="fact"><b data-count="2400">0</b><small>khách hàng thân thiết</small></div>
+        <div class="fact"><b data-count="24">0</b><small>giờ từ kho đến nhà</small></div>
+        <div class="fact"><b data-count="4.9" data-dec="1">0</b><small>điểm đánh giá</small></div>
+        <div class="fact"><b data-count="100">0</b><small>% hoàn tiền nếu hỏng</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tap-chi">
+    <div class="sh reveal"><small>03</small><h2>Tạp chí trái cây</h2></div>
+    <div class="jr">
+      <a class="post reveal" href="#"><div class="im" style="background:#f8c9c0"><span>🍓</span></div><small>Mẹo hay</small><h3>Cách chọn dâu ngọt và giữ tươi 7 ngày</h3></a>
+      <a class="post reveal" href="#"><div class="im" style="background:#fbe0a0"><span>🥭</span></div><small>Mùa vụ</small><h3>Xoài Úc vào mùa: nên mua loại nào?</h3></a>
+      <a class="post reveal" href="#"><div class="im" style="background:#c9e3c4"><span>🎁</span></div><small>Quà biếu</small><h3>5 set quà trái cây cho dịp cuối năm</h3></a>
+    </div>
+  </section>
+</main>
+
+<footer id="lh"><div class="wrap">
+  <p class="big">Mua trái cây ngon, như đi chợ cùng người hiểu chuyện.</p>
+  <div class="fg">
+    <div><h4>Hải Anh Fruit</h4><p>Trái cây nhập khẩu, giao nội thành Hà Nội.</p></div>
+    <div><h4>Hỗ trợ</h4><a href="#">Chính sách giao hàng</a><a href="#">Đổi trả</a><a href="#">Câu hỏi thường gặp</a></div>
+    <div><h4>Liên hệ</h4><p>Hotline: 09xx xxx xxx</p><p>Hà Nội</p></div>
+  </div>
+</div></footer>
+
+<div id="scrim"></div>
+<aside id="drawer"><div class="dh"><h3>Giỏ hàng</h3><button id="drawerClose" aria-label="Đóng">×</button></div>
+  <div id="drawerList"></div>
+  <div class="dt"><span>Tạm tính</span><span id="drawerTotal">0đ</span></div>
+  <button class="btn" style="width:100%">Thanh toán</button>
+</aside>
+<script src="mock.js"></script>
+</body>
+</html>

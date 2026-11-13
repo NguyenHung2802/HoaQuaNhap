@@ -1,0 +1,80 @@
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h4 class="mb-0">Xem trước tin ẩn</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/admin/news">Tin tức ẩn</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Xem trước</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/admin/news/edit/<%= post.id %>" class="btn btn-primary btn-sm rounded-pill px-3"><i class="fas fa-edit me-1"></i>Sửa</a>
+        <a href="/admin/news" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Quay lại</a>
+    </div>
+</div>
+
+<div class="alert <%= post.is_published ? 'alert-success' : 'alert-warning' %> small rounded-4">
+    <% if (post.is_published) { %>
+        <i class="fas fa-check-circle me-1"></i>Bài <strong>đã đăng</strong>. Link công khai: <code><%= link %></code>
+    <% } else { %>
+        <i class="fas fa-lock me-1"></i>Bài là <strong>bản nháp</strong>: chỉ admin xem được ở trang này, link công khai trả 404 cho tới khi đăng.
+    <% } %>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <article class="card border-0 shadow-sm rounded-4">
+            <% if (post.thumbnail_url) { %><img src="<%= post.thumbnail_url %>" alt="" class="w-100 rounded-top-4" style="max-height:340px;object-fit:cover;"><% } %>
+            <div class="card-body p-4 p-md-5">
+                <div class="small text-muted mb-2"><%= post.url_date %> · <%= readMinutes %> phút đọc</div>
+                <h2 class="fw-bold mb-3"><%= post.title %></h2>
+                <% if (post.summary) { %><p class="lead text-muted"><%= post.summary %></p><% } %>
+                <% if (post.video_url) { %>
+                    <div class="ratio ratio-16x9 my-4">
+                        <% if (/res\.cloudinary\.com/.test(post.video_url)) { %>
+                            <video src="<%= post.video_url %>" controls preload="metadata"></video>
+                        <% } else { %>
+                            <iframe src="<%= post.video_url %>" loading="lazy" allowfullscreen title="Video" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                        <% } %>
+                    </div>
+                <% } %>
+                <%# Nội dung đã được làm sạch ở posts.service (sanitizeContent) nên in nguyên bản %>
+                <div class="news-content"><%- post.content %></div>
+                <% if (Array.isArray(post.gallery) && post.gallery.length) { %>
+                    <div class="row g-2 mt-4">
+                        <% post.gallery.forEach(url => { %>
+                            <div class="col-6 col-md-4"><img src="<%= url %>" alt="" class="w-100 rounded-3 border" loading="lazy" style="aspect-ratio:4/3;object-fit:cover;"></div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+        </article>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="fas fa-bullhorn me-2 text-danger"></i>Popup affiliate</h6>
+                <% if (affiliateUrl) { %>
+                    <div class="small mb-2 text-break"><span class="text-muted">Link:</span> <a href="<%= affiliateUrl %>" target="_blank" rel="noopener noreferrer"><%= affiliateUrl %></a></div>
+                    <% if (usingDefaultAffiliate) { %><div class="badge bg-light text-dark border mb-2">Đang dùng link mặc định</div><% } %>
+                <% } else { %>
+                    <div class="alert alert-warning small mb-2">Chưa có link affiliate (riêng hoặc mặc định). Popup sẽ không hiện.</div>
+                <% } %>
+                <div class="small text-muted">Tiêu đề: <%= post.ad_headline || '(mặc định theo tiêu đề bài)' %></div>
+                <div class="small text-muted">Chữ nút: <%= post.ad_cta_text || 'Xem ưu đãi' %></div>
+                <% if (post.ad_image_url) { %><img src="<%= post.ad_image_url %>" alt="" class="rounded border mt-2 w-100" style="max-height:140px;object-fit:cover;"><% } %>
+                <div class="small text-muted mt-3">Popup thật chạy trên trang công khai (slice S47); đây chỉ là bản kiểm tra nội dung.</div>
+            </div>
+        </div>
+        <% if (post.tags) { %>
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-2">Thẻ</h6>
+                    <% post.tags.split(',').forEach(t => { %><span class="badge bg-light text-dark border me-1"><%= t %></span><% }) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+<style>.news-content img{max-width:100%;height:auto;border-radius:12px}.news-content iframe{max-width:100%}</style>

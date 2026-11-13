@@ -1,3 +1,5 @@
+<% const isV2 = (typeof uiTheme !== 'undefined' && uiTheme === 'v2'); %>
+<% if (isV2) { %><link rel="stylesheet" href="/css/shop-v2.css?v=s53"><% } %>
 <!-- Breadcrumb -->
 <div class="bg-light-grey py-3 border-bottom">
     <div class="container">
@@ -14,8 +16,8 @@
     <div class="container">
         <div class="row g-5">
             <!-- ===== SIDEBAR ===== -->
-            <div class="col-lg-3" data-aos="fade-right">
-                <div class="shop-sidebar">
+            <div class="col-lg-3" data-aos="fade-right" id="shopSidebarCol">
+                <div class="shop-sidebar" id="shopSidebar">
                     <form action="/products" method="GET" id="filterForm">
                         <!-- Search -->
                         <div class="sidebar-block">
@@ -136,7 +138,7 @@
             </div>
 
             <!-- ===== PRODUCT GRID ===== -->
-            <div class="col-lg-9">
+            <div class="col-lg-9" id="shopResults">
                 <!-- Toolbar -->
                 <div class="shop-toolbar d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3" data-aos="fade-down">
                     <div class="text-muted small">
@@ -170,6 +172,9 @@
                                         <% if (p.is_featured && !p.is_best_seller) { %><span class="fruit-tag new">Nổi bật ✨</span><% } %>
                                         <% if (p.discountPercent > 0) { %>
                                             <span class="fruit-tag discount">-<%= p.discountPercent %>%</span>
+                                        <% } %>
+                                        <% if (isV2 && p.stock_quantity > 0) { %>
+                                            <button type="button" class="fruit-quick-add" aria-label="Thêm <%= p.name %> vào giỏ" onclick="event.preventDefault(); event.stopPropagation(); addToCart(<%= p.id %>, 1)"><i class="fas fa-plus" aria-hidden="true"></i></button>
                                         <% } %>
                                     </div>
                                     <div class="fruit-card-body">
@@ -317,3 +322,4 @@
         });
     });
 </script>
+<% if (isV2) { %><script src="/js/shop-v2.js?v=s53" defer></script><% } %>

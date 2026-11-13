@@ -303,7 +303,51 @@ model BlogPost {
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
 
-  author User @relation(fields: [author_id], references: [id])
+  // --- Mở rộng cho API đăng bài và tin tức ẩn (BA v9) ---
+  post_type       String  @default("blog") // blog | news
+  access_token    String? @unique // chỉ dùng cho news (base64url, 22 ký tự)
+  url_date        String? // dd-mm-yyyy, cố định khi tạo
+  affiliate_url   String?
+  ad_headline     String?
+  ad_image_url    String?
+  ad_cta_text     String?
+  video_url       String?
+  gallery         Json?
+  tags            String?
+  seo_title       String?
+  seo_description String?
+  source          String?
+  external_id     String?
+
+  author User            @relation(fields: [author_id], references: [id])
+  stats  NewsStatDaily[]
+
+  @@unique([source, external_id])
+  @@index([post_type, is_published, published_at])
+}
+
+model ApiKey {
+  id           Int       @id @default(autoincrement())
+  name         String
+  key_prefix   String
+  key_hash     String    @unique
+  scopes       String    @default("posts:write")
+  is_active    Boolean   @default(true)
+  last_used_at DateTime?
+  created_at   DateTime  @default(now())
+  revoked_at   DateTime?
+}
+
+model NewsStatDaily {
+  id      Int      @id @default(autoincrement())
+  post_id Int
+  day     DateTime @db.Date
+  event   String // view | popup_show | popup_close | cta_popup | cta_banner | cta_inline
+  count   Int      @default(0)
+
+  post BlogPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, day, event])
 }
 
 model Review {

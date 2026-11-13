@@ -13,8 +13,7 @@ const renderLog = async (req, res, next) => {
         });
 
         // Fetch current stock for all products to show in an overview
-        const { PrismaClient } = require('@prisma/client');
-        const prisma = new PrismaClient();
+        const prisma = require('../../config/db');
         const productsStock = await prisma.product.findMany({
             select: {
                 id: true,

@@ -34,3 +34,19 @@
 - Trong bộ lọc sản phẩm, cần có dấu hiệu luôn hiển thị để biết danh mục cha có mục con, không phụ thuộc hover.
 - Làm phần thông tin dinh dưỡng ở cả admin và public đẹp, trực quan và tương tự mô tả chi tiết.
 - Phạm vi chốt: chevron + số mục con + tổng sản phẩm nhóm; Quill rich text + tương thích plain text cũ; không đổi DB/API.
+
+## Cập nhật 2026-11-12 — Nâng cấp giao diện, API đăng bài, Tin tức ẩn (BA v9)
+Yêu cầu gốc (nguyên văn rút gọn):
+- Giao diện: trực quan, bắt mắt, có animation, logic hoạt động, kiểu công nghệ hiện đại nhưng vẫn giữ bản chất web hoa quả; có thể thiết kế lại bố cục; admin chỉ sửa nếu logic công khai thay đổi.
+- API đăng bài cho n8n: nhận nội dung, ảnh, video; mặc định nháp, có tham số đăng ngay; áp dụng cho cả blog công khai và tin ẩn.
+- Tin tức ẩn: URL dạng `/tin-tuc/{dd-mm-yyyy}/{slug không dấu}/{mã base64}`; không hiển thị link ở đâu trên web; vào bằng link có sẵn; kèm popup quảng cáo affiliate Shopee/TikTok.
+Điều chỉnh đã chốt:
+- Popup: lớn; bấm thân popup/CTA mở link tab mới + đóng; X và nền mờ chỉ đóng (không bẫy click). Hiện lại mỗi lần tải trang.
+- Link affiliate theo bài, dự phòng link mặc định; subdomain tách riêng (`tin.haianhfruit.com`); có thống kê; video ưu tiên link nhúng.
+- Hạ tầng: VPS 1 vCPU/1GB RAM/20GB SSD; n8n chạy chung tại subdomain `n8n.`; gọi API qua localhost.
+- Giao diện: làm 3 bản mẫu để chọn.
+Loại bỏ: nút X khó bấm / bấm ngoài X mở link (2026-11-12, lý do: click lừa, rủi ro chính sách affiliate).
+
+## Cập nhật 2026-11-12 — Chốt giao diện
+- Chọn phương án C (Editorial). Yêu cầu bổ sung: tông sáng, nền trắng, sang trọng và sạch; có animation, hiệu ứng click, lướt, xem sản phẩm mượt mà chuyên nghiệp; không được làm giao diện trông tệ hơn bản cũ; lưu ý bố cục cũ.
+- Phản hồi: giữ bộ khung và nhận diện cũ, bản mẫu C2 nền trắng đã dựng (`docs/mockups/mau-c2-nen-trang.html`).

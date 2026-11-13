@@ -17,4 +17,7 @@ router.post('/contacts', contactsController.submitContactForm);
 const wishlistController = require('../modules/wishlist/wishlist.controller');
 router.post('/wishlist/toggle/:productId', wishlistController.toggleWishlist);
 
+// API đăng bài cho n8n (xác thực bằng API key)
+router.use('/v1/posts', require('../modules/posts/posts.api.route'));
+
 module.exports = router;

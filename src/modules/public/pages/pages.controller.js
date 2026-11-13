@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../../../config/db');
 
 /**
  * [GET] /page/:key
@@ -30,10 +29,11 @@ const renderPage = async (req, res, next) => {
  */
 const renderSitemap = async (req, res, next) => {
     try {
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        // Ưu tiên SITE_URL (tên miền chính thức) để sitemap luôn đúng https/tên miền khi chạy sau Nginx hoặc qua localhost
+        const baseUrl = (process.env.SITE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/+$/, '');
         
         // 1. Static URLs
-        const staticUrls = ['', '/products', '/about', '/faq', '/policy', '/privacy', '/blogs'];
+        const staticUrls = ['', '/products', '/about', '/contact', '/faq', '/shipping', '/return', '/privacy', '/blogs'];
         
         // 2. Fetch Products
         const products = await prisma.product.findMany({
@@ -43,12 +43,15 @@ const renderSitemap = async (req, res, next) => {
 
         // 3. Fetch Categories
         const categories = await prisma.category.findMany({
-            select: { id: true, name: true } // Assuming categories use ID for now or need a custom route
+            where: { is_active: true },
+            select: { slug: true } // shop lọc theo ?category=<slug>
         });
 
         // 4. Fetch Blogs
-        const blogs = await prisma.blog.findMany({
-            select: { id: true, updated_at: true } // Assuming blogs use ID
+        // Chỉ bài blog công khai đã đăng. Tin tức ẩn (post_type = 'news') tuyệt đối KHÔNG đưa vào sitemap.
+        const blogs = await prisma.blogPost.findMany({
+            where: { is_published: true, post_type: 'blog' },
+            select: { slug: true, updated_at: true }
         });
 
         res.set('Content-Type', 'text/xml');

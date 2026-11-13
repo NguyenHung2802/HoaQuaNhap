@@ -1,3 +1,5 @@
+<% const isV2 = (typeof uiTheme !== 'undefined' && uiTheme === 'v2'); %>
+<% if (isV2) { %><link rel="stylesheet" href="/css/cart-v2.css?v=s54"><% } %>
 <!-- Breadcrumb -->
 <div class="bg-light-grey py-3 border-bottom">
     <div class="container">
@@ -11,7 +13,8 @@
 </div>
 
 <section class="cart-section py-5">
-    <div class="container">
+    <div class="container" id="cartRoot">
+        <% if (isV2) { %><%- include('../../partials/order-steps', { current: 1 }) %><% } %>
         <h1 class="font-heading text-primary mb-4">Giỏ hàng của bạn</h1>
         <% const money = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value); %>
 
@@ -202,3 +205,4 @@
 .suggested-card { transition: all 0.25s ease; }
 .suggested-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); border-color: var(--brand-accent) !important; }
 </style>
+<% if (isV2) { %><script src="/js/cart-v2.js?v=s54" defer></script><% } %>

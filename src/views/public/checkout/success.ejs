@@ -1,5 +1,8 @@
+<% const isV2 = (typeof uiTheme !== 'undefined' && uiTheme === 'v2'); %>
+<% if (isV2) { %><link rel="stylesheet" href="/css/cart-v2.css?v=s54"><% } %>
 <section class="py-5">
     <div class="container text-center">
+        <% if (isV2) { %><%- include('../../partials/order-steps', { current: 3 }) %><% } %>
         <div class="mb-4">
             <i class="fas fa-check-circle text-success fa-5x"></i>
         </div>

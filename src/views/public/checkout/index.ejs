@@ -1,3 +1,5 @@
+<% const isV2 = (typeof uiTheme !== 'undefined' && uiTheme === 'v2'); %>
+<% if (isV2) { %><link rel="stylesheet" href="/css/cart-v2.css?v=s54"><% } %>
 <!-- Breadcrumb -->
 <div class="bg-light-grey py-3 border-bottom">
     <div class="container">
@@ -13,6 +15,7 @@
 
 <section class="py-5">
     <div class="container">
+        <% if (isV2) { %><%- include('../../partials/order-steps', { current: 2 }) %><% } %>
         <h1 class="font-heading text-primary mb-5">Thông tin thanh toán</h1>
         
         <form action="/checkout/place-order" method="POST" id="checkoutForm">

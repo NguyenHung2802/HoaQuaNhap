@@ -1,0 +1,130 @@
+/*
+ * Shop + chi tiết sản phẩm giao diện v2 (S53). Chỉ nạp ở 2 trang này khi UI_THEME=v2.
+ * Lớp phủ trên markup/logic hiện có; mọi quy tắc nằm dưới body.theme-v2.
+ */
+
+/* ---------- Thanh breadcrumb ---------- */
+body.theme-v2 .bg-light-grey.py-3 { background: #fff; border-bottom: 1px solid var(--tv2-line) !important; }
+body.theme-v2 .breadcrumb { font-weight: 500; }
+body.theme-v2 .breadcrumb-item a { color: var(--text-muted); transition: color .2s; }
+body.theme-v2 .breadcrumb-item a:hover { color: var(--brand-primary); }
+body.theme-v2 .breadcrumb-item.active { color: var(--brand-primary); }
+body.theme-v2 .section-padding { padding: 56px 0 72px; }
+
+/* ---------- Sidebar bộ lọc ---------- */
+body.theme-v2 .shop-sidebar { top: 92px; background: #fff; border: 1px solid var(--tv2-line); border-radius: 26px; padding: 22px 20px 18px; box-shadow: var(--tv2-shadow-sm); }
+body.theme-v2 .sidebar-block { margin-bottom: 24px; }
+body.theme-v2 .sidebar-title { font-family: var(--font-heading); font-size: 1.05rem; border-bottom: 0; padding-bottom: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+body.theme-v2 .sidebar-title::after { content: ""; flex: 1; height: 1px; background: var(--tv2-line); }
+body.theme-v2 .shop-sidebar .form-control, body.theme-v2 .shop-sidebar .form-select { border-radius: 999px; background: #f6f7f4 !important; border: 1px solid transparent !important; transition: box-shadow .25s, background .25s, border-color .25s; }
+body.theme-v2 .shop-sidebar .form-control:focus { background: #fff !important; border-color: var(--brand-accent) !important; box-shadow: 0 0 0 3px rgba(46, 125, 50, .15); }
+body.theme-v2 .cat-filter-item { transition: background .25s var(--tv2-ease), color .25s, padding-left .3s var(--tv2-ease); }
+body.theme-v2 .cat-filter-item:hover { padding-left: 18px; }
+body.theme-v2 .cat-filter-item.active { background: var(--brand-primary); color: #fff; }
+body.theme-v2 .cat-filter-item.active .badge { background: rgba(255, 255, 255, .2) !important; color: #fff !important; border-color: transparent !important; }
+body.theme-v2 .cat-filter-parent .cat-filter-item.active { background: var(--brand-primary); }
+body.theme-v2 .sub-categories-list .cat-filter-item.active { background: var(--brand-light-green); color: var(--brand-primary); }
+body.theme-v2 .sub-categories-list .cat-filter-item.active .badge { background: #fff !important; color: var(--brand-primary) !important; }
+body.theme-v2 .status-chip .badge { transition: transform .25s var(--tv2-ease), background .25s, color .25s; }
+body.theme-v2 .status-chip:hover .badge { transform: translateY(-2px); }
+body.theme-v2 .shop-sidebar .btn { border-radius: 999px; }
+
+/* Nút mở/đóng bộ lọc trên điện thoại (do JS thêm) */
+body.theme-v2 .tv2-filter-toggle { display: none; width: 100%; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px; margin-bottom: 14px; border: 1px solid var(--tv2-line); border-radius: 999px; background: #fff; font-weight: 600; color: var(--brand-primary); box-shadow: var(--tv2-shadow-sm); }
+body.theme-v2 .tv2-filter-toggle i { transition: transform .3s var(--tv2-ease); }
+body.theme-v2 .tv2-filter-toggle[aria-expanded="true"] i.fa-chevron-down { transform: rotate(180deg); }
+@media (max-width: 991.98px) {
+    body.theme-v2 .tv2-filter-toggle { display: flex; }
+    body.theme-v2 .tv2-collapsible:not(.is-open) { display: none; }
+    body.theme-v2 .shop-sidebar { position: static; }
+}
+
+/* ---------- Thanh công cụ ---------- */
+body.theme-v2 .shop-toolbar { background: #f8f8f4; border-radius: 999px; padding: 10px 14px 10px 22px; }
+body.theme-v2 .shop-toolbar .form-select { background-color: #fff !important; border: 1px solid var(--tv2-line) !important; }
+
+/* ---------- Lưới sản phẩm ---------- */
+body.theme-v2 #shopResults { transition: opacity .25s ease, transform .3s var(--tv2-ease); }
+body.theme-v2 #shopResults.tv2-loading { opacity: .4; transform: translateY(4px); pointer-events: none; position: relative; }
+body.theme-v2 #shopResults.tv2-loading::before { content: ""; position: absolute; left: 0; right: 0; top: -8px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, transparent, var(--brand-accent), var(--brand-secondary), transparent); background-size: 50% 100%; background-repeat: no-repeat; animation: tv2-load 1s linear infinite; }
+@keyframes tv2-load { from { background-position: -50% 0; } to { background-position: 150% 0; } }
+body.theme-v2 #shopResults.tv2-enter .row > .col { animation: tv2-card-in .6s var(--tv2-ease) both; }
+body.theme-v2 #shopResults.tv2-enter .row > .col:nth-child(2) { animation-delay: .04s; }
+body.theme-v2 #shopResults.tv2-enter .row > .col:nth-child(3) { animation-delay: .08s; }
+body.theme-v2 #shopResults.tv2-enter .row > .col:nth-child(4) { animation-delay: .12s; }
+body.theme-v2 #shopResults.tv2-enter .row > .col:nth-child(5) { animation-delay: .16s; }
+body.theme-v2 #shopResults.tv2-enter .row > .col:nth-child(6) { animation-delay: .20s; }
+body.theme-v2 #shopResults.tv2-enter .row > .col:nth-child(n+7) { animation-delay: .24s; }
+@keyframes tv2-card-in { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: none; } }
+
+body.theme-v2 .fruit-card-cat { color: var(--brand-accent); }
+body.theme-v2 .fruit-card-name { font-size: 1.02rem; }
+body.theme-v2 .price-main { color: var(--brand-primary); }
+body.theme-v2 .fruit-card-img-wrap { background: #f8f8f4; }
+body.theme-v2 .fruit-quick-add { position: absolute; right: 12px; bottom: 12px; z-index: 3; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #fff; color: var(--brand-primary); box-shadow: 0 8px 20px rgba(20, 32, 26, .22); display: grid; place-items: center; cursor: pointer; opacity: 0; transform: translateY(10px) scale(.9); transition: opacity .3s var(--tv2-ease), transform .35s var(--tv2-ease), background .25s, color .25s; }
+body.theme-v2 .fruit-card:hover .fruit-quick-add, body.theme-v2 .fruit-quick-add:focus-visible { opacity: 1; transform: none; }
+body.theme-v2 .fruit-quick-add:hover { background: var(--brand-primary); color: #fff; transform: rotate(90deg) scale(1.05); }
+@media (hover: none) { body.theme-v2 .fruit-quick-add { opacity: 1; transform: none; width: 40px; height: 40px; } }
+
+/* ---------- Phân trang ---------- */
+body.theme-v2 .pagination .page-link { border-color: var(--tv2-line); transition: background .25s, color .25s, transform .25s var(--tv2-ease); }
+body.theme-v2 .pagination .page-link:hover { background: var(--brand-light-green); transform: translateY(-2px); }
+body.theme-v2 .pagination .page-item.active .page-link { background: var(--brand-primary); color: #fff; box-shadow: 0 8px 18px rgba(27, 77, 62, .25); }
+
+/* ---------- Trang chi tiết: thư viện ảnh ---------- */
+body.theme-v2 .product-gallery .mainSwiper { border-radius: 28px !important; box-shadow: var(--tv2-shadow-sm); border: 1px solid var(--tv2-line); }
+body.theme-v2 .product-gallery .zoom-hover img { transition: transform .8s var(--tv2-ease); }
+body.theme-v2 .product-gallery .zoom-hover:hover img { transform: scale(1.06); }
+body.theme-v2 .product-gallery .swiper-button-next, body.theme-v2 .product-gallery .swiper-button-prev { width: 42px; height: 42px; border-radius: 50%; background: rgba(255, 255, 255, .92); color: var(--brand-primary); box-shadow: 0 6px 18px rgba(0, 0, 0, .15); transition: transform .3s var(--tv2-ease), background .25s, color .25s; }
+body.theme-v2 .product-gallery .swiper-button-next::after, body.theme-v2 .product-gallery .swiper-button-prev::after { font-size: .85rem; font-weight: 800; }
+body.theme-v2 .product-gallery .swiper-button-next:hover, body.theme-v2 .product-gallery .swiper-button-prev:hover { background: var(--brand-primary); color: #fff; transform: scale(1.08); }
+body.theme-v2 .thumbSwiper .swiper-slide img { border-radius: 16px !important; border: 2px solid transparent; transition: opacity .3s, transform .3s var(--tv2-ease), border-color .3s; }
+body.theme-v2 .thumbSwiper .swiper-slide:hover img { opacity: .9 !important; transform: translateY(-2px); }
+body.theme-v2 .thumbSwiper .swiper-slide-thumb-active img { opacity: 1 !important; border-color: var(--brand-primary); }
+
+/* ---------- Trang chi tiết: thông tin ---------- */
+body.theme-v2 .detail-cat-badge { display: inline-block; padding: 5px 14px; border-radius: 999px; background: var(--brand-light-green); color: var(--brand-primary); font-weight: 600; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; transition: background .25s, color .25s; }
+body.theme-v2 .detail-cat-badge:hover { background: var(--brand-primary); color: #fff; }
+body.theme-v2 .detail-title { font-size: clamp(2rem, 3.6vw, 3rem); line-height: 1.08; letter-spacing: -.02em; }
+body.theme-v2 .detail-price-block { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; padding: 18px 22px; border-radius: 22px; background: linear-gradient(135deg, #f4faf5, #fff); border: 1px solid #dcebdf; margin-bottom: 20px; }
+body.theme-v2 .detail-price-sale { font-family: var(--font-heading); font-size: clamp(1.9rem, 3vw, 2.6rem); font-weight: 700; color: var(--brand-primary); letter-spacing: -.02em; }
+body.theme-v2 .detail-discount-badge { border-radius: 999px; box-shadow: 0 6px 14px rgba(0, 0, 0, .1); }
+body.theme-v2 .product-promotions-box { background: #fffaf0 !important; border-color: #f6e3b4 !important; border-radius: 20px !important; }
+body.theme-v2 .detail-specs { border: 1px solid var(--tv2-line); border-radius: 20px; overflow: hidden; }
+body.theme-v2 .detail-specs .spec-row { padding: 11px 18px; transition: background .2s; }
+body.theme-v2 .detail-specs .spec-row:nth-child(odd) { background: #fafaf7; }
+body.theme-v2 .detail-specs .spec-row:hover { background: var(--brand-light-green); }
+body.theme-v2 .qty-control { border-radius: 999px; border: 1px solid var(--tv2-line); background: #fff; overflow: hidden; }
+body.theme-v2 .qty-btn { transition: background .2s, color .2s, transform .2s var(--tv2-ease); }
+body.theme-v2 .qty-btn:hover { background: var(--brand-primary); color: #fff; }
+body.theme-v2 .qty-btn:active { transform: scale(.9); }
+body.theme-v2 .detail-trust-badges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+body.theme-v2 .detail-trust-badges > div { padding: 12px 14px; border: 1px solid var(--tv2-line); border-radius: 16px; font-size: .8rem; line-height: 1.35; transition: transform .35s var(--tv2-ease), box-shadow .35s, border-color .25s; }
+body.theme-v2 .detail-trust-badges > div:hover { transform: translateY(-3px); box-shadow: var(--tv2-shadow-sm); border-color: transparent; }
+@media (max-width: 575.98px) { body.theme-v2 .detail-trust-badges { grid-template-columns: 1fr; } }
+
+/* ---------- Trang chi tiết: tab mô tả/đánh giá ---------- */
+body.theme-v2 .detail-tabs { border-bottom: 1px solid var(--tv2-line); gap: 6px; }
+body.theme-v2 .detail-tabs .nav-link { border: 0; border-radius: 999px 999px 0 0; font-weight: 600; color: var(--text-muted); position: relative; background: none; transition: color .25s; }
+body.theme-v2 .detail-tabs .nav-link::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: -1px; height: 3px; border-radius: 3px; background: var(--brand-secondary); transform: scaleX(0); transition: transform .35s var(--tv2-ease); }
+body.theme-v2 .detail-tabs .nav-link:hover { color: var(--brand-primary); }
+body.theme-v2 .detail-tabs .nav-link.active { color: var(--brand-primary); background: none; }
+body.theme-v2 .detail-tabs .nav-link.active::after { transform: scaleX(1); }
+body.theme-v2 .detail-tab-content { border-color: var(--tv2-line) !important; border-radius: 0 0 26px 26px !important; }
+body.theme-v2 .tab-pane.fade { transition: opacity .3s ease; }
+
+/* ---------- Thanh mua dính (điện thoại, do JS thêm) ---------- */
+#tv2-buybar { position: fixed; left: 10px; right: 10px; bottom: 78px; z-index: 1035; display: none; align-items: center; gap: 12px; padding: 10px 10px 10px 18px; background: rgba(255, 255, 255, .96); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--tv2-line); border-radius: 999px; box-shadow: 0 14px 40px rgba(20, 32, 26, .22); transform: translateY(150%); transition: transform .45s var(--tv2-ease); }
+#tv2-buybar.on { transform: none; }
+#tv2-buybar .bb-info { min-width: 0; flex: 1; line-height: 1.25; }
+#tv2-buybar .bb-name { font-size: .78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#tv2-buybar .bb-price { font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; color: var(--brand-primary); }
+#tv2-buybar .btn { flex: none; padding: .6rem 1.3rem; white-space: nowrap; }
+@media (max-width: 991.98px) { #tv2-buybar { display: flex; } }
+@media (min-width: 768px) and (max-width: 991.98px) { #tv2-buybar { bottom: 16px; left: 50%; right: auto; width: min(520px, 92vw); transform: translate(-50%, 150%); } #tv2-buybar.on { transform: translate(-50%, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+    body.theme-v2 #shopResults.tv2-enter .row > .col { animation: none; }
+    body.theme-v2 #shopResults.tv2-loading::before { animation: none; }
+    #tv2-buybar { transition: none; }
+}

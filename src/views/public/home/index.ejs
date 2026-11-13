@@ -1,3 +1,67 @@
+<% const isV2 = (typeof uiTheme !== 'undefined' && uiTheme === 'v2'); %>
+<% if (isV2) { %>
+<link rel="stylesheet" href="/css/home-v2.css?v=s52">
+<%
+    // Dữ liệu hero: ưu tiên banner do admin quản lý; nếu chưa có thì dùng 3 slide mặc định như bản cũ.
+    const heroSlides = (banners && banners.length > 0)
+        ? banners.map(b => ({
+            eyebrow: 'Nhập khẩu chính hãng · Tươi ngon mỗi ngày',
+            title: b.title || 'Trái Cây Nhập Khẩu Tươi Ngon',
+            accent: '',
+            lead: b.subtitle || '',
+            image: b.image_url,
+            alt: b.title || 'Banner Hải Anh Fruit',
+            primary: { href: b.link_url || '/products', text: b.link_url ? 'Khám phá ngay' : 'Mua sắm ngay' },
+            secondary: null
+        }))
+        : [
+            { eyebrow: 'Nhập khẩu chính hãng · Tươi ngon mỗi ngày', title: 'Tinh Hoa Trái Cây Nhập Khẩu Toàn Cầu.', accent: 'Nhập Khẩu', lead: 'Hàng trăm loại trái cây tươi ngon từ Hàn Quốc, Nhật Bản, Mỹ, Úc — cam kết chất lượng, giao tận cửa.', image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=1000&q=80', alt: 'Trái cây nhập khẩu', primary: { href: '/products', text: 'Mua sắm ngay' }, secondary: { href: '/products?status=on_sale', text: 'Xem ưu đãi' } },
+            { eyebrow: 'Quà tặng sang trọng · Ấn tượng đầu tiên', title: 'Giỏ Quà Trái Cây Cao Cấp Cho Mọi Dịp.', accent: 'Trái Cây', lead: 'Táo Envy, Nho Shine Muscat, Lê Hàn Quốc — đóng hộp sang trọng, phù hợp biếu tặng đối tác, gia đình.', image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=1000&q=80', alt: 'Giỏ quà trái cây', primary: { href: '/products', text: 'Chọn ngay' }, secondary: { href: '/contact', text: 'Tư vấn miễn phí' } },
+            { eyebrow: 'Kiểm định nhập khẩu · An toàn', title: 'Sức Khỏe Từ Thiên Nhiên Đến Bàn Ăn Của Bạn.', accent: 'Từ Thiên Nhiên', lead: 'Mỗi sản phẩm đều có giấy kiểm định nhập khẩu, bảo quản lạnh chuẩn quốc tế, tươi ngon đến tay bạn.', image: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=1000&q=80', alt: 'Trái cây tươi', primary: { href: '/products', text: 'Khám phá ngay' }, secondary: { href: '/about', text: 'Về chúng tôi' } }
+        ];
+%>
+<!-- ===== HERO v2 (editorial, nền trắng) ===== -->
+<section class="hv2-hero" aria-label="Giới thiệu">
+    <div class="container">
+        <div class="swiper heroSwiper hv2-swiper">
+            <div class="swiper-wrapper">
+                <% heroSlides.forEach((s, i) => {
+                    const idx = s.accent ? s.title.indexOf(s.accent) : -1;
+                %>
+                    <div class="swiper-slide">
+                        <div class="hv2-grid">
+                            <div class="hv2-copy">
+                                <span class="hv2-eyebrow"><%= s.eyebrow %></span>
+                                <<%= i === 0 ? 'h1' : 'h2' %> class="hv2-title">
+                                    <% if (idx >= 0) { %><%= s.title.slice(0, idx) %><em><%= s.accent %></em><%= s.title.slice(idx + s.accent.length) %><% } else { %><%= s.title %><% } %>
+                                </<%= i === 0 ? 'h1' : 'h2' %>>
+                                <% if (s.lead) { %><p class="hv2-lead"><%= s.lead %></p><% } %>
+                                <div class="hv2-cta">
+                                    <a href="<%= s.primary.href %>" class="btn btn-primary btn-lg px-5"><%= s.primary.text %> <span class="hv2-arrow" aria-hidden="true">→</span></a>
+                                    <% if (s.secondary) { %><a href="<%= s.secondary.href %>" class="hv2-link"><%= s.secondary.text %></a><% } %>
+                                </div>
+                            </div>
+                            <div class="hv2-media">
+                                <div class="hv2-arch">
+                                    <img src="<%= s.image %>" alt="<%= s.alt %>" <%- i === 0 ? 'fetchpriority="high"' : 'fetchpriority="low" decoding="async"' %>>
+                                </div>
+                                <div class="hv2-badge"><i class="fas fa-truck-fast"></i><span>Giao nội thành<br>Hà Nội trong ngày</span></div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+            <div class="hv2-controls">
+                <div class="swiper-pagination"></div>
+                <div class="hv2-arrows">
+                    <div class="swiper-button-prev" aria-label="Slide trước"></div>
+                    <div class="swiper-button-next" aria-label="Slide sau"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<% } else { %>
 <!-- ===== HERO SECTION (Dynamic Slider) ===== -->
 <section class="hero-slider-section">
     <div class="swiper heroSwiper">
@@ -86,6 +150,7 @@
         <div class="swiper-button-prev"></div>
     </div>
 </section>
+<% } %>
 
 <!-- ===== TRUST BADGES BAR ===== -->
 <section class="trust-bar-section">
@@ -281,7 +346,39 @@
     </div>
 </section>
 
-<!-- ===== COMBO SECTION ===== -->
+<!-- ===== BỘ SƯU TẬP THEO NHU CẦU (v2: dữ liệu thật từ danh mục) ===== -->
+<% if (isV2) { %>
+<% if (typeof collections !== 'undefined' && collections.length) { %>
+<section class="section-padding hv2-collections">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-eyebrow">Chọn theo nhu cầu</p>
+            <h2 class="section-title">Bộ Sưu Tập<br>Theo Nhu Cầu</h2>
+            <p class="text-muted mt-2 mx-auto" style="max-width:520px;">Biếu tặng, đi lễ hay ăn ngon mỗi ngày: chọn đúng nhóm trái cây, shop đã sắp sẵn cho bạn.</p>
+        </div>
+        <div class="hv2-coll-grid hv2-coll-n<%= collections.length %>">
+            <% collections.forEach((c, i) => { %>
+                <a href="<%= c.link %>" class="hv2-coll hv2-coll-<%= i === 0 ? 'lg' : 'sm' %>" aria-label="<%= c.title %>">
+                    <% if (c.cover) { %>
+                        <img src="<%= c.cover.replace('/image/upload/', '/image/upload/f_auto,q_auto,w_900/') %>" alt="<%= c.title %>" loading="lazy" decoding="async">
+                    <% } %>
+                    <span class="hv2-coll-shade" aria-hidden="true"></span>
+                    <span class="hv2-coll-body">
+                        <span class="hv2-coll-eyebrow"><%= c.eyebrow %></span>
+                        <span class="hv2-coll-title"><%= c.title %></span>
+                        <span class="hv2-coll-desc"><%= c.desc %></span>
+                        <span class="hv2-coll-meta">
+                            <span><%= c.count %> sản phẩm<% if (c.minPrice) { %> · từ <%= new Intl.NumberFormat('vi-VN').format(c.minPrice) %>đ<% } %></span>
+                            <span class="hv2-coll-go">Xem bộ sưu tập <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                        </span>
+                    </span>
+                </a>
+            <% }) %>
+        </div>
+    </div>
+</section>
+<% } %>
+<% } else { %>
 <section class="section-padding combo-section">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
@@ -360,6 +457,7 @@
         </div>
     </div>
 </section>
+<% } %>
 
 <!-- ===== WHY CHOOSE US ===== -->
 <section class="section-padding">

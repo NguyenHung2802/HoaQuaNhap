@@ -5,3 +5,16 @@ logs/
 package-lock.json
 public/uploads/*
 !public/uploads/.gitkeep
+
+# Ảnh nhập sản phẩm hàng loạt (nặng, sinh bằng scripts/build-product-import.py)
+data/import/images/
+# Trạng thái chạy nhập sản phẩm (sinh ra, không cần đồng bộ nhiều máy)
+data/import/products.json
+data/import/upload-cache.json
+data/import/import-log.txt
+backups/
+
+# File tạm do công cụ editor ghi dở rồi bị khóa quyền xóa trên Windows (vô hại, không phải mã nguồn)
+*.tmp.[0-9]*
+# File khóa tạm của Microsoft Office khi đang mở
+~$*

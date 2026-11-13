@@ -1,5 +1,6 @@
 const db = require('../../../config/db');
 const { getActivePromotions, calculateBestPrice } = require('../../../utils/promotion-helper');
+const { getHomeCollections } = require('./collections.service');
 
 /**
  * Hiển thị trang chủ - Phase 4 Version
@@ -58,10 +59,12 @@ exports.renderHome = async (req, res, next) => {
 
     // 5. Recent Blogs
     const latestBlogs = await db.blogPost.findMany({
-      where: { is_published: true },
+      where: { is_published: true, post_type: 'blog' },
       orderBy: { created_at: 'desc' },
       take: 3
     });
+
+    const collections = await getHomeCollections();
 
     const activePromotions = await getActivePromotions();
     const mapWithBestPrice = (p) => ({
@@ -78,6 +81,7 @@ exports.renderHome = async (req, res, next) => {
       categories,
       banners,
       latestBlogs,
+      collections,
       layout: 'layouts/main'
     });
   } catch (error) {
@@ -91,6 +95,7 @@ exports.renderHome = async (req, res, next) => {
       categories: [],
       banners: [],
       latestBlogs: [],
+      collections: [],
       layout: 'layouts/main'
     });
   }

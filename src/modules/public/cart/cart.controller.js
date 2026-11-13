@@ -1,6 +1,5 @@
 const cartService = require('./cart.service');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../../../config/db');
 const { calculateBestPrice, getActivePromotions } = require('../../../utils/promotion-helper');
 
 const buildShippingPromotion = (campaign, totalAmount) => {
@@ -148,6 +147,65 @@ const getCartCount = async (req, res) => {
 };
 
 /**
+ * [GET] /cart/mini
+ * Dữ liệu gọn cho ngăn kéo giỏ hàng (giao diện v2). Không thay đổi giỏ hàng.
+ */
+const getMiniCart = async (req, res) => {
+    try {
+        if (req.session.user && (!req.session.cart || req.session.cart.length === 0)) {
+            const dbCart = await cartService.getDbCart(req.session.user.id);
+            if (dbCart.length > 0) req.session.cart = dbCart;
+        }
+        const sessionCart = req.session.cart || [];
+        const { items, totalAmount } = await cartService.getCartDetails(sessionCart);
+
+        let shipping = null;
+        if (items.length > 0) {
+            const now = new Date();
+            const campaign = await prisma.shippingCampaign.findFirst({
+                where: {
+                    is_active: true,
+                    OR: [{ start_at: null }, { start_at: { lte: now } }],
+                    AND: [{ OR: [{ end_at: null }, { end_at: { gte: now } }] }]
+                },
+                orderBy: { min_order_value: 'asc' }
+            });
+            const promo = buildShippingPromotion(campaign, totalAmount);
+            if (promo) {
+                shipping = {
+                    progress: promo.progress,
+                    reached: promo.reached,
+                    message: promo.reached ? promo.unlockedMessage : promo.pendingMessage
+                };
+            }
+        }
+
+        res.set('Cache-Control', 'no-store').json({
+            success: true,
+            count: items.reduce((sum, i) => sum + i.quantity, 0),
+            totalAmount,
+            shipping,
+            items: items.map((i) => ({
+                product_id: i.product_id,
+                name: i.name,
+                slug: i.slug,
+                image_url: i.image_url,
+                price: i.price,
+                original_price: i.original_price,
+                is_discounted: i.is_discounted,
+                quantity: i.quantity,
+                stock_quantity: i.stock_quantity,
+                line_total: i.line_total,
+                is_out_of_stock: i.is_out_of_stock
+            }))
+        });
+    } catch (error) {
+        console.error('Mini cart error:', error);
+        res.status(500).json({ success: false, count: 0, items: [], totalAmount: 0 });
+    }
+};
+
+/**
  * [POST] /cart/add
  */
 const addToCart = async (req, res) => {
@@ -247,6 +305,7 @@ module.exports = {
     initCart,
     renderCart,
     getCartCount,
+    getMiniCart,
     addToCart,
     updateCart,
     removeFromCart

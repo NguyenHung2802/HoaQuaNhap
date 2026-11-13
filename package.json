@@ -8,13 +8,18 @@
     "dev": "nodemon src/server.js",
     "pm2:dev": "pm2 start ecosystem.config.js --only WebHoaQua-Dev",
     "pm2:prod": "pm2 start ecosystem.config.js --only WebHoaQua-Prod --env production",
-    "pm2:stop": "pm2 stop all",
-    "pm2:restart": "pm2 restart all",
-    "pm2:logs": "pm2 logs",
-    "pm2:clean": "npx pm2 flush && del /f /q logs\\*.log",
-    "pm2:kill": "pm2 delete all",
+    "pm2:stop": "pm2 stop WebHoaQua-Prod",
+    "pm2:stop:dev": "pm2 stop WebHoaQua-Dev",
+    "pm2:restart": "pm2 restart WebHoaQua-Prod --update-env",
+    "pm2:reload": "pm2 reload WebHoaQua-Prod --update-env",
+    "pm2:restart:dev": "pm2 restart WebHoaQua-Dev",
+    "pm2:logs": "pm2 logs WebHoaQua-Prod",
+    "pm2:logs:dev": "pm2 logs WebHoaQua-Dev",
+    "pm2:clean": "npx pm2 flush WebHoaQua-Prod && npx pm2 flush WebHoaQua-Dev",
+    "pm2:kill": "pm2 delete WebHoaQua-Prod WebHoaQua-Dev",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -36,6 +41,7 @@
     "morgan": "^1.10.0",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.4",
+    "sanitize-html": "^2.13.0",
     "slugify": "^1.6.6"
   },
   "devDependencies": {

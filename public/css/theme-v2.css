@@ -1,0 +1,143 @@
+/*
+ * Giao diện v2 (S51) — lớp phủ trên style.css + Bootstrap, không thay đổi cấu trúc HTML.
+ * Nền trắng, nhận diện xanh đậm + vàng, chữ Playfair/Outfit, chuyển động mượt có mục đích.
+ * Tắt toàn bộ bằng UI_THEME=classic (layout sẽ không nạp file này).
+ */
+:root {
+    --tv2-ease: cubic-bezier(.2, .8, .2, 1);
+    --tv2-shadow-sm: 0 1px 2px rgba(20, 32, 26, .05), 0 8px 24px rgba(20, 32, 26, .06);
+    --tv2-shadow-md: 0 2px 4px rgba(20, 32, 26, .05), 0 18px 44px rgba(20, 32, 26, .12);
+    --tv2-line: #ececE6;
+}
+
+/* ---------- Chuyển trang mượt (trình duyệt hỗ trợ View Transitions; nơi khác bỏ qua) ---------- */
+@view-transition { navigation: auto; }
+/* Chuyển trang rất ngắn: không làm trang cũ mờ dần (gây cảm giác trễ), trang mới hiện nhanh */
+::view-transition-old(root) { animation: none; }
+::view-transition-new(root) { animation: tv2-in .16s ease-out both; }
+@keyframes tv2-in { from { opacity: .4; } }
+
+html { scroll-behavior: smooth; }
+body.theme-v2 { background: #fff; -webkit-font-smoothing: antialiased; overflow-x: clip; } /* AOS (fade-left/right) tạm thời đẩy phần tử ra ngoài khung gây thanh cuộn ngang */
+body.theme-v2 :focus-visible { outline: 2px solid var(--brand-accent); outline-offset: 3px; border-radius: 6px; }
+
+/* ---------- Thanh tiến độ cuộn ---------- */
+#tv2-progress { position: fixed; left: 0; top: 0; height: 3px; width: 0; z-index: 2100; background: linear-gradient(90deg, var(--brand-accent), var(--brand-secondary)); pointer-events: none; }
+
+/* ---------- Header ---------- */
+body.theme-v2 .navbar {
+    background: rgba(255, 255, 255, .88) !important;
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent;
+    box-shadow: none;
+    transition: box-shadow .35s var(--tv2-ease), border-color .35s var(--tv2-ease);
+}
+body.theme-v2 .navbar.is-scrolled { border-bottom-color: var(--tv2-line); box-shadow: 0 8px 28px rgba(20, 32, 26, .07); }
+body.theme-v2 .logo-main { height: 62px; margin: 6px 0; transition: height .35s var(--tv2-ease), transform .3s var(--tv2-ease); }
+body.theme-v2 .navbar.is-scrolled .logo-main { height: 46px; }
+body.theme-v2 .nav-link { font-weight: 500; letter-spacing: .01em; }
+body.theme-v2 .nav-link::after { height: 2px; border-radius: 2px; transform-origin: left; background: linear-gradient(90deg, var(--brand-accent), var(--brand-secondary)); transition: transform .4s var(--tv2-ease); }
+body.theme-v2 .nav-icon-btn {
+    width: 44px; height: 44px; justify-content: center; border-radius: 50%; border: 1px solid var(--tv2-line); background: #fff; padding: 0;
+    transition: background .3s var(--tv2-ease), color .3s, border-color .3s, transform .3s var(--tv2-ease);
+}
+body.theme-v2 .nav-icon-btn:hover { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); transform: translateY(-2px); }
+body.theme-v2 .search-bar .form-control { background: #f6f7f4 !important; transition: box-shadow .3s, background .3s; }
+body.theme-v2 .search-bar .form-control:focus { background: #fff !important; box-shadow: 0 0 0 3px rgba(46, 125, 50, .18); }
+body.theme-v2 .cart-badge.tv2-bump { animation: tv2-bump .5s var(--tv2-ease); }
+@keyframes tv2-bump { 40% { transform: scale(1.6); } }
+body.theme-v2 .dropdown-menu { border: 0; border-radius: 18px; box-shadow: var(--tv2-shadow-md); padding: 8px; }
+body.theme-v2 .dropdown-item { border-radius: 10px; transition: background .2s, padding-left .25s var(--tv2-ease); }
+body.theme-v2 .dropdown-item:hover { padding-left: 24px; }
+
+/* ---------- Nút ---------- */
+body.theme-v2 .btn { border-radius: 999px; transition: transform .3s var(--tv2-ease), box-shadow .3s var(--tv2-ease), background-color .3s, color .3s, border-color .3s; }
+body.theme-v2 .btn:active { transform: translateY(0) scale(.98); }
+body.theme-v2 .btn-primary:hover, body.theme-v2 .btn-primary:focus-visible { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(27, 77, 62, .26); }
+body.theme-v2 .btn-outline-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(27, 77, 62, .18); }
+
+/* ---------- Thẻ sản phẩm / bài viết ---------- */
+body.theme-v2 .fruit-card { border-radius: 22px; border-color: var(--tv2-line); box-shadow: var(--tv2-shadow-sm); }
+body.theme-v2 .fruit-card:hover { transform: translateY(-8px); box-shadow: var(--tv2-shadow-md); border-color: transparent; }
+body.theme-v2 .fruit-card img { transition: transform .7s var(--tv2-ease); }
+body.theme-v2 .fruit-card:hover img { transform: scale(1.07); }
+body.theme-v2 .blog-card { border-radius: 22px; border-color: var(--tv2-line); box-shadow: var(--tv2-shadow-sm); }
+body.theme-v2 .blog-card:hover { transform: translateY(-8px); box-shadow: var(--tv2-shadow-md); }
+body.theme-v2 .section-title, body.theme-v2 h1, body.theme-v2 h2 { letter-spacing: -.02em; }
+body.theme-v2 .section-eyebrow { letter-spacing: .18em; }
+
+/* ---------- Hiện dần khi cuộn (JS chỉ gắn lớp cho phần tử nằm dưới màn hình) ---------- */
+body.theme-v2 .tv2-reveal { opacity: 0; transform: translateY(18px); transition: opacity .45s var(--tv2-ease), transform .5s var(--tv2-ease); }
+body.theme-v2 .tv2-reveal.tv2-in { opacity: 1; transform: none; }
+
+/* ---------- Footer ---------- */
+body.theme-v2 .footer-dark { background: linear-gradient(180deg, #17402f 0%, #0f2b22 100%); border-radius: 36px 36px 0 0; color: #cfe3d6; }
+body.theme-v2 .footer-dark a { color: #aac8b6; transition: color .25s, padding-left .25s var(--tv2-ease); }
+body.theme-v2 .footer-dark a:hover { color: #fff; }
+body.theme-v2 .footer-dark ul li a:hover { padding-left: 6px; }
+body.theme-v2 .footer-dark .social-icon { transition: transform .3s var(--tv2-ease), background .3s; }
+body.theme-v2 .footer-dark .social-icon:hover { transform: translateY(-4px) rotate(-6deg); padding-left: 0; }
+
+/* ---------- Thanh điều hướng dưới (điện thoại) ---------- */
+body.theme-v2 .app-bottom-nav { border-radius: 22px 22px 0 0; box-shadow: 0 -10px 30px rgba(20, 32, 26, .1); border-top: 0 !important; }
+body.theme-v2 .app-bottom-nav .nav-item { transition: color .25s, transform .3s var(--tv2-ease); }
+body.theme-v2 .app-bottom-nav .nav-item:active { transform: scale(.92); }
+
+/* ---------- Thông báo nhỏ (SweetAlert2 toast) ---------- */
+body.theme-v2 .swal2-popup.swal2-toast { border-radius: 16px; box-shadow: var(--tv2-shadow-md); padding: 12px 16px; font-family: var(--font-body); }
+
+/* ---------- Ảnh bay vào giỏ ---------- */
+.tv2-fly { position: fixed; z-index: 2200; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; pointer-events: none; box-shadow: 0 10px 26px rgba(0, 0, 0, .28); border: 3px solid #fff; }
+
+/* ---------- Ngăn kéo giỏ hàng ---------- */
+#tv2-scrim { position: fixed; inset: 0; z-index: 2150; background: rgba(14, 28, 20, .5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity .35s ease; }
+#tv2-scrim.open { opacity: 1; }
+#tv2-cart {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 2160; width: min(420px, 94vw); background: #fff; display: flex; flex-direction: column;
+    border-radius: 28px 0 0 28px; box-shadow: -24px 0 70px rgba(0, 0, 0, .18); transform: translateX(105%); transition: transform .5s var(--tv2-ease);
+}
+#tv2-cart.open { transform: none; }
+#tv2-cart[hidden], #tv2-scrim[hidden] { display: none; }
+.tv2-cart-head { display: flex; justify-content: space-between; align-items: center; padding: 22px 24px 10px; }
+.tv2-cart-head h3 { margin: 0; font-size: 1.6rem; }
+.tv2-cart-head small { font-family: var(--font-body); font-size: .85rem; color: var(--text-muted); font-weight: 500; }
+.tv2-x { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--tv2-line); background: #fff; font-size: 22px; line-height: 1; cursor: pointer; transition: background .25s, color .25s, transform .3s var(--tv2-ease); }
+.tv2-x:hover { background: var(--brand-primary); color: #fff; transform: rotate(90deg); }
+.tv2-ship { margin: 4px 24px 6px; padding: 12px 14px; border-radius: 14px; background: var(--brand-light-green); }
+.tv2-ship-msg { font-size: .85rem; color: var(--brand-primary); font-weight: 500; margin-bottom: 8px; }
+.tv2-ship-bar { height: 7px; border-radius: 7px; background: rgba(27, 77, 62, .15); overflow: hidden; }
+.tv2-ship-bar i { display: block; height: 100%; width: 0; border-radius: 7px; background: linear-gradient(90deg, var(--brand-accent), var(--brand-secondary)); transition: width .8s var(--tv2-ease); }
+.tv2-cart-list { flex: 1; overflow: auto; padding: 4px 24px; overscroll-behavior: contain; }
+.tv2-empty { text-align: center; color: var(--text-muted); padding: 50px 10px; }
+.tv2-empty i { font-size: 2.4rem; opacity: .25; display: block; margin-bottom: 12px; }
+.tv2-row { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--tv2-line); animation: tv2-row-in .45s var(--tv2-ease) both; }
+@keyframes tv2-row-in { from { opacity: 0; transform: translateX(18px); } }
+.tv2-row.is-removing { opacity: 0; transform: translateX(30px); transition: opacity .25s, transform .3s var(--tv2-ease); }
+.tv2-row-img { width: 64px; height: 64px; border-radius: 16px; background: #f3f5f1; object-fit: cover; display: block; }
+.tv2-row-name { font-weight: 600; font-size: .95rem; line-height: 1.3; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tv2-row-price { font-size: .85rem; color: var(--text-muted); margin-top: 2px; }
+.tv2-row-price s { margin-left: 6px; opacity: .7; }
+.tv2-row-warn { font-size: .78rem; color: #c0392b; margin-top: 2px; }
+.tv2-qty { display: inline-flex; align-items: center; border: 1px solid var(--tv2-line); border-radius: 999px; margin-top: 8px; }
+.tv2-qty button { width: 32px; height: 32px; border: 0; background: none; font-size: 18px; line-height: 1; cursor: pointer; border-radius: 50%; transition: background .2s; }
+.tv2-qty button:hover:not(:disabled) { background: var(--brand-light-green); }
+.tv2-qty button:disabled { opacity: .35; cursor: not-allowed; }
+.tv2-qty span { min-width: 26px; text-align: center; font-weight: 600; font-size: .9rem; }
+.tv2-row-side { text-align: right; align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; }
+.tv2-row-total { font-weight: 700; color: var(--brand-primary); }
+.tv2-del { border: 0; background: none; color: #9aa1a8; font-size: .8rem; cursor: pointer; padding: 4px 0; transition: color .2s; }
+.tv2-del:hover { color: #c0392b; }
+.tv2-cart-foot { padding: 16px 24px 22px; border-top: 1px solid var(--tv2-line); }
+.tv2-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.tv2-total b { font-family: var(--font-heading); font-size: 1.6rem; color: var(--brand-primary); }
+.tv2-viewcart { display: block; text-align: center; margin-top: 12px; font-size: .9rem; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.tv2-cart-foot .btn.is-disabled { pointer-events: none; opacity: .5; }
+body.tv2-lock { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    body.theme-v2 *, body.theme-v2 *::before, body.theme-v2 *::after { animation: none !important; transition: none !important; }
+    body.theme-v2 .tv2-reveal { opacity: 1; transform: none; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
