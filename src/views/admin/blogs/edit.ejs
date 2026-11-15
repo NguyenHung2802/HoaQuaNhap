@@ -74,6 +74,32 @@
             </div>
         </div>
 
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold">Ảnh phụ <span class="text-muted fw-normal">(tối đa 5 ảnh)</span></h6>
+                <span id="gallery-count" class="badge bg-light-green text-primary"></span>
+            </div>
+            <div class="card-body">
+                <% const existingGallery = Array.isArray(blog.gallery) ? blog.gallery : []; %>
+                <div id="gallery-existing" class="d-flex flex-wrap gap-2 mb-3">
+                    <% existingGallery.forEach(function (url, i) { %>
+                        <div class="position-relative gallery-existing-item" data-url="<%= url %>" style="width:70px;">
+                            <img src="<%= url %>" class="rounded border w-100" style="height:70px;object-fit:cover;" alt="Ảnh phụ <%= i + 1 %>">
+                            <label class="position-absolute top-0 end-0 bg-white rounded-circle border d-flex align-items-center justify-content-center" style="width:20px;height:20px;cursor:pointer;" title="Bỏ ảnh này">
+                                <input type="checkbox" name="keep_gallery" value="<%= url %>" checked class="form-check-input m-0" style="width:14px;height:14px;" onchange="this.closest('.gallery-existing-item').style.opacity = this.checked ? 1 : .3; updateGalleryCount();">
+                            </label>
+                        </div>
+                    <% }) %>
+                </div>
+                <div id="gallery-preview" class="d-flex flex-wrap gap-2 mb-3"></div>
+                <label class="btn btn-outline-primary btn-sm rounded-pill w-100 mb-2">
+                    <i class="fas fa-images me-2"></i>Thêm ảnh phụ
+                    <input type="file" name="gallery" id="galleryInput" class="d-none" accept="image/*" multiple form="blogForm">
+                </label>
+                <small class="text-muted d-block">Bỏ tick ảnh cũ để xoá. Hiển thị thành dải ảnh ở cuối bài viết.</small>
+            </div>
+        </div>
+
         <div class="card bg-light-green border-0 rounded-4 p-4 text-primary">
             <h6 class="fw-bold mb-2">Thông tin bổ sung</h6>
             <div class="small mb-1">ID: #<%= blog.id %></div>
@@ -117,6 +143,43 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
+
+    // Ảnh phụ: đếm số ảnh cũ còn giữ + ảnh mới chọn, không vượt quá 5
+    const MAX_GALLERY = 5;
+    function keptCount() {
+        return document.querySelectorAll('#gallery-existing input[name="keep_gallery"]:checked').length;
+    }
+    function updateGalleryCount() {
+        const kept = keptCount();
+        const added = (document.getElementById('galleryInput').files || []).length;
+        document.getElementById('gallery-count').textContent = (kept + added) + '/' + MAX_GALLERY;
+    }
+    document.getElementById('galleryInput').addEventListener('change', function (e) {
+        const preview = document.getElementById('gallery-preview');
+        const remain = Math.max(0, MAX_GALLERY - keptCount());
+        let files = Array.from(e.target.files || []);
+        if (files.length > remain) {
+            alert('Bạn chỉ còn giữ lại được ' + remain + ' ảnh phụ (tổng tối đa ' + MAX_GALLERY + '). Chỉ ' + remain + ' ảnh đầu được giữ.');
+            files = files.slice(0, remain);
+            const dt = new DataTransfer();
+            files.forEach((f) => dt.items.add(f));
+            e.target.files = dt.files;
+        }
+        preview.innerHTML = '';
+        files.forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = document.createElement('img');
+                img.src = ev.target.result;
+                img.className = 'rounded border';
+                img.style.cssText = 'width:70px;height:70px;object-fit:cover;';
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+        updateGalleryCount();
+    });
+    updateGalleryCount();
 
     // Submit form
     document.getElementById('blogForm').onsubmit = function() {

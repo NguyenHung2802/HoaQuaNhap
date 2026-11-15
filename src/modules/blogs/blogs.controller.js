@@ -2,6 +2,19 @@ const prisma = require('../../config/db');
 const slugify = require('../../utils/slug');
 const { uploadToCloudinary } = require('../../middlewares/upload.middleware');
 
+const MAX_GALLERY = 5;
+
+/** Upload tối đa 5 ảnh phụ lên Cloudinary, trả về mảng URL (bỏ qua nếu không có file). */
+async function uploadGalleryFiles(files) {
+    const list = (files || []).slice(0, MAX_GALLERY);
+    const urls = [];
+    for (const f of list) {
+        const result = await uploadToCloudinary(f.buffer, 'blogs');
+        urls.push(result.secure_url);
+    }
+    return urls;
+}
+
 /**
  * [GET] /admin/blogs
  */
@@ -53,10 +66,13 @@ const createBlog = async (req, res, next) => {
         const slug = slugify(title);
         let thumbnail_url = '';
 
-        if (req.file) {
-            const result = await uploadToCloudinary(req.file.buffer, 'blogs');
+        const thumbFile = req.files && req.files.thumbnail && req.files.thumbnail[0];
+        if (thumbFile) {
+            const result = await uploadToCloudinary(thumbFile.buffer, 'blogs');
             thumbnail_url = result.secure_url;
         }
+
+        const gallery = await uploadGalleryFiles(req.files && req.files.gallery);
 
         await prisma.blogPost.create({
             data: {
@@ -65,6 +81,7 @@ const createBlog = async (req, res, next) => {
                 summary,
                 content,
                 thumbnail_url,
+                gallery: gallery.length ? gallery : undefined,
                 is_published: is_published === 'on',
                 published_at: is_published === 'on' ? new Date() : null,
                 author_id: req.session.user.id
@@ -114,7 +131,7 @@ const updateBlog = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id);
         const { title, summary, content, is_published } = req.body;
-        
+
         const currentBlog = await prisma.blogPost.findUnique({ where: { id } });
         if (!currentBlog || currentBlog.post_type !== 'blog') {
             req.flash('error_msg', 'Không tìm thấy bài viết.');
@@ -122,9 +139,21 @@ const updateBlog = async (req, res, next) => {
         }
         let thumbnail_url = currentBlog.thumbnail_url;
 
-        if (req.file) {
-            const result = await uploadToCloudinary(req.file.buffer, 'blogs');
+        const thumbFile = req.files && req.files.thumbnail && req.files.thumbnail[0];
+        if (thumbFile) {
+            const result = await uploadToCloudinary(thumbFile.buffer, 'blogs');
             thumbnail_url = result.secure_url;
+        }
+
+        // Ảnh phụ: giữ lại những ảnh cũ admin không bỏ chọn (keep_gallery[]), rồi nối thêm ảnh mới upload, tối đa 5 ảnh.
+        const existingGallery = Array.isArray(currentBlog.gallery) ? currentBlog.gallery : [];
+        const keepRaw = req.body.keep_gallery;
+        const keep = keepRaw ? (Array.isArray(keepRaw) ? keepRaw : [keepRaw]) : [];
+        const kept = existingGallery.filter((u) => keep.includes(u));
+        const newUrls = await uploadGalleryFiles(req.files && req.files.gallery);
+        const gallery = [...kept, ...newUrls].slice(0, MAX_GALLERY);
+        if (kept.length + newUrls.length > MAX_GALLERY) {
+            req.flash('error_msg', `Chỉ giữ tối đa ${MAX_GALLERY} ảnh phụ, một vài ảnh mới đã không được lưu.`);
         }
 
         await prisma.blogPost.update({
@@ -135,6 +164,7 @@ const updateBlog = async (req, res, next) => {
                 summary,
                 content,
                 thumbnail_url,
+                gallery,
                 is_published: is_published === 'on',
                 updated_at: new Date()
             }

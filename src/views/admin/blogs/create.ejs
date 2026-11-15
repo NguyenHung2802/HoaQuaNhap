@@ -74,6 +74,20 @@
             </div>
         </div>
 
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold">Ảnh phụ <span class="text-muted fw-normal">(tối đa 5 ảnh)</span></h6>
+            </div>
+            <div class="card-body">
+                <div id="gallery-preview" class="d-flex flex-wrap gap-2 mb-3"></div>
+                <label class="btn btn-outline-primary btn-sm rounded-pill w-100 mb-2">
+                    <i class="fas fa-images me-2"></i>Chọn ảnh phụ
+                    <input type="file" name="gallery" id="galleryInput" class="d-none" accept="image/*" multiple form="blogForm">
+                </label>
+                <small class="text-muted d-block">Hiển thị thành dải ảnh (bấm để phóng to) ở cuối bài viết.</small>
+            </div>
+        </div>
+
         <div class="card bg-light-green border-0 rounded-4 p-4 text-primary">
             <h6 class="fw-bold mb-3"><i class="fas fa-lightbulb me-2"></i>Mẹo viết bài</h6>
             <ul class="small ps-3 mb-0">
@@ -117,11 +131,37 @@
         }
     }
 
+    // Xem trước ảnh phụ, giới hạn chọn tối đa 5 ảnh
+    const MAX_GALLERY = 5;
+    document.getElementById('galleryInput').addEventListener('change', function (e) {
+        const preview = document.getElementById('gallery-preview');
+        let files = Array.from(e.target.files || []);
+        if (files.length > MAX_GALLERY) {
+            alert('Chỉ chọn tối đa ' + MAX_GALLERY + ' ảnh phụ. Chỉ ' + MAX_GALLERY + ' ảnh đầu được giữ lại.');
+            files = files.slice(0, MAX_GALLERY);
+            const dt = new DataTransfer();
+            files.forEach((f) => dt.items.add(f));
+            e.target.files = dt.files;
+        }
+        preview.innerHTML = '';
+        files.forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = document.createElement('img');
+                img.src = ev.target.result;
+                img.className = 'rounded border';
+                img.style.cssText = 'width:70px;height:70px;object-fit:cover;';
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
     // Submit form
     document.getElementById('blogForm').onsubmit = function() {
         const content = document.getElementById('contentInput');
         content.value = quill.root.innerHTML;
-        
+
         if (quill.getText().trim().length === 0 && !quill.root.innerHTML.includes('<img')) {
             alert('Vui lòng nhập nội dung bài viết!');
             return false;
