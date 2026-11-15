@@ -46,6 +46,7 @@ function validate(rows, catBySlugOrName) {
         if (!STATUS.has(String(r.trang_thai || 'draft'))) e('trang_thai không hợp lệ');
         if (!String(r.anh_chinh).trim()) e('thiếu ảnh chính');
         [r.anh_chinh, ...split(r.anh_phu)].filter(Boolean).forEach((p) => {
+            if (cache[p]) return; // đã có link Cloudinary từ lần chạy trước, không cần file ảnh trên đĩa nữa
             if (!fs.existsSync(path.join(DIR, p))) e(`không thấy file ảnh ${p}`);
         });
     });
@@ -66,8 +67,8 @@ async function main() {
     const checkMap = new Map(byKey);
     DATA.categories.forEach((c) => { checkMap.set(c.ten_danh_muc, c); checkMap.set(c.slug, c); });
 
-    const errors = validate(DATA.products, checkMap);
-    // 2) Trùng với DB
+    // 2) Trùng với DB — xác định TRƯỚC khi kiểm tra dữ liệu, vì sản phẩm đã có rồi thì không cần
+    // đòi hỏi file ảnh của nó phải có mặt (ảnh đó không được dùng tới nữa).
     const slugs = DATA.products.map((p) => p.slug);
     const skus = DATA.products.map((p) => p.ma_sku);
     const existing = await prisma.product.findMany({ where: { OR: [{ slug: { in: slugs } }, { sku: { in: skus } }] }, select: { id: true, slug: true, sku: true, name: true } });
@@ -79,6 +80,7 @@ async function main() {
         if (hit) { skipped.push(`${p.ten_san_pham} (đã có: #${hit.id} ${hit.name})`); return false; }
         return true;
     });
+    const errors = validate(todo, checkMap);
 
     console.log(`Sản phẩm trong file: ${DATA.products.length} | sẽ tạo: ${todo.length} | bỏ qua vì đã tồn tại: ${skipped.length}`);
     console.log(`Danh mục mới sẽ tạo: ${toCreate.length} (${toCreate.map((c) => c.ten_danh_muc).join('; ') || 'không'})`);
