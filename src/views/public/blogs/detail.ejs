@@ -78,7 +78,7 @@
                             <div class="blog-share d-flex align-items-center gap-2 flex-wrap">
                                 <span class="small text-muted fw-bold share-label">Chia sẻ:</span>
                                 <a href="<%= share.facebook %>" target="_blank" rel="noopener noreferrer" aria-label="Chia sẻ lên Facebook" class="share-btn"><i class="fab fa-facebook-f"></i></a>
-                                <a href="<%= share.twitter %>" target="_blank" rel="noopener noreferrer" aria-label="Chia sẻ lên X (Twitter)" class="share-btn"><i class="fab fa-x-twitter"></i></a>
+                                <a href="<%= share.twitter %>" target="_blank" rel="noopener noreferrer" aria-label="Chia sẻ lên X (Twitter)" class="share-btn"><i class="fab fa-twitter"></i></a>
                                 <button type="button" class="share-btn" id="copy-link" data-url="<%= shareUrl %>" aria-label="Sao chép liên kết" title="Sao chép liên kết"><i class="fas fa-link"></i></button>
                                 <button type="button" class="share-btn d-none" id="native-share" data-url="<%= shareUrl %>" data-title="<%= blog.title %>" aria-label="Chia sẻ qua ứng dụng khác" title="Chia sẻ"><i class="fas fa-share-nodes"></i></button>
                                 <span class="small text-success fw-bold ms-1" id="copy-note" role="status" aria-live="polite"></span>
@@ -248,6 +248,21 @@
     .related-post-img { aspect-ratio: 16/10; background: #f3f4f6; }
     .related-post-img img { height: 100%; transition: transform .6s; }
     .related-post:hover .related-post-img img { transform: scale(1.06); }
+    /* Sản phẩm liên quan (thẻ sản phẩm chuẩn, ảnh luôn vuông vắn không bị méo/quá dài) */
+    .fruit-card { border: 1px solid #eee; border-radius: 18px; overflow: hidden; background: #fff; transition: all .3s ease; color: inherit; }
+    .fruit-card:hover { transform: translateY(-6px); box-shadow: 0 16px 36px rgba(0,0,0,.1); }
+    .fruit-card-img-wrap { position: relative; overflow: hidden; padding-top: 75%; background: #f3f4f6; }
+    .fruit-card-img-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+    .fruit-card:hover .fruit-card-img-wrap img { transform: scale(1.06); }
+    .fruit-card-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #ccc; }
+    .fruit-tag { position: absolute; top: 12px; left: 12px; padding: 4px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .fruit-tag.discount { background: var(--brand-accent); color: #fff; top: 12px; right: 12px; left: auto; }
+    .fruit-card-body { padding: 16px; }
+    .fruit-card-name { font-family: var(--font-heading); font-size: 1rem; line-height: 1.3; color: var(--brand-primary); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .fruit-card-price-wrap { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+    .price-main { font-size: 1.1rem; font-weight: 700; color: var(--brand-accent); }
+    .price-old { font-size: .85rem; color: #9ca3af; text-decoration: line-through; }
+    .fruit-card-unit { font-size: .8rem; color: var(--text-muted); margin: 4px 0 0; }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 <script>
