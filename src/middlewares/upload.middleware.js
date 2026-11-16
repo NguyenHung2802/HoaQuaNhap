@@ -9,7 +9,8 @@ const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // Limit 5MB
+    fileSize: 5 * 1024 * 1024, // Limit 5MB mỗi file
+    fieldSize: 5 * 1024 * 1024 // Trường text (vd. content bài viết) tối đa 5MB, phòng bài cũ còn ảnh base64 nhúng sẵn
   }
 });
 

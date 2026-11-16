@@ -16,6 +16,20 @@ async function uploadGalleryFiles(files) {
 }
 
 /**
+ * [POST] /admin/blogs/upload-image — Quill gọi khi chèn ảnh vào nội dung,
+ * upload lên Cloudinary và trả về URL thay vì nhúng base64 (tránh request quá nặng).
+ */
+const uploadInlineImage = async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: 'Thiếu file ảnh.' });
+        const result = await uploadToCloudinary(req.file.buffer, 'blogs/content');
+        res.json({ url: result.secure_url });
+    } catch (error) {
+        res.status(500).json({ error: error.message || 'Upload ảnh thất bại.' });
+    }
+};
+
+/**
  * [GET] /admin/blogs
  */
 const renderList = async (req, res, next) => {
@@ -200,5 +214,6 @@ module.exports = {
     createBlog,
     renderEdit,
     updateBlog,
-    deleteBlog
+    deleteBlog,
+    uploadInlineImage
 };
