@@ -13,6 +13,7 @@ const uploadFields = upload.fields([
 const withUpload = (back) => (req, res, next) => {
     uploadFields(req, res, (err) => {
         if (!err) return next();
+        console.log('[DEBUG withUpload ERROR]', err.code, err.message); // DEBUG TẠM THỜI, xoá sau khi tìm ra lỗi 413/mất ảnh
         const msg = err.code === 'LIMIT_FILE_SIZE' ? 'Ảnh vượt quá 5MB, hãy chọn ảnh nhẹ hơn.'
             : (err.code === 'LIMIT_FIELD_VALUE' ? 'Nội dung bài viết quá nặng (có thể do ảnh chèn trực tiếp). Hãy xoá bớt ảnh trong nội dung rồi chèn lại bằng nút ảnh trên thanh công cụ.'
             : 'Upload ảnh không hợp lệ: ' + err.message);

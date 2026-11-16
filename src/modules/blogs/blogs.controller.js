@@ -146,6 +146,14 @@ const updateBlog = async (req, res, next) => {
         const id = parseInt(req.params.id);
         const { title, summary, content, is_published } = req.body;
 
+        // DEBUG TẠM THỜI — tìm nguyên nhân ảnh phụ/ảnh nội dung bị mất trên production, sẽ xoá sau khi tìm ra lỗi.
+        console.log('[DEBUG updateBlog]', {
+            contentLength: req.headers['content-length'],
+            files: req.files ? Object.keys(req.files).map((k) => ({ field: k, count: req.files[k].length, sizes: req.files[k].map((f) => f.size) })) : null,
+            contentFieldLength: content ? content.length : 0,
+            contentHasImg: content ? content.includes('<img') : false
+        });
+
         const currentBlog = await prisma.blogPost.findUnique({ where: { id } });
         if (!currentBlog || currentBlog.post_type !== 'blog') {
             req.flash('error_msg', 'Không tìm thấy bài viết.');
