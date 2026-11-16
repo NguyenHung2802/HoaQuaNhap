@@ -1,7 +1,19 @@
 {
-  "last_haf_done": "HAF058",
+  "last_haf_done": "HAF059",
   "telegram_update_id_watermark": 424285554,
   "history": [
-    {"haf": "HAF058", "date": "2026-11-15", "slug": "qua-2011-lich-su-va-phu-hop-voi-cach-tri-an", "post_id": 1, "ghi_chu": "API trả bài đã tồn tại (created=false), status published - cần chủ shop kiểm tra"}
+    {
+      "haf": "HAF058",
+      "date": "2026-11-15",
+      "slug": "qua-2011-lich-su-va-phu-hop-voi-cach-tri-an",
+      "post_id": 1,
+      "ghi_chu": "API trả bài đã tồn tại (created=false), status published - cần chủ shop kiểm tra"
+    },
+    {
+      "haf": "HAF059",
+      "date": "2026-11-16",
+      "slug": "qua-tri-an-20-11-theo-nhom",
+      "post_id": 2
+    }
   ]
 }
