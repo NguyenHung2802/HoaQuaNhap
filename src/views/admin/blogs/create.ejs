@@ -121,6 +121,7 @@
     });
 
     // Upload ảnh chèn trong nội dung lên Cloudinary (thay vì nhúng base64 làm nặng request)
+    let pendingImageUploads = 0;
     function quillImageHandler() {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -131,6 +132,7 @@
             if (!file) return;
             const range = quill.getSelection(true);
             quill.insertText(range.index, 'Đang tải ảnh lên...', { italic: true });
+            pendingImageUploads++;
             try {
                 const fd = new FormData();
                 fd.append('image', file);
@@ -143,6 +145,8 @@
             } catch (err) {
                 quill.deleteText(range.index, 'Đang tải ảnh lên...'.length);
                 alert('Tải ảnh lên thất bại: ' + err.message);
+            } finally {
+                pendingImageUploads--;
             }
         };
     }
@@ -189,6 +193,10 @@
 
     // Submit form
     document.getElementById('blogForm').onsubmit = function() {
+        if (pendingImageUploads > 0) {
+            alert('Ảnh trong nội dung đang tải lên, vui lòng đợi vài giây rồi bấm Đăng bài lại.');
+            return false;
+        }
         const content = document.getElementById('contentInput');
         content.value = quill.root.innerHTML;
 
