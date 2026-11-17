@@ -1,6 +1,6 @@
 {
-  "last_haf_done": "HAF059",
-  "telegram_update_id_watermark": 424285554,
+  "last_haf_done": "HAF060",
+  "telegram_update_id_watermark": 424285555,
   "history": [
     {
       "haf": "HAF058",
@@ -14,6 +14,12 @@
       "date": "2026-11-16",
       "slug": "qua-tri-an-20-11-theo-nhom",
       "post_id": 2
+    },
+    {
+      "haf": "HAF060",
+      "date": "2026-11-17",
+      "slug": "gio-hoa-qua-tet-gia-dinh",
+      "post_id": 3
     }
   ]
 }
