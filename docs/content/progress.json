@@ -1,5 +1,5 @@
 {
-  "last_haf_done": "HAF092",
+  "last_haf_done": "HAF093",
   "telegram_update_id_watermark": 424285555,
   "history": [
     {
@@ -80,6 +80,12 @@
       "date": "2026-11-27",
       "slug": "mam-qua-tet-nho-gon-ha-noi",
       "post_id": 13
+    },
+    {
+      "haf": "HAF093",
+      "date": "2026-11-28",
+      "slug": "hoa-qua-trung-tet-va-an",
+      "post_id": 14
     }
   ]
 }
